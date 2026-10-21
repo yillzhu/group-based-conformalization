@@ -1,0 +1,2 @@
+train_coverage_before,test_coverage_before,train_width_before,test_width_before,train_coverage_after,test_coverage_after,train_width_after,test_width_after,qhat,target_coverage
+0.9542857142857143,0.95225,0.035882596,0.03579955,0.9013571428571429,0.90525,0.030686794,0.030603757,-0.0025978982,0.9

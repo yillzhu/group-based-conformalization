@@ -1,0 +1,289 @@
+{
+  "source_folder": "student-enroll",
+  "policy": "No algorithm fixes. Imports, paths, module boundaries, comments, and runner main guards only.",
+  "symbols": [
+    {
+      "original": "src/group.py",
+      "symbol": "Group",
+      "destination": "src/conformal_cl/groups.py",
+      "refactored_ast_sha256": "886aa7bc10fcc4a6b6ce33129e3681b289e704076576d51e450a3d73e687f400"
+    },
+    {
+      "original": "src/group.py",
+      "symbol": "update_groups",
+      "destination": "src/conformal_cl/groups.py",
+      "refactored_ast_sha256": "025763e2c3bf5dc2d902e470012c91bf3f963b5d6245558341695721f197a403"
+    },
+    {
+      "original": "src/quadratic_sample.py",
+      "symbol": "generate_quadratic",
+      "destination": "src/conformal_cl/quadratic/problem.py",
+      "refactored_ast_sha256": "ab36ddd1b4f112296e94f3d5f50cab8a47abc78f90e4e9bd99876481051681fb"
+    },
+    {
+      "original": "src/quadratic_sample.py",
+      "symbol": "generate_samples",
+      "destination": "src/conformal_cl/quadratic/problem.py",
+      "refactored_ast_sha256": "fdcad31f7a2975eea6ee9c871a3261513f4ac6d631a1ef4d710a63b2993234e9"
+    },
+    {
+      "original": "src/quadratic_sample.py",
+      "symbol": "is_feasible",
+      "destination": "src/conformal_cl/quadratic/problem.py",
+      "refactored_ast_sha256": "eda1c33726bd86a2d7c870f7911e2dbfa3ff600ef3be98bb7fae4c5beb8792d0"
+    },
+    {
+      "original": "src/quadratic_sample.py",
+      "symbol": "build_model",
+      "destination": "src/conformal_cl/quadratic/models.py",
+      "refactored_ast_sha256": "9d173ef520cacaf8c612bfbb75d8f5fac09a93c8d477428115f1274bec2792d9"
+    },
+    {
+      "original": "src/quadratic_sample.py",
+      "symbol": "interval_score_loss",
+      "destination": "src/conformal_cl/quadratic/models.py",
+      "refactored_ast_sha256": "da41c858697b3f4771a7a9916841dbbb336d8b8f6176eb498b5a89977281ec7c"
+    },
+    {
+      "original": "src/quadratic_sample.py",
+      "symbol": "build_quantile_model",
+      "destination": "src/conformal_cl/quadratic/models.py",
+      "refactored_ast_sha256": "7bd5343c20deb105d1756f90f75f3f64abf1df473f3a4f8f40190491a7240dc3"
+    },
+    {
+      "original": "src/quadratic_sample.py",
+      "symbol": "train_main",
+      "destination": "src/conformal_cl/quadratic/training.py",
+      "refactored_ast_sha256": "6b4de5a9366f7b623ede657f17e861cb7d39a418650da1093762e568bc41cdd9"
+    },
+    {
+      "original": "src/quadratic_sample.py",
+      "symbol": "train_wrapper",
+      "destination": "src/conformal_cl/quadratic/training.py",
+      "refactored_ast_sha256": "ce54d1c1ac531029289a2dbe62ab0d8038fb06df766b64ff49a82adcec8722f1"
+    },
+    {
+      "original": "src/quadratic_sample.py",
+      "symbol": "train_quantiles",
+      "destination": "src/conformal_cl/quadratic/training.py",
+      "refactored_ast_sha256": "1edc0e5857a6630b110438726f544c3c803b42323001a88d2a03e57eb1a7b922"
+    },
+    {
+      "original": "src/quadratic_sample.py",
+      "symbol": "conformalizing",
+      "destination": "src/conformal_cl/quadratic/calibration.py",
+      "refactored_ast_sha256": "4e85b9be5ce61eb34465ea6f074f5cf0070725dd9dc4bdddf7d52aa5b0523348"
+    },
+    {
+      "original": "src/quadratic_numerical.py",
+      "symbol": "optimize_compare",
+      "destination": "src/conformal_cl/quadratic/optimization.py",
+      "refactored_ast_sha256": "95b43cfb97963585628d9f0e615f9f15b04b108e26d5db1d487a30baa8fb1412"
+    },
+    {
+      "original": "src/quadratic_numerical.py",
+      "symbol": "is_feasible",
+      "destination": "src/conformal_cl/quadratic/optimization.py",
+      "refactored_ast_sha256": "eda1c33726bd86a2d7c870f7911e2dbfa3ff600ef3be98bb7fae4c5beb8792d0"
+    },
+    {
+      "original": "src/RCC.py",
+      "symbol": "run_rcc",
+      "destination": "src/conformal_cl/quadratic/group_conformal.py",
+      "refactored_ast_sha256": "2c9395fdb7ecd1c4808d09f33c7397cee4f8d4e8b610d3357b7bcbb49ef36852"
+    },
+    {
+      "original": "src/quadratic_numerical.py",
+      "symbol": "run_one",
+      "destination": "src/conformal_cl/quadratic/benchmark.py",
+      "refactored_ast_sha256": "8eb92b20e5c53a2ac0153f033f265cf7750ffa339da31bad552d6834144b0384"
+    },
+    {
+      "original": "src/quadratic_numerical.py",
+      "symbol": "run_many",
+      "destination": "src/conformal_cl/quadratic/benchmark.py",
+      "refactored_ast_sha256": "1e51a156b361f55d457d8136c9862b1b3dafe01c581c8258992463e66e4f8023"
+    },
+    {
+      "original": "scripts/train_enroll_data.py",
+      "symbol": "create_enrollment_net",
+      "destination": "src/conformal_cl/enrollment/models.py",
+      "refactored_ast_sha256": "b28c4c068cccffbe7d3c942b0ab7ba2a704d71eb1a3c62bb08cf482b46c62890"
+    },
+    {
+      "original": "scripts/train_enroll_data.py",
+      "symbol": "create_enrollment_net_for_gurobi",
+      "destination": "src/conformal_cl/enrollment/models.py",
+      "refactored_ast_sha256": "e2f787a63447a6337dbdb4826845b2ee57a4a8520ca6b856b808a7bad753c228"
+    },
+    {
+      "original": "scripts/train_enroll_data.py",
+      "symbol": "inverse_sigmoid",
+      "destination": "src/conformal_cl/enrollment/models.py",
+      "refactored_ast_sha256": "e8d05220f42eb6994edb3ed524dbf795e333af24412609e0735f977f3657d15d"
+    },
+    {
+      "original": "scripts/train_enroll_data.py",
+      "symbol": "create_quantile_net",
+      "destination": "src/conformal_cl/enrollment/models.py",
+      "refactored_ast_sha256": "fdc7aa34d62aaee3d945efec2832d87ad28181a2d64fe4aea8b054119232cfe9"
+    },
+    {
+      "original": "scripts/train_enroll_data.py",
+      "symbol": "interval_score_loss",
+      "destination": "src/conformal_cl/enrollment/models.py",
+      "refactored_ast_sha256": "212cb9c8513237c07b6e4a3a14e3081ce9ae27d943693b893d6a5dc649c9b4a1"
+    },
+    {
+      "original": "scripts/train_enroll_data.py",
+      "symbol": "split_train_test_cal",
+      "destination": "src/conformal_cl/enrollment/data.py",
+      "refactored_ast_sha256": "af94f9d2d03dc4a5daebece6c31e492f6e0956ca5606ef524010434184c5e3fc"
+    },
+    {
+      "original": "scripts/train_enroll_data.py",
+      "symbol": "conformalizing",
+      "destination": "src/conformal_cl/enrollment/calibration.py",
+      "refactored_ast_sha256": "22aa31e864d4c409382640cf943d1d800b9fbb221860f4ef676b4c003a214991"
+    },
+    {
+      "original": "scripts/train_enroll_data.py",
+      "symbol": "train_main",
+      "destination": "src/conformal_cl/enrollment/training.py",
+      "refactored_ast_sha256": "bf71e326d2e5186fd6723aa844711c73b9abe33973b890e00d583acc502559e9"
+    },
+    {
+      "original": "scripts/train_enroll_data.py",
+      "symbol": "train_quantile",
+      "destination": "src/conformal_cl/enrollment/training.py",
+      "refactored_ast_sha256": "4896170d6f88f00ff3d95a863e75f9c02eef630263b32a0667c0260e832f78b2"
+    },
+    {
+      "original": "scripts/run_enroll.py",
+      "symbol": "load_and_prepare_data",
+      "destination": "src/conformal_cl/enrollment/optimization.py",
+      "refactored_ast_sha256": "f0a1be43a92f67a63c53527a85a84860e6f38df586e314d350009825a7526e0a"
+    },
+    {
+      "original": "scripts/run_enroll.py",
+      "symbol": "optimize_merit_with_enrollment_constraint",
+      "destination": "src/conformal_cl/enrollment/optimization.py",
+      "refactored_ast_sha256": "2490560c10b225c000c1ee9d07ce6a7a0d22bc5f44a5a81b55d31c701e7abbd3"
+    },
+    {
+      "original": "scripts/run_enroll.py",
+      "symbol": "optimize_merit_with_quantile_constraint",
+      "destination": "src/conformal_cl/enrollment/optimization.py",
+      "refactored_ast_sha256": "44251b775a844929511a58ed8417c3fdd04aeee9eef7fa874ef20fbc2afd1ea1"
+    },
+    {
+      "original": "src/enroll_RCC.py",
+      "symbol": "load_models_and_data",
+      "destination": "src/conformal_cl/enrollment/group_conformal.py",
+      "refactored_ast_sha256": "a70eb3e138fae2c40c06860067d5caa617e7cda9ffc9701147069d30e7d39b9e"
+    },
+    {
+      "original": "src/enroll_RCC.py",
+      "symbol": "run_enroll_rcc",
+      "destination": "src/conformal_cl/enrollment/group_conformal.py",
+      "refactored_ast_sha256": "e0cc49844c0b69fc4adb874cc0b63cb0c1178c660699cf136153d397982f0f16"
+    },
+    {
+      "original": "src/enroll_RCC.py",
+      "symbol": "run_enroll_rcc_batch",
+      "destination": "src/conformal_cl/enrollment/group_conformal.py",
+      "refactored_ast_sha256": "a8a8efe40faa341ec012406e80990702fc01e51db8b7adf05fbcfbe4ec5f630e"
+    }
+  ],
+  "source_files_sha256": {
+    "environment.yml": "21790581981e326f678af55aa9cd18ec7120dcf75d2524e7134413e39a31cc35",
+    "docs/enrollment_models_experiment_description.txt": "6d07d7075afa4b13971e30e59b7ae318a7e73f1adc6efb581eb9536b88efa7e8",
+    "docs/chapter4_repository_plan.md": "bc2448c7333baae08bc3384a83518e799feaf5b67e8e650133375c7878d1fa2d",
+    "docs/RCC_approach_summary.md": "b6a4e22e30e668776e00bc4f6a8dc8f484b769c82e339a3ab34717d95efc0561",
+    "docs/chapter4_audit.md": "30d4d11b496cb350e0f62fd47ed6ac2cfacf6eae2b284a7be1a89a356047a37e",
+    "docs/model_approach_summary.md": "1f0ae23e9f0883fdb607b99fc7522d7c8a537073b814f8131f40c29241e40c21",
+    "results/rcc_fig1_quantiles.png": "b3769cf82b7ab3d7d1a6f76d002b21237ab71533f6b63905923803b555b77028",
+    "results/rcc_fig3_algorithm_logic.png": "f125069911f6cdf00ccbaaaa202f41a82a0e1d44dcc7ff9fbac5484cb80230c6",
+    "results/rcc_fig2_partitioning.png": "8bfd09f8c3a4d29ab391f0cb542590c5673d3515dd93e25ff4a2202c4a76c1db",
+    "results/rcc_fig4_calibration.png": "d85c00802331179bbd06330369bf5813a43514819c5833854178cdab4cf74f09",
+    "logs/RCC_20251114_135434.log": "40e082b6fb342c2c7d0118666e3a624f3236428981661febf439e1ea7296fd6f",
+    "logs/enroll_RCC_20251127_012124.log": "0e4222d70f56d73f5247ac4271fd8e5ac89afef233b734952cf7610fee02469f",
+    "scripts/figure.ipynb": "00303acf7eceadbac13c13df22d126b6aedd92284defffbfa0df363bb856b6f7",
+    "scripts/run_quadratic_numerical.py": "7288a12c7296ce1e02d627aad0938830857ecfee8e4700aafe0f9b4e9e81dbb0",
+    "scripts/run_enroll.py": "5a12022fe17db2b19388e5a33495571305ee333c2bdaa8e40ddb6c3211294ebc",
+    "scripts/train_enroll_data.py": "6c2304389614e8421db8b50de4c1071246b02c00d3bdccfa74973de5201f63fa",
+    "data/college_student_enroll-s1-1.csv": "da9732f483ea6f995242cc25a68c5872b3e1f05034d8bdfe6d325633ab1f1b59",
+    "data/college_applications6000.csv": "16a601ad904c5c017dc2ea7fef40c261c1d47e58b698466a698123e96d0d69d6",
+    "src/quadratic_numerical.py": "8c9af491f4cd792ead6e5ea092c06eadbc3a22f2c8d84a34dfc6adbc00c95829",
+    "src/enroll_RCC.py": "53adc73249da6e9c4da13bdd3629fce66c291d41639eb629aab2414db028f563",
+    "src/RCC.py": "d52695bd569fdb6ab76b74f6779c3924a6abc781272015cff9e4d6b4bcf567fa",
+    "src/group.py": "56ed3a2ab5336c4964c792c2a3df57f90175a0ff3e980fc1647140702f52fb48",
+    "src/quadratic_sample.py": "42cc422b044629e65d8d5e8a82eca90d693eb15f0c8f0017883408563c671820",
+    "results/student_enroll/enrollment_result_rcc.csv": "e25a562c4e8fb832334948467b8abb7478ef700322411c535e4faa5c2fbab22d",
+    "results/student_enroll/enrollment_metrics_quantile.csv": "f00b4ad5a1c0e1c1226b786ddefd7196262a21ef7e5a6e3a98855bd9ec25e995",
+    "results/student_enroll/enrollment_scaler_quantile.pkl": "4127b693b341629347011b1264101a7124d4271af15ee5422b330845876d323f",
+    "results/student_enroll/enrollment_result_comparison.csv": "61632aa70bc11f838b67444af794c70cabaaf6f3968e587a71ee53500c3c6664",
+    "results/student_enroll/enrollment_metrics_basic.csv": "dc6620bee0de7bba57293d1e5b55901d84bb6b284cd21f358458140fcc4b1835",
+    "results/student_enroll/enrollment_model_basic.pth": "4ed3b2adb1a1900ef0124fc455d0cc2a3829a94cd43f69cffd9e7241c25e3093",
+    "results/student_enroll/enrollment_scaler_basic.pkl": "4127b693b341629347011b1264101a7124d4271af15ee5422b330845876d323f",
+    "results/student_enroll/enrollment_result_quantile.csv": "10aa19eee005747f839ef31c61798a2182ed5f8d3787052950434c1fa229276b",
+    "results/student_enroll/enrollment_qhat.csv": "d71658a7ade786141d66b990d280a8b44ecafe94553b7505f68c289b931b1512",
+    "results/student_enroll/enrollment_result_basic.csv": "1cfdc290ebf542dedda0592ac5fa76d4960c85a76f24f41eb3dcc4474d64864e",
+    "results/student_enroll/enrollment_model_quantile.pth": "3793860bc6dedd5817a8f6014afa8c42dd0af012ae35102de9bb44248b9e8778"
+  },
+  "historical_archive": "Original sibling student-enroll folder only; no duplicate archive in this repository.",
+  "retained_data_and_results": [
+    {
+      "path": "data/college_applications6000.csv",
+      "sha256": "16a601ad904c5c017dc2ea7fef40c261c1d47e58b698466a698123e96d0d69d6"
+    },
+    {
+      "path": "data/college_student_enroll-s1-1.csv",
+      "sha256": "da9732f483ea6f995242cc25a68c5872b3e1f05034d8bdfe6d325633ab1f1b59"
+    },
+    {
+      "path": "results/enrollment/enrollment_metrics_basic.csv",
+      "sha256": "dc6620bee0de7bba57293d1e5b55901d84bb6b284cd21f358458140fcc4b1835"
+    },
+    {
+      "path": "results/enrollment/enrollment_metrics_quantile.csv",
+      "sha256": "f00b4ad5a1c0e1c1226b786ddefd7196262a21ef7e5a6e3a98855bd9ec25e995"
+    },
+    {
+      "path": "results/enrollment/enrollment_model_basic.pth",
+      "sha256": "4ed3b2adb1a1900ef0124fc455d0cc2a3829a94cd43f69cffd9e7241c25e3093"
+    },
+    {
+      "path": "results/enrollment/enrollment_model_quantile.pth",
+      "sha256": "3793860bc6dedd5817a8f6014afa8c42dd0af012ae35102de9bb44248b9e8778"
+    },
+    {
+      "path": "results/enrollment/enrollment_qhat.csv",
+      "sha256": "d71658a7ade786141d66b990d280a8b44ecafe94553b7505f68c289b931b1512"
+    },
+    {
+      "path": "results/enrollment/enrollment_result_basic.csv",
+      "sha256": "1cfdc290ebf542dedda0592ac5fa76d4960c85a76f24f41eb3dcc4474d64864e"
+    },
+    {
+      "path": "results/enrollment/enrollment_result_comparison.csv",
+      "sha256": "61632aa70bc11f838b67444af794c70cabaaf6f3968e587a71ee53500c3c6664"
+    },
+    {
+      "path": "results/enrollment/enrollment_result_quantile.csv",
+      "sha256": "10aa19eee005747f839ef31c61798a2182ed5f8d3787052950434c1fa229276b"
+    },
+    {
+      "path": "results/enrollment/enrollment_result_rcc.csv",
+      "sha256": "e25a562c4e8fb832334948467b8abb7478ef700322411c535e4faa5c2fbab22d"
+    },
+    {
+      "path": "results/enrollment/enrollment_scaler_basic.pkl",
+      "sha256": "4127b693b341629347011b1264101a7124d4271af15ee5422b330845876d323f"
+    },
+    {
+      "path": "results/enrollment/enrollment_scaler_quantile.pkl",
+      "sha256": "4127b693b341629347011b1264101a7124d4271af15ee5422b330845876d323f"
+    }
+  ]
+}

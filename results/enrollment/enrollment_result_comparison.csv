@@ -1,0 +1,4 @@
+Method,Total_Applicants,Optimal_Solutions,Infeasible_Solutions,Average_Merit_Dollars,Theta
+Basic Model,6000,6000,0,1021.1671243308195,0.17
+Quantile Model,6000,6000,0,1054.9396171813096,0.17
+RCC Model,6000,6000,0,1238.306550062892,0.17

@@ -1,0 +1,25 @@
+# Portable dependency declaration, not a recovered lockfile.
+# The superseded definition remains in the original sibling student-enroll folder.
+name: group-based-conformalization
+channels:
+  - gurobi
+  - defaults
+dependencies:
+  - python=3.12.12
+  - numpy
+  - pandas
+  - scikit-learn
+  - matplotlib
+  - tqdm
+  - ipykernel
+  - jupyterlab
+  - gurobi
+  - joblib
+  - pyarrow
+  - pip
+  - pip:
+    - torch
+    - gurobipy
+    - gurobi-machinelearning
+    - tensorflow==2.18.0
+    - -e .
