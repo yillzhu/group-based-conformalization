@@ -1,7 +1,4 @@
-"""Historical 10-applicant sample entry point; ISSUE-09 remains intentionally broken.
-
-Only module imports and filesystem wiring have been reorganized.
-"""
+"""Small corrected enrollment RCC smoke-run entry point."""
 
 from conformal_cl.paths import PROJECT_ROOT
 from conformal_cl.enrollment.group_conformal import load_models_and_data, run_enroll_rcc_batch
@@ -29,7 +26,7 @@ if __name__ == "__main__":
 
     # Load models and data
     logging.info("Loading models and calibration data...")
-    quantile_model, scaler, qhat, cal_X, cal_probs = load_models_and_data()
+    quantile_model, basic_model, scaler, qhat, cal_X, cal_probs = load_models_and_data()
     logging.info(f"Loaded models. qhat = {qhat:.6f}")
 
     # Load applicant data
@@ -50,11 +47,11 @@ if __name__ == "__main__":
     logging.info(f"\nRunning RCC optimization for {sample_size} applicants...")
     logging.info("Parameters: theta=0.6, alpha=0.1, delta=0.1, max_split=64")
 
-    # KNOWN-ISSUE[ISSUE-09]: required basic_model argument remains absent.
     results_df = run_enroll_rcc_batch(
         applicants_df=df_sample,
         features_scaled=features_sample,
         quantile_model=quantile_model,
+        basic_model=basic_model,
         cal_X=cal_X,
         cal_probs=cal_probs,
         qhat_global=qhat,
@@ -70,9 +67,11 @@ if __name__ == "__main__":
     results_path = (
         PROJECT_ROOT
         / "results"
+        / "corrected"
         / "enrollment"
-        / "enrollment_result_rcc.csv"
+        / "enrollment_result_rcc_sample.csv"
     )
+    results_path.parent.mkdir(parents=True, exist_ok=True)
     results_df.to_csv(results_path, index=False)
     logging.info(f"\nResults saved to {results_path}")
 

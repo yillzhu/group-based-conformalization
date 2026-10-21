@@ -1,8 +1,4 @@
-"""Section 4.6.2: classifier fitting and quantile fitting to classifier predictions.
-
-Historical implementation; known issues are deliberately retained.
-See docs/findings.md and KNOWN-ISSUE markers.
-"""
+"""Section 4.6.2: classifier fitting and quantile fitting to classifier predictions."""
 
 from pathlib import Path
 from conformal_cl.paths import PROJECT_ROOT
@@ -25,6 +21,7 @@ def train_main(
     learning_rate=0.01,
     test_size=0.2,
     random_state=42,
+    return_split_ids=False,
 ):
     """
     Train a one-layer ReLU network with 10 hidden neurons on enrollment data.
@@ -60,20 +57,26 @@ def train_main(
     features = df[["SAT", "GPA", "merit"]].values
     labels = df["enroll"].values.reshape(-1, 1)
 
-    # Scale SAT and GPA columns using StandardScaler
-    # KNOWN-ISSUE[ISSUE-04]: scaler is fitted before splitting, on all rows.
-    scaler = StandardScaler()
-    features[:, :2] = scaler.fit_transform(
-        features[:, :2]
-    )  # Scale SAT and GPA (first two columns)
-
-    print(
-        f"\nScaled features - Mean: {features[:, :2].mean(axis=0)}, Std: {features[:, :2].std(axis=0)}"
+    # Split data into train (70%), test (20%), and calibration (10%) sets
+    X_train, X_test, X_cal, y_train, y_test, y_cal, split_indices = split_train_test_cal(
+        features,
+        labels,
+        test_size=test_size,
+        cal_size=0.1,
+        random_state=random_state,
+        return_indices=True,
     )
 
-    # Split data into train (70%), test (20%), and calibration (10%) sets
-    X_train, X_test, X_cal, y_train, y_test, y_cal = split_train_test_cal(
-        features, labels, test_size=0.2, cal_size=0.1, random_state=random_state
+    # Fit preprocessing on training rows only, then reuse it unchanged for test,
+    # calibration, and applicant cohorts.
+    scaler = StandardScaler()
+    scaler.fit(X_train[:, :2])
+    for split in (X_train, X_test, X_cal):
+        split[:, :2] = scaler.transform(split[:, :2])
+
+    print(
+        f"\nScaled training features - Mean: {X_train[:, :2].mean(axis=0)}, "
+        f"Std: {X_train[:, :2].std(axis=0)}"
     )
 
     print(
@@ -87,7 +90,7 @@ def train_main(
     y_test_tensor = torch.FloatTensor(y_test)
 
     # Initialize the model (with sigmoid for classification)
-    # KNOWN-ISSUE[ISSUE-09]: no torch seed is added in this refactor.
+    torch.manual_seed(random_state)
     model = create_enrollment_net(input_size=3, hidden_size=10, output_size=1)
 
     # Loss function and optimizer (Binary Cross Entropy for classification)
@@ -156,12 +159,21 @@ def train_main(
         f"Predicted probabilities - Min: {train_predictions.min():.4f}, Max: {train_predictions.max():.4f}, Mean: {train_predictions.mean():.4f}"
     )
 
+    if return_split_ids:
+        train_idx, test_idx, cal_idx = split_indices
+        split_ids = {
+            "train": df.iloc[train_idx]["StudentID"].to_numpy(),
+            "test": df.iloc[test_idx]["StudentID"].to_numpy(),
+            "calibration": df.iloc[cal_idx]["StudentID"].to_numpy(),
+        }
+        return model, scaler, metrics, split_ids
     return model, scaler, metrics
 
 
 def train_quantile(
     csv_path=None,
     basic_model_path=None,
+    basic_scaler_path=None,
     alpha=0.1,
     epochs=1000,
     learning_rate=0.01,
@@ -199,17 +211,25 @@ def train_quantile(
             PROJECT_ROOT / "data" / "college_student_enroll-s1-1.csv"
         )
 
+    default_basic_model_path = (
+        PROJECT_ROOT
+        / "results"
+        / "corrected"
+        / "enrollment"
+        / "enrollment_model_basic.pth"
+    )
     if basic_model_path is None:
-        basic_model_path = (
-            PROJECT_ROOT
-            / "results"
-            / "enrollment"
-            / "enrollment_model_basic.pth"
-        )
-        # KNOWN-ISSUE[ISSUE-09]: undefined outside the default-model-path branch.
+        basic_model_path = default_basic_model_path
+
+    if basic_scaler_path is None:
+        if Path(basic_model_path) != default_basic_model_path:
+            raise ValueError(
+                "basic_scaler_path is required when basic_model_path is customized"
+            )
         basic_scaler_path = (
             PROJECT_ROOT
             / "results"
+            / "corrected"
             / "enrollment"
             / "enrollment_scaler_basic.pkl"
         )
@@ -236,7 +256,7 @@ def train_quantile(
     features_scaled = features.copy()
     features_scaled[:, :2] = basic_scaler.transform(features[:, :2])
 
-    # KNOWN-ISSUE[ISSUE-05]: targets are teacher predictions, not true probabilities.
+    # Method limitation: targets are teacher predictions, not true probabilities.
     # Generate predicted probabilities from basic model as new labels
     print("Generating predicted probabilities from basic model...")
     X_tensor = torch.FloatTensor(features_scaled)
@@ -271,7 +291,8 @@ def train_quantile(
     y_test_tensor = torch.FloatTensor(y_test)
     X_cal_tensor = torch.FloatTensor(X_cal)
 
-    # Initialize the quantile model (outputs 2 values: lower and upper quantiles)
+    # Initialize the quantile model deterministically.
+    torch.manual_seed(random_state)
     model = create_quantile_net(input_size=3, hidden_size=10, output_size=2)
 
     # Optimizer

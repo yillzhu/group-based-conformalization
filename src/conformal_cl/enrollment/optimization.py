@@ -1,8 +1,4 @@
-"""Sections 4.6.1-4.6.2: applicant input, baseline and CQR merit optimization.
-
-Historical implementation; known issues are deliberately retained.
-See docs/findings.md and KNOWN-ISSUE markers.
-"""
+"""Sections 4.6.1-4.6.2: applicant input, baseline and CQR merit optimization."""
 
 from pathlib import Path
 from conformal_cl.paths import PROJECT_ROOT
@@ -13,9 +9,25 @@ import gurobipy as gp
 from gurobipy import Model, GRB
 from gurobi_ml import add_predictor_constr
 from .models import inverse_sigmoid
+from conformal_cl.solver import quiet_gurobi_env
 
 
-def load_and_prepare_data():
+def gurobi_status_label(model):
+    """Return a stable label without conflating all failures with infeasibility."""
+
+    labels = {
+        GRB.OPTIMAL: "Optimal",
+        GRB.INFEASIBLE: "Infeasible",
+        GRB.INF_OR_UNBD: "InfeasibleOrUnbounded",
+        GRB.UNBOUNDED: "Unbounded",
+        GRB.TIME_LIMIT: "TimeLimit",
+        GRB.INTERRUPTED: "Interrupted",
+        GRB.NUMERIC: "NumericalFailure",
+    }
+    return labels.get(model.status, f"SolverStatus{model.status}")
+
+
+def load_and_prepare_data(results_dir=None):
     """
     Load college applications data and prepare it for optimization.
 
@@ -26,12 +38,9 @@ def load_and_prepare_data():
     """
     # Paths
     data_path = PROJECT_ROOT / "data" / "college_applications6000.csv"
-    scaler_path = (
-        PROJECT_ROOT
-        / "results"
-        / "enrollment"
-        / "enrollment_scaler_basic.pkl"
-    )
+    if results_dir is None:
+        results_dir = PROJECT_ROOT / "results" / "corrected" / "enrollment"
+    scaler_path = Path(results_dir) / "enrollment_scaler_basic.pkl"
 
     # Load applicant data
     df = pd.read_csv(data_path)
@@ -75,8 +84,9 @@ def optimize_merit_with_enrollment_constraint(
         model: The Gurobi model object
     """
     # Create Gurobi model
-    m = gp.Model(f"enrollment_applicant_{applicant_idx}")
-    m.setParam("OutputFlag", 0)  # Suppress Gurobi output
+    m = gp.Model(
+        f"enrollment_applicant_{applicant_idx}", env=quiet_gurobi_env()
+    )
 
     # Decision variable: merit aid (bounded between 0 and 25000)
     merit = m.addVar(lb=0.0, ub=25.0, name="merit")
@@ -130,7 +140,8 @@ def optimize_merit_with_quantile_constraint(
     subject to lower quantile of enrollment probability (with conformal adjustment) >= theta.
 
     The learned quantile model predicts [lower, upper] quantiles for enrollment.
-    We use the lower quantile + qhat (conformal adjustment) as the constraint.
+    We use the conformalized lower endpoint, ``lower quantile - qhat``, as the
+    constraint.
 
     Args:
         applicant_idx: Index of the applicant (for display purposes)
@@ -138,16 +149,17 @@ def optimize_merit_with_quantile_constraint(
         gpa_scaled: Scaled GPA
         model_nn: Trained PyTorch QuantileNet model (outputs 2 values: [lower, upper])
         qhat: Conformal prediction adjustment value
-        theta: Minimum required enrollment probability (default 0.6)
+        theta: Minimum required conformal lower endpoint (default 0.6)
 
     Returns:
         optimal_merit: Optimal merit aid amount
-        lower_quantile_adjusted: Lower quantile + qhat at optimal merit
+        lower_quantile_adjusted: Lower quantile - qhat at optimal merit
         model: The Gurobi model object
     """
     # Create Gurobi model
-    m = gp.Model(f"enrollment_quantile_applicant_{applicant_idx}")
-    m.setParam("OutputFlag", 0)  # Suppress Gurobi output
+    m = gp.Model(
+        f"enrollment_quantile_applicant_{applicant_idx}", env=quiet_gurobi_env()
+    )
 
     # Decision variable: merit aid (bounded between 0 and 25)
     merit = m.addVar(lb=0.0, ub=25.0, name="merit")
@@ -171,10 +183,8 @@ def optimize_merit_with_quantile_constraint(
     # Embed the neural network as constraints using gurobi-ml
     add_predictor_constr(m, model_nn, input_vars, output_vars)
 
-    # Add constraint: lower_quantile + qhat >= theta
-    # This ensures the conformalized lower bound meets the threshold
-    # KNOWN-ISSUE[ISSUE-02]: plus sign conflicts with evaluated lower-qhat interval.
-    m.addConstr(lower_quantile_var + qhat >= theta, name="min_lower_quantile_conf")
+    # The calibrated interval is [lower - qhat, upper + qhat].
+    m.addConstr(lower_quantile_var - qhat >= theta, name="min_lower_quantile_conf")
 
     # Objective: minimize merit aid
     m.setObjective(merit, GRB.MINIMIZE)
@@ -185,7 +195,7 @@ def optimize_merit_with_quantile_constraint(
     # Extract solution
     if m.status == GRB.OPTIMAL:
         optimal_merit = merit.X
-        lower_quantile_adjusted = lower_quantile_var.X + qhat
+        lower_quantile_adjusted = lower_quantile_var.X - qhat
         return optimal_merit, lower_quantile_adjusted, m
     else:
         return None, None, m

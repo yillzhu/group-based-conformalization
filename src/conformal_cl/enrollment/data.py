@@ -1,14 +1,33 @@
-"""Section 4.6.2: randomized historical train/test/calibration split.
-
-Historical implementation; known issues are deliberately retained.
-See docs/findings.md and KNOWN-ISSUE markers.
-"""
+"""Section 4.6.2: deterministic train/test/calibration split helpers."""
 
 from sklearn.model_selection import train_test_split
 
 
+def split_train_test_cal_indices(
+    n_rows, test_size=0.2, cal_size=0.1, random_state=42
+):
+    """Return deterministic row indices for the train/test/calibration split."""
+
+    if n_rows <= 0:
+        raise ValueError("n_rows must be positive")
+    indices = list(range(n_rows))
+    temp_idx, test_idx = train_test_split(
+        indices, test_size=test_size, random_state=random_state
+    )
+    cal_size_adjusted = cal_size / (1 - test_size)
+    train_idx, cal_idx = train_test_split(
+        temp_idx, test_size=cal_size_adjusted, random_state=random_state
+    )
+    return train_idx, test_idx, cal_idx
+
+
 def split_train_test_cal(
-    features, labels, test_size=0.2, cal_size=0.1, random_state=42
+    features,
+    labels,
+    test_size=0.2,
+    cal_size=0.1,
+    random_state=42,
+    return_indices=False,
 ):
     """
     Split data into 70% train, 20% test, 10% calibration sets.
@@ -23,16 +42,23 @@ def split_train_test_cal(
     Returns:
         X_train, X_test, X_cal, y_train, y_test, y_cal
     """
-    # First split: separate out test set (20%)
-    X_temp, X_test, y_temp, y_test = train_test_split(
-        features, labels, test_size=test_size, random_state=random_state
-    )
+    if len(features) != len(labels):
+        raise ValueError("features and labels must have the same number of rows")
 
-    # Second split: from remaining 80%, split into train (87.5% of 80% = 70% total)
-    # and cal (12.5% of 80% = 10% total)
-    cal_size_adjusted = cal_size / (1 - test_size)  # 0.1 / 0.8 = 0.125
-    X_train, X_cal, y_train, y_cal = train_test_split(
-        X_temp, y_temp, test_size=cal_size_adjusted, random_state=random_state
+    train_idx, test_idx, cal_idx = split_train_test_cal_indices(
+        len(features),
+        test_size=test_size,
+        cal_size=cal_size,
+        random_state=random_state,
     )
-
-    return X_train, X_test, X_cal, y_train, y_test, y_cal
+    result = (
+        features[train_idx],
+        features[test_idx],
+        features[cal_idx],
+        labels[train_idx],
+        labels[test_idx],
+        labels[cal_idx],
+    )
+    if return_indices:
+        return (*result, (train_idx, test_idx, cal_idx))
+    return result

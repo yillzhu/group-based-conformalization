@@ -1,8 +1,4 @@
-"""Section 4.6.2: classifier/logit/quantile architectures and interval loss.
-
-Historical implementation; known issues are deliberately retained.
-See docs/findings.md and KNOWN-ISSUE markers.
-"""
+"""Section 4.6.2: classifier/logit/quantile architectures and interval loss."""
 
 import numpy as np
 import torch
