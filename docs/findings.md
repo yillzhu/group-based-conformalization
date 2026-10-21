@@ -1,8 +1,9 @@
-# Findings retained in the refactored companion code
+# Historical findings and correction backlog
 
-All findings below are **unfixed**. This is a guide to locating and correcting them
-in a future change, not a claim that a scientific correction was applied.
-Search for `KNOWN-ISSUE` in source to find the affected expressions.
+This document records the audit of the historical implementation. Several confirmed
+software defects have since been corrected in the active code; see
+[`corrections.md`](corrections.md) for current status and remaining validation work.
+The checked-in historical result artifacts were not regenerated or relabeled.
 
 The detailed review below was originally prepared against the `student-enroll`
 folder. Its original-file line references remain historical references; each issue
@@ -28,8 +29,10 @@ checks for its own reporting. This does not change the original runner's logic.
 
 Labels: **confirmed** means directly established from local source/artifacts or a
 small isolated check; **review needed** means the intended mathematics, experiment
-provenance, or solver behavior needs reconciliation. No training or full solver
-experiments were run. No external literature/API validation was performed.
+provenance, or solver behavior needs reconciliation. At the time of this historical
+audit, no training or full solver experiments had been run. Current validation is
+recorded separately in `corrections.md`; no external literature validation was
+performed.
 
 ## Findings that should shape the reorganization
 

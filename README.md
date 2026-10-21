@@ -4,13 +4,12 @@ Companion code for Chapter 4, **Robustness in Constraint Learning with Group-Bas
 Conformalization**. Two applications share a group representation: the quadratic
 benchmark (§4.5) and the student enrollment case study (§4.6).
 
-This is an organization-only refactor of `student-enroll`. Existing formulas,
-defaults, randomness, solver logic, return values, and known mistakes are retained.
-Module boundaries, imports, repository paths, and runner main guards were reorganized.
-`KNOWN-ISSUE[ISSUE-xx]` comments point to [findings and proposed fixes](docs/findings.md).
-Proposed fixes in that document have **not** been implemented. Original comments
-and docstrings can contain misleading claims; the findings guide takes precedence
-as the description of their limitations.
+This began as an organization-only refactor of `student-enroll`. The checked-in
+results remain immutable historical artifacts, but the active implementation now
+contains a tested correction pass for several confirmed defects. See the
+[historical findings](docs/findings.md) and [correction status](docs/corrections.md).
+Regenerated corrected results are a separate lineage and must not be represented as
+the source of the historical tables.
 
 ## Start with the saved results
 
@@ -46,24 +45,31 @@ If recovered, add those CSVs to `results/quadratic/` and rerun. See
 [Thesis crosswalk](docs/thesis_map.md) · [Findings](docs/findings.md) ·
 [Refactor policy](docs/refactor_policy.md) · [Data](data/README.md)
 
-## Running the original experiments
+## Running the corrected experiments
 
 Install the relevant optional dependencies, or use `environment.yml` as a starting
-environment definition. The full ML/solver environment has not been validated here.
-An appropriate Gurobi installation/license is required to solve the experiments.
+environment definition. The enrollment pipeline has been validated end to end with
+Gurobi 13.0.3; the TensorFlow-based quadratic pipeline has not. An appropriate
+Gurobi installation/license is required to solve either experiment.
 
 ```bash
 python -m pip install -e '.[enrollment,quadratic]'
-python experiments/sec46_enrollment/train.py
-python experiments/sec46_enrollment/run.py
-python experiments/sec45_quadratic/run.py
+python experiments/sec46_enrollment/train.py  # writes results/corrected/enrollment
+python experiments/sec46_enrollment/run.py    # writes results/corrected/enrollment
+python experiments/sec45_quadratic/run.py     # writes results/corrected/quadratic
 ```
 
-The default enrollment comparison uses theta=.17; individual solver function defaults
-remain .6 as in the original. Training/experiment commands overwrite their working
-output filenames under `results/enrollment/` or `results/quadratic/`. The original sibling `student-enroll` folder remains the historical record. Full runs can be expensive; aggregation does not launch
-them. The historical enrollment `legacy_sample.py` still has its missing-argument
-defect (ISSUE-09) and is retained for traceability, not recommended as a quick start.
+Use `python experiments/sec45_quadratic/run.py --smoke` for one small quadratic
+configuration before launching the full sweep. Both experiment runners accept
+explicit output directories; the enrollment runner also accepts applicant limits,
+theta, split-cap, and feasibility-tolerance overrides.
+
+The default enrollment comparison uses theta=.17; lower-level solver APIs retain .6
+for backward compatibility. Corrected commands write under `results/corrected/`;
+checked-in historical
+artifacts under `results/enrollment/` are not overwritten. Full runs can be expensive,
+and the aggregation notebook does not launch them. The small enrollment sample entry
+point is available as a smoke test after corrected models have been trained.
 
 Terminology: RCC denotes **restricted conditional coverage** in the chapter. Legacy
 function names such as `run_rcc` are retained; original documents sometimes expand

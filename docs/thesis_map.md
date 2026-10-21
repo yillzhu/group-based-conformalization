@@ -6,11 +6,11 @@
 | §4.1.2 / Figure 4.2 polynomial wrapper example | No generator recovered | Missing; distinct from neural-network wrapper benchmark |
 | §4.2–4.3 interval and coverage interpretation | Calibration and optimization modules; `findings.md` | Theory is not executable evidence of pointwise guarantees |
 | §4.4.1 unconstrained group min-max algorithm | No complete implementation identified | Theoretical material only in this checkout |
-| §4.4.2 group calibration | `src/conformal_cl/groups.py` | Historical implementation, issues retained |
-| §4.4.3 Algorithm 1 | `quadratic/group_conformal.py`, `enrollment/group_conformal.py` | Separate historical adapters, not a rewritten shared engine |
+| §4.4.2 group calibration | `src/conformal_cl/groups.py` | Corrected implementation; historical results preserved separately |
+| §4.4.3 Algorithm 1 | `quadratic/group_conformal.py`, `enrollment/group_conformal.py` | Separate corrected adapters, not a rewritten shared engine |
 | §4.5.1 generation/training/optimization | `src/conformal_cl/quadratic/` | Original methods and parameters |
 | §4.5.2 Tables 4.1–4.2 | `notebooks/thesis_results.ipynb` | New aggregation; raw historical CSVs missing |
-| §4.6.1–4.6.2 training and merit solves | `src/conformal_cl/enrollment/` | Teacher-probability targets and original signs retained |
+| §4.6.1–4.6.2 training and merit solves | `src/conformal_cl/enrollment/` | Interval signs and data split corrected; teacher-target limitation retained |
 | §4.6.3 Table 4.3 | `notebooks/thesis_results.ipynb` | Re-aggregates preserved 6,000-applicant results per method |
 | Supplemental conceptual drawings | `examples/illustrations.ipynb` | Original cells retained; not thesis Figures 4.1–4.2 |
 
@@ -62,8 +62,8 @@ historical documentation, and saved model architectures stay easy to cross-refer
 | `src/RCC.py` main block | `experiments/sec45_quadratic/legacy_sample.py` |
 | `scripts/train_enroll_data.py` main block | `experiments/sec46_enrollment/train.py` |
 | `scripts/run_enroll.py` main block | `experiments/sec46_enrollment/run.py` |
-| `src/enroll_RCC.py` main block | `experiments/sec46_enrollment/legacy_sample.py` (broken call retained) |
+| `src/enroll_RCC.py` main block | `experiments/sec46_enrollment/legacy_sample.py` |
 
 Original summary documents, the prior organization proposal, and first audit remain
-only in the original sibling `student-enroll/docs/` folder. Some recommendations in
-that earlier proposal involved fixes; the implemented scope here excludes them.
+only in the original sibling `student-enroll/docs/` folder. See `corrections.md` for
+the implemented correction and validation scope in this checkout.
