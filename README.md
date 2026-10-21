@@ -48,9 +48,10 @@ If recovered, add those CSVs to `results/quadratic/` and rerun. See
 ## Running the corrected experiments
 
 Install the relevant optional dependencies, or use `environment.yml` as a starting
-environment definition. The enrollment pipeline has been validated end to end with
-Gurobi 13.0.3; the TensorFlow-based quadratic pipeline has not. An appropriate
-Gurobi installation/license is required to solve either experiment.
+environment definition. Both pipelines have been validated end to end with Gurobi
+13.0.3. The quadratic environment used Python 3.12, TensorFlow 2.18.0, and
+`gurobi-machinelearning` 1.7.0. An appropriate Gurobi installation/license is
+required to solve either experiment.
 
 ```bash
 python -m pip install -e '.[enrollment,quadratic]'

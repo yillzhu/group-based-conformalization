@@ -51,7 +51,8 @@ Recover the raw runs and exact inclusion rules before calling these tables repro
 
 ## Verification limits
 
-The original file/algorithm errors remain. Aggregation of stored numbers does not
-establish statistical guarantees or prove current source regenerated those numbers.
-Table 4.3 is supported by available applicant rows. Full training/solver execution and
-exact historical quadratic reproduction have not been validated.
+Aggregation of stored numbers does not establish statistical guarantees. Table 4.3
+is supported by the preserved applicant rows, and the corrected quadratic lineage
+has now completed full training, solver execution, and independent true-constraint
+validation; see `corrections.md`. Exact historical quadratic reproduction remains
+unavailable because its raw outputs and aggregation policy were not recovered.

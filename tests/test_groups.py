@@ -49,6 +49,20 @@ class GroupTests(unittest.TestCase):
         self.assertEqual(left.qhat, 0.75)
         self.assertEqual(right.qhat, 0.75)
 
+    def test_conformalize_rejects_nonfinite_geometry(self):
+        group = Group(bounds={(np.inf, 0.0): 1})
+        with self.assertRaises(ValueError):
+            group.conformalize(
+                np.arange(20, dtype=float).reshape(-1, 1),
+                np.linspace(0, 1, 20),
+            )
+
+        group = Group()
+        calibration = np.arange(20, dtype=float).reshape(-1, 1)
+        calibration[0, 0] = np.nan
+        with self.assertRaises(ValueError):
+            group.conformalize(calibration, np.linspace(0, 1, 20))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -48,6 +48,8 @@ class Group:
         n_cal = len(cal_X)
         if n_cal == 0:
             raise ValueError("cal_X must contain at least one calibration row")
+        if not np.isfinite(cal_X).all():
+            raise ValueError("cal_X must contain only finite values")
         if len(R) != n_cal:
             raise ValueError("cal_X and R must contain the same number of rows")
         if not 0 < delta < 1:
@@ -55,10 +57,21 @@ class Group:
 
         index = np.ones(n_cal, dtype=bool)
         for coeffs, d in self.bounds.items():
-            coeffs = np.array(coeffs)
+            coeffs = np.asarray(coeffs, dtype=float)
+            if coeffs.size != cal_X.shape[1] + 1 or not np.isfinite(coeffs).all():
+                raise ValueError("group bounds must be finite feature coefficients plus b")
+            if d not in (-1, 1):
+                raise ValueError("group bound directions must be -1 or 1")
             norm = coeffs[:-1]
             b = coeffs[-1]
-            index *= d * (norm @ cal_X.T) <= d * b
+            # ``np.matmul`` can inherit floating-point status flags from native
+            # TensorFlow/Gurobi code on macOS and emit spurious divide-by-zero
+            # warnings even for bounded multiplication.  The explicit row-wise
+            # contraction is small here and lets us validate the actual result.
+            projection = np.einsum("i,ji->j", norm, cal_X)
+            if not np.isfinite(projection).all():
+                raise FloatingPointError("non-finite group-bound projection")
+            index &= d * projection <= d * b
 
         self.Nhat = np.sum(index)
 

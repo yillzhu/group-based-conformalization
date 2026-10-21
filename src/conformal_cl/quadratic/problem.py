@@ -15,8 +15,11 @@ def generate_quadratic(dim):
 
 
 def generate_samples(seed, noise_std, dim):
-    np.random.seed(seed)  # For reproducibility
-    tf.random.set_seed(seed)
+    # Keras 3 has RNG state beyond ``tf.random.set_seed``.  Seed Python, NumPy,
+    # and TensorFlow together and request deterministic kernels so a parameter
+    # tuple produces the same trained models both alone and inside a sweep.
+    tf.keras.utils.set_random_seed(seed)
+    tf.config.experimental.enable_op_determinism()
 
     A_f, A_g, b_f, b_g, c_f, c_g = generate_quadratic(dim)
 

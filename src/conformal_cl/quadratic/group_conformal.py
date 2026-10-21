@@ -111,12 +111,16 @@ def run_rcc(
 
         coeff_split = np.zeros(dim + 1)
         norm_split = G.max_x - G.ul_x
-        if np.linalg.norm(norm_split) <= feasibility_tol:
+        norm_length = np.linalg.norm(norm_split)
+        if not np.isfinite(norm_length) or norm_length <= feasibility_tol:
             groups_nc.put(G)
             continue
-        b_split = np.dot(G.max_x - G.ul_x, bound_split)
+        # A hyperplane is invariant to positive scaling. Unit normalization keeps
+        # repeated regional membership calculations well conditioned.
+        norm_split = norm_split / norm_length
+        b_split = np.dot(norm_split, bound_split)
         coeff_split[:dim] = norm_split
-        coeff_split[dim:] = b_split
+        coeff_split[dim] = b_split
 
         if tuple(coeff_split) not in G.bounds:
             G_l, G_r = G.split(

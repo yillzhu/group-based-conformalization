@@ -273,9 +273,11 @@ def run_enroll_rcc(
         # Create splitting hyperplane perpendicular to (max_x - ul_x)
         coeff_split = np.zeros(dim + 1)
         norm_split = G.max_x - G.ul_x
-        if np.linalg.norm(norm_split) <= feasibility_tol:
+        norm_length = np.linalg.norm(norm_split)
+        if not np.isfinite(norm_length) or norm_length <= feasibility_tol:
             groups_nc.put(G)
             continue
+        norm_split = norm_split / norm_length
         b_split = np.dot(norm_split, bound_split)
         coeff_split[:dim] = norm_split
         coeff_split[dim] = b_split

@@ -50,9 +50,37 @@ endpoint violation larger than `1e-5`; the largest numerical residual was about
 `results/corrected/enrollment/` and are intentionally excluded from the historical
 artifact lineage.
 
-The quadratic Gurobi/TensorFlow path still needs an isolated compatible environment
-and solver-backed validation. Unexercised enrollment solver failure branches also
-remain covered only by defensive status labeling, not by forced integration cases.
+## Solver-backed validation completed for quadratic examples
+
+The corrected quadratic sweep ran all 60 configurations (10 seeds, dimensions 1--3,
+noise standard deviations 0.10 and 0.15, `P=10`, and `alpha=0.1`) using Python 3.12,
+TensorFlow 2.18.0, Gurobi 13.0.3, and `gurobi-machinelearning` 1.7.0. The run produced
+56 truly feasible instances and four verified truly infeasible instances.
+
+Independent evaluation of every returned vector against its generating quadratic
+found the following counts among the 56 truly feasible instances:
+
+| Method | Returned | Truly feasible | Rate over all 56 | Rate when returned |
+| --- | ---: | ---: | ---: | ---: |
+| Standard | 54 | 43 | 76.79% | 79.63% |
+| CQR | 54 | 54 | 96.43% | 100.00% |
+| Wrapper | 54 | 50 | 89.29% | 92.59% |
+| RCC | 54 | 54 | 96.43% | 100.00% |
+
+The complete grid has no duplicate or missing keys; stored feasibility flags agree
+with independently recomputed constraints; all timings are finite and nonnegative;
+and the result and source hashes match the run manifest. Two independent smoke runs
+also matched exactly in every non-timing output after replacing partial TensorFlow
+seeding with unified deterministic Keras seeding.
+
+During validation, dimension-3 RCC exposed unstable native matrix-multiplication
+warnings in regional membership checks. Split hyperplanes are now unit-normalized,
+geometry is explicitly checked for finite values, and membership uses a validated
+row-wise contraction. The failing case passes with runtime warnings promoted to
+errors after this correction.
+
+Unexercised enrollment solver failure branches remain covered only by defensive
+status labeling, not by forced integration cases.
 
 ## Methodological limitations not fixed by code
 

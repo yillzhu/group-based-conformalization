@@ -8,7 +8,7 @@
 | §4.4.1 unconstrained group min-max algorithm | No complete implementation identified | Theoretical material only in this checkout |
 | §4.4.2 group calibration | `src/conformal_cl/groups.py` | Corrected implementation; historical results preserved separately |
 | §4.4.3 Algorithm 1 | `quadratic/group_conformal.py`, `enrollment/group_conformal.py` | Separate corrected adapters, not a rewritten shared engine |
-| §4.5.1 generation/training/optimization | `src/conformal_cl/quadratic/` | Original methods and parameters |
+| §4.5.1 generation/training/optimization | `src/conformal_cl/quadratic/` | Corrected methods; full 60-configuration sweep validated |
 | §4.5.2 Tables 4.1–4.2 | `notebooks/thesis_results.ipynb` | New aggregation; raw historical CSVs missing |
 | §4.6.1–4.6.2 training and merit solves | `src/conformal_cl/enrollment/` | Interval signs and data split corrected; teacher-target limitation retained |
 | §4.6.3 Table 4.3 | `notebooks/thesis_results.ipynb` | Re-aggregates preserved 6,000-applicant results per method |
