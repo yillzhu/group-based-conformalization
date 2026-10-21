@@ -35,6 +35,13 @@ they are compared with the historical tables.
 - RCC builds a fresh solver model per region so predictor-embedding auxiliaries do
   not leak between regions, and recorded RCC time uses accumulated solver runtime
   rather than wall-clock construction/training time.
+- Quadratic outputs now preserve the solver termination status for every method and
+  the true-information solve instead of collapsing all missing solutions into a
+  feasibility flag.
+- Quadratic sweeps use grid-derived filenames, refuse accidental collisions, and
+  validate completed parameter keys before resuming an interrupted run.
+- A corrected-schema aggregator validates status/vector/flag consistency, duplicate
+  keys, and timings before computing feasibility and recorded-time tables.
 
 ## Solver-backed validation completed for enrollment
 
@@ -73,6 +80,11 @@ and the result and source hashes match the run manifest. Two independent smoke r
 also matched exactly in every non-timing output after replacing partial TensorFlow
 seeding with unified deterministic Keras seeding.
 
+A license-gated end-to-end test now exercises the complete quadratic smoke case and
+asserts optimal structured statuses for all five solves. It is skipped in the
+lightweight default test suite and enabled with `RUN_GUROBI_INTEGRATION=1` in a
+configured solver environment.
+
 During validation, dimension-3 RCC exposed unstable native matrix-multiplication
 warnings in regional membership checks. Split hyperplanes are now unit-normalized,
 geometry is explicitly checked for finite values, and membership uses a validated
@@ -94,3 +106,5 @@ passes every test.
 The thesis/PDF, raw historical quadratic results, exact historical aggregation
 policy, data redistribution permission, project license, and citation metadata are
 not present. Those provenance issues require source material or an owner decision.
+The new status-aware summarizer intentionally rejects old or ad hoc CSVs that lack
+the corrected schema; it does not infer statuses or retrofit historical evidence.

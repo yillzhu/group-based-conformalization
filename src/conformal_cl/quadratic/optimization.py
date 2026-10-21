@@ -4,7 +4,7 @@ import numpy as np
 import gurobipy as gp
 from gurobipy import GRB
 from gurobi_ml.keras.keras import add_keras_constr
-from conformal_cl.solver import quiet_gurobi_env
+from conformal_cl.solver import gurobi_status_label, quiet_gurobi_env
 
 
 def optimize_compare(
@@ -32,6 +32,7 @@ def optimize_compare(
 
     model.optimize()
     t_true = model.Runtime
+    status_true = gurobi_status_label(model)
 
     if model.status == GRB.OPTIMAL:
         opt_true = xx.X
@@ -44,6 +45,7 @@ def optimize_compare(
 
     model.optimize()
     t_abs = model.Runtime
+    status_abs = gurobi_status_label(model)
 
     if model.status == GRB.OPTIMAL:
         opt_abs = xx.X
@@ -61,6 +63,7 @@ def optimize_compare(
 
     model.optimize()
     t_cqr = model.Runtime
+    status_cqr = gurobi_status_label(model)
 
     if model.status == GRB.OPTIMAL:
         opt_cqr = xx.X
@@ -79,13 +82,30 @@ def optimize_compare(
 
     model.optimize()
     t_wrapper = model.Runtime
+    status_wrapper = gurobi_status_label(model)
 
     if model.status == GRB.OPTIMAL:
         opt_wrapper = xx.X
     else:
         opt_wrapper = np.nan
 
-    return opt_abs, opt_cqr, opt_wrapper, opt_true, t_abs, t_cqr, t_wrapper, t_true
+    statuses = {
+        "abs": status_abs,
+        "cqr": status_cqr,
+        "wrapper": status_wrapper,
+        "true": status_true,
+    }
+    return (
+        opt_abs,
+        opt_cqr,
+        opt_wrapper,
+        opt_true,
+        t_abs,
+        t_cqr,
+        t_wrapper,
+        t_true,
+        statuses,
+    )
 
 
 def is_feasible(A_g, b_g, c_g, xhat):

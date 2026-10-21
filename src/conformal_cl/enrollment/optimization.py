@@ -9,22 +9,7 @@ import gurobipy as gp
 from gurobipy import Model, GRB
 from gurobi_ml import add_predictor_constr
 from .models import inverse_sigmoid
-from conformal_cl.solver import quiet_gurobi_env
-
-
-def gurobi_status_label(model):
-    """Return a stable label without conflating all failures with infeasibility."""
-
-    labels = {
-        GRB.OPTIMAL: "Optimal",
-        GRB.INFEASIBLE: "Infeasible",
-        GRB.INF_OR_UNBD: "InfeasibleOrUnbounded",
-        GRB.UNBOUNDED: "Unbounded",
-        GRB.TIME_LIMIT: "TimeLimit",
-        GRB.INTERRUPTED: "Interrupted",
-        GRB.NUMERIC: "NumericalFailure",
-    }
-    return labels.get(model.status, f"SolverStatus{model.status}")
+from conformal_cl.solver import gurobi_status_label, quiet_gurobi_env
 
 
 def load_and_prepare_data(results_dir=None):

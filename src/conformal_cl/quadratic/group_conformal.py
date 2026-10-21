@@ -7,7 +7,7 @@ import gurobipy as gp
 from gurobipy import GRB
 from gurobi_ml.keras.keras import add_keras_constr
 from queue import Queue
-from conformal_cl.solver import quiet_gurobi_env
+from conformal_cl.solver import gurobi_status_label, quiet_gurobi_env
 
 
 def run_rcc(
@@ -23,6 +23,8 @@ def run_rcc(
     R = np.maximum(cal_y - q[:, 1:2], q[:, 0:1] - cal_y)
 
     solve_time = 0.0
+    partition_failures = []
+    candidate_statuses = []
     groups_queue = Queue()
     groups_opt = Queue()
     groups_nc = Queue()
@@ -61,6 +63,7 @@ def run_rcc(
                 G.max_x = xx.X
                 G.max_v = model.ObjVal
             else:
+                partition_failures.append(gurobi_status_label(model))
                 groups_nc.put(G)
                 continue
 
@@ -79,6 +82,7 @@ def run_rcc(
                 G.min_x = xx.X
                 G.min_v = model.ObjVal
             else:
+                partition_failures.append(gurobi_status_label(model))
                 groups_nc.put(G)
                 continue
 
@@ -99,6 +103,7 @@ def run_rcc(
                 G.ul_x = xx.X
                 G.ul_v = model.ObjVal
             else:
+                partition_failures.append(gurobi_status_label(model))
                 groups_nc.put(G)
                 continue
 
@@ -155,6 +160,7 @@ def run_rcc(
     xx3 = model3.addMVar(shape=dim, lb=-1, ub=1)
     model3.setObjective(xx3 @ A_g @ xx3 + b_g.T @ xx3 + c_g, GRB.MINIMIZE)
     model3.optimize()
+    true_status = gurobi_status_label(model3)
     if model3.status == GRB.OPTIMAL:
         true_obj = model3.ObjVal
         true_f = true_obj <= 0
@@ -163,7 +169,15 @@ def run_rcc(
         true_f = np.nan
 
     if groups_opt.empty() and groups_nc.empty():
-        return np.nan, [2], solve_time, true_f, true_obj
+        return (
+            np.nan,
+            [2],
+            solve_time,
+            true_f,
+            true_obj,
+            "NoCandidateRegion",
+            true_status,
+        )
 
     obj = np.inf
     while not groups_opt.empty():
@@ -179,6 +193,7 @@ def run_rcc(
 
         model2.optimize()
         solve_time += model2.Runtime
+        candidate_statuses.append(gurobi_status_label(model2))
 
         if model2.status == GRB.OPTIMAL:
             if model2.ObjVal < obj:
@@ -201,6 +216,7 @@ def run_rcc(
 
         model2.optimize()
         solve_time += model2.Runtime
+        candidate_statuses.append(gurobi_status_label(model2))
 
         if model2.status == GRB.OPTIMAL:
             if model2.ObjVal < obj:
@@ -208,8 +224,21 @@ def run_rcc(
                 obj = model2.ObjVal
 
     if not np.isfinite(obj):
-        return np.nan, [2], solve_time, true_f, true_obj
+        non_infeasible = [
+            status
+            for status in (*partition_failures, *candidate_statuses)
+            if status != "Infeasible"
+        ]
+        status = (
+            "Infeasible"
+            if candidate_statuses and not non_infeasible
+            else "NoSolution:" + ",".join(sorted(set(non_infeasible or candidate_statuses)))
+        )
+        return np.nan, [2], solve_time, true_f, true_obj, status, true_status
 
     is_f = opt.T @ A_g @ opt + b_g.T @ opt + c_g <= 0
 
-    return opt, is_f[0], solve_time, true_f, true_obj
+    status = "Optimal"
+    if partition_failures:
+        status += ":PartitionFallback=" + ",".join(sorted(set(partition_failures)))
+    return opt, is_f[0], solve_time, true_f, true_obj, status, true_status

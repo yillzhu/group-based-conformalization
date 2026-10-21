@@ -61,9 +61,22 @@ python experiments/sec45_quadratic/run.py     # writes results/corrected/quadrat
 ```
 
 Use `python experiments/sec45_quadratic/run.py --smoke` for one small quadratic
-configuration before launching the full sweep. Both experiment runners accept
-explicit output directories; the enrollment runner also accepts applicant limits,
-theta, split-cap, and feasibility-tolerance overrides.
+configuration before launching the full sweep. Quadratic filenames are derived from
+the complete parameter grid, existing outputs are refused by default, and an
+interrupted compatible run can be continued with `--resume`. Summarize one or more
+nonoverlapping corrected batches with:
+
+```bash
+python experiments/sec45_quadratic/summarize.py \
+  results/corrected/quadratic/quadratic_*.csv
+```
+
+The corrected CSV schema records solver status separately from mathematical
+feasibility. The summarizer validates those statuses, solution vectors, legacy
+feasibility flags, parameter-key uniqueness, and timings before writing corrected
+Table 4.1 and Table 4.2 exports. Both experiment runners accept explicit output
+directories; the enrollment runner also accepts applicant limits, theta, split-cap,
+and feasibility-tolerance overrides.
 
 The default enrollment comparison uses theta=.17; lower-level solver APIs retain .6
 for backward compatibility. Corrected commands write under `results/corrected/`;
@@ -76,3 +89,7 @@ Terminology: RCC denotes **restricted conditional coverage** in the chapter. Leg
 function names such as `run_rcc` are retained; original documents sometimes expand
 the acronym differently. No project license, dataset redistribution permission, or
 formal citation metadata is inferred by this refactor; settle these before publication.
+
+The regular test suite does not require a solver license. To exercise one complete
+quadratic case in a licensed environment, run
+`RUN_GUROBI_INTEGRATION=1 python -m unittest tests.test_quadratic_solver_integration`.

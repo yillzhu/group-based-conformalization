@@ -17,7 +17,17 @@ def run_one(seed, dim, noise_std, P, alpha):
     quantile = training.train_quantiles(dim, X, y, alpha)
     wrapper = training.train_wrapper(dim, X, y, P, seed)
     qhat = calibration.conformalizing(quantile, cal_X, cal_y, alpha)
-    opt_abs, opt_cqr, opt_wrapper, opt_true, t_abs, t_cqr, t_wrapper, t_true = (
+    (
+        opt_abs,
+        opt_cqr,
+        opt_wrapper,
+        opt_true,
+        t_abs,
+        t_cqr,
+        t_wrapper,
+        t_true,
+        statuses,
+    ) = (
         optimize_compare(
             dim,
             main_model,
@@ -51,9 +61,14 @@ def run_one(seed, dim, noise_std, P, alpha):
         opt_q = np.full((3, 2), np.nan)
 
     # Use the same quantile network for selection and evaluation.
-    opt_rcc, f_rcc, t_rcc, *_ = RCC.run_rcc(
+    opt_rcc, f_rcc, t_rcc, _, _, status_rcc, status_rcc_true = RCC.run_rcc(
         samples, alpha, delta=0.1, quantile=quantile
     )
+    if statuses["true"] != status_rcc_true:
+        raise RuntimeError(
+            "true-model status differs between comparison and RCC solves: "
+            f"{statuses['true']} != {status_rcc_true}"
+        )
     emp_rcc = np.array([[0]], dtype=np.float64)
     if not np.isnan(opt_rcc).any():
         q_rcc = quantile.predict(opt_rcc.reshape(1, -1), verbose=0)[0, 1]
@@ -87,15 +102,35 @@ def run_one(seed, dim, noise_std, P, alpha):
         t_rcc,
         opt_true,
         t_true,
+        statuses["abs"],
+        statuses["cqr"],
+        statuses["wrapper"],
+        status_rcc,
+        statuses["true"],
     )
 
 
-def run_many(csv_file, seeds, dims, noise_stds, Ps, alphas):
+def run_many(
+    csv_file,
+    seeds,
+    dims,
+    noise_stds,
+    Ps,
+    alphas,
+    *,
+    skip_keys=None,
+):
+    """Run the requested grid, appending one durable row per completed key."""
+
+    completed = set(skip_keys or ())
     for seed in seeds:
         for dim in dims:
             for noise_std in noise_stds:
                 for P in Ps:
                     for alpha in alphas:
+                        key = (seed, dim, noise_std, P, alpha)
+                        if key in completed:
+                            continue
                         (
                             opt_abs,
                             f_abs,
@@ -119,6 +154,11 @@ def run_many(csv_file, seeds, dims, noise_stds, Ps, alphas):
                             t_rcc,
                             opt_true,
                             t_true,
+                            status_abs,
+                            status_cqr,
+                            status_wrapper,
+                            status_rcc,
+                            status_true,
                         ) = run_one(seed, dim, noise_std, P, alpha)
 
                         row = [
@@ -149,9 +189,15 @@ def run_many(csv_file, seeds, dims, noise_stds, Ps, alphas):
                             t_rcc,
                             opt_true,
                             t_true,
+                            status_abs,
+                            status_cqr,
+                            status_wrapper,
+                            status_rcc,
+                            status_true,
                         ]
 
                         row_df = pd.DataFrame([row])
                         row_df.to_csv(csv_file, mode="a", header=False, index=False)
+                        completed.add(key)
                         K.clear_session()
-    return row
+    return completed

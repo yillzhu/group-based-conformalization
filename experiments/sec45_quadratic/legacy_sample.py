@@ -41,7 +41,9 @@ if __name__ == "__main__":
                 samples = quadratic_sample.generate_samples(
                     seed=seed, noise_std=noise_std, dim=dim
                 )
-                opt, is_f, t, true_f, min_constr = run_rcc(samples, alpha, delta)
+                opt, is_f, t, true_f, min_constr, *_ = run_rcc(
+                    samples, alpha, delta
+                )
                 logging.info(
                     f"Results: opt={opt}, is_f={is_f}, time={t}, true_f={true_f}, min_constr={min_constr}"
                 )

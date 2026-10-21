@@ -5,6 +5,7 @@ from __future__ import annotations
 import atexit
 
 import gurobipy as gp
+from gurobipy import GRB
 
 
 _QUIET_ENV = None
@@ -20,6 +21,35 @@ def quiet_gurobi_env():
         env.start()
         _QUIET_ENV = env
     return _QUIET_ENV
+
+
+def gurobi_status_label(model_or_status):
+    """Return a stable, human-readable label for a Gurobi status code."""
+
+    status = (
+        model_or_status.status
+        if hasattr(model_or_status, "status")
+        else int(model_or_status)
+    )
+    labels = {
+        GRB.LOADED: "Loaded",
+        GRB.OPTIMAL: "Optimal",
+        GRB.INFEASIBLE: "Infeasible",
+        GRB.INF_OR_UNBD: "InfeasibleOrUnbounded",
+        GRB.UNBOUNDED: "Unbounded",
+        GRB.CUTOFF: "Cutoff",
+        GRB.ITERATION_LIMIT: "IterationLimit",
+        GRB.NODE_LIMIT: "NodeLimit",
+        GRB.TIME_LIMIT: "TimeLimit",
+        GRB.SOLUTION_LIMIT: "SolutionLimit",
+        GRB.INTERRUPTED: "Interrupted",
+        GRB.NUMERIC: "NumericalFailure",
+        GRB.SUBOPTIMAL: "Suboptimal",
+        GRB.USER_OBJ_LIMIT: "UserObjectiveLimit",
+        GRB.WORK_LIMIT: "WorkLimit",
+        GRB.MEM_LIMIT: "MemoryLimit",
+    }
+    return labels.get(status, f"SolverStatus{status}")
 
 
 def _dispose_quiet_env():
