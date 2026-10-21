@@ -1,19 +1,19 @@
-"""Sections 4.4.2-4.4.3: region state, local calibration, and splitting.
-
-Historical implementation; known issues are deliberately retained.
-See docs/findings.md and KNOWN-ISSUE markers.
-"""
+"""Sections 4.4.2-4.4.3: region state, local calibration, and splitting."""
 
 import numpy as np
+
+from .order_stats import InsufficientCalibrationError, conformal_order_statistic
+
+
+MIN_CALIBRATION_SIZE = 11
 
 
 class Group:
     def __init__(
         self,
-        # KNOWN-ISSUE[ISSUE-01]: mutable default and shared child bounds retained.
-        bounds={},
-        Nhat=-1,
-        Xhat=-1,
+        bounds=None,
+        Nhat=0,
+        Xhat=False,
         qhat=0,
         min_x=np.nan,
         max_x=np.nan,
@@ -27,7 +27,9 @@ class Group:
         - lb: Lower bound
         - ub: Upper bound
         """
-        self.bounds = bounds  # [a^T | b] s.t. ax=b is the split plane
+        # Each group owns its boundary state.  Sharing this dictionary caused the
+        # right-child cut to overwrite the left child and its parent.
+        self.bounds = dict(bounds or {})  # [a^T | b] s.t. ax=b is the split plane
         # binary: 1 -> ax<=b; -1 -> ax>=b
         self.Nhat = Nhat  # Default is -1
         self.Xhat = Xhat  # Default is -1
@@ -40,7 +42,16 @@ class Group:
         self.ul_v = ul_v
 
     def conformalize(self, cal_X, R, alpha=0.1, delta=0.1):
+        cal_X = np.asarray(cal_X, dtype=float)
+        if cal_X.ndim != 2:
+            raise ValueError("cal_X must be a two-dimensional array")
         n_cal = len(cal_X)
+        if n_cal == 0:
+            raise ValueError("cal_X must contain at least one calibration row")
+        if len(R) != n_cal:
+            raise ValueError("cal_X and R must contain the same number of rows")
+        if not 0 < delta < 1:
+            raise ValueError(f"delta must be in (0, 1), got {delta!r}")
 
         index = np.ones(n_cal, dtype=bool)
         for coeffs, d in self.bounds.items():
@@ -51,57 +62,47 @@ class Group:
 
         self.Nhat = np.sum(index)
 
-        self.Xhat = self.Nhat >= delta * n_cal * (
+        sufficiently_represented = self.Nhat >= delta * n_cal * (
             1 - np.sqrt(2 * np.log(n_cal) / delta / n_cal)
         )
 
-        # KNOWN-ISSUE[ISSUE-06, ISSUE-07]: strict count and legacy quantile rank retained.
-        if self.Nhat > 10 and self.Xhat == 1:
-            self.qhat = np.quantile(
-                R[index],
-                np.ceil((self.Nhat + 1) * (1 - alpha + 1 / n_cal)) / self.Nhat,
-                method="higher",
-            )
+        self.Xhat = bool(
+            self.Nhat >= MIN_CALIBRATION_SIZE and sufficiently_represented
+        )
+        if self.Xhat:
+            try:
+                self.qhat = conformal_order_statistic(
+                    R[index], alpha=alpha, level_adjustment=1 / n_cal
+                )
+            except InsufficientCalibrationError:
+                # Keep the inherited correction and route this group through the
+                # caller's explicit unresolved-group fallback.  The inherited
+                # correction carries only its parent/global interpretation; it
+                # does not create a new local-coverage guarantee.
+                self.Xhat = False
 
     def split(self, coeff_split, cal_X, R, alpha=0.1, delta=0.1):
-        norm_split = coeff_split[:-1]
-        b_split = coeff_split[-1]
+        coeff_split = np.asarray(coeff_split, dtype=float)
+        cal_X = np.asarray(cal_X, dtype=float)
+        if cal_X.ndim != 2:
+            raise ValueError("cal_X must be a two-dimensional array")
+        if coeff_split.ndim != 1 or coeff_split.size != cal_X.shape[1] + 1:
+            raise ValueError("coeff_split must contain one coefficient per feature plus b")
+        if not np.isfinite(coeff_split).all():
+            raise ValueError("coeff_split must be finite")
 
-        # KNOWN-ISSUE[ISSUE-01]: children intentionally share this dictionary.
-        G_l = Group(self.bounds)
+        # Children inherit the parent's correction as an explicit fallback, but
+        # own independent boundary dictionaries.
+        G_l = Group(self.bounds, qhat=self.qhat)
         G_l.bounds[tuple(coeff_split)] = -1
         G_l.conformalize(cal_X, R, alpha=alpha, delta=delta)
 
-        if norm_split @ self.max_x >= b_split:
-            G_l.max_x = self.max_x
-            G_l.max_v = self.max_v - self.qhat + G_l.qhat
-
-        if norm_split @ self.min_x >= b_split:
-            G_l.min_x = self.min_x
-            G_l.min_v = self.min_v - self.qhat + G_l.qhat
-
-        if norm_split @ self.ul_x >= b_split:
-            G_l.ul_x = self.ul_x
-            G_l.ul_v = self.ul_v - self.qhat + G_l.qhat
-
-        G_r = Group(self.bounds)
+        G_r = Group(self.bounds, qhat=self.qhat)
         G_r.bounds[tuple(coeff_split)] = 1
         G_r.conformalize(cal_X, R, alpha=alpha, delta=delta)
 
-        if norm_split @ self.max_x <= b_split:
-            G_r.max_x = self.max_x
-            # KNOWN-ISSUE[ISSUE-03]: left qhat/right cache sign retained.
-            G_r.max_v = self.max_v - self.qhat + G_l.qhat
-
-        if norm_split @ self.min_x <= b_split:
-            G_r.min_x = self.min_x
-            # KNOWN-ISSUE[ISSUE-03]: left qhat/right cache sign retained.
-            G_r.min_v = self.min_v - self.qhat + G_l.qhat
-
-        if norm_split @ self.ul_x <= b_split:
-            G_r.ul_x = self.ul_x
-            # KNOWN-ISSUE[ISSUE-03]: left qhat/right cache sign retained.
-            G_r.ul_v = self.ul_v - self.qhat + G_l.qhat
+        # Extrema depend on both the region and expression-specific qhat signs.
+        # Invalidating them is safer than algebraically shifting a cached value.
 
         return G_l, G_r
 
@@ -109,25 +110,12 @@ class Group:
         print(self.Nhat, self.Xhat, self.max_x, self.min_x, self.ul_x)
 
 
-# KNOWN-ISSUE[ISSUE-09]: obsolete helper references absent Group attributes.
 def update_groups(groups_queue, minmax_v, cal_X, R):
-    for i in range(groups_queue.qsize()):
-        G = groups_queue.get()
-        if G.split == 0:
-            groups_queue.put(G)
-            continue
-        elif G.min_v >= minmax_v:
-            G.split = 1
-            groups_queue.put(G)
-            continue
-        else:
-            bound_split = (G.min_x + G.max_x) / 2
+    """Retired legacy helper.
 
-            G_l = Group(G.lb, bound_split)
-            G_r = Group(bound_split, G.ub)
+    Its former implementation referenced attributes that have never belonged to
+    :class:`Group`.  Keeping an explicit failure is safer than producing a partial
+    queue mutation followed by an unrelated ``AttributeError``.
+    """
 
-            G_l.conformalize(cal_X, R)
-            G_r.conformalize(cal_X, R)
-
-            groups_queue.put(G_l)
-            groups_queue.put(G_r)
+    raise NotImplementedError("update_groups is obsolete; use Group.split explicitly")

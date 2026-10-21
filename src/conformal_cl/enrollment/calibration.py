@@ -1,11 +1,9 @@
-"""Section 4.6.2: teacher-probability interval calibration.
-
-Historical implementation; known issues are deliberately retained.
-See docs/findings.md and KNOWN-ISSUE markers.
-"""
+"""Section 4.6.2: teacher-probability interval calibration."""
 
 import numpy as np
 import torch
+
+from conformal_cl.order_stats import conformal_order_statistic
 
 
 def conformalizing(model, cal_X, cal_y, alpha):
@@ -31,11 +29,4 @@ def conformalizing(model, cal_X, cal_y, alpha):
     # Calculate nonconformity scores: max(y - upper, lower - y)
     cal_scores = np.maximum(cal_y - q[:, 1:2], q[:, 0:1] - cal_y)
 
-    # Get the score quantile
-    cal_n = cal_y.shape[0]
-    # KNOWN-ISSUE[ISSUE-07]: legacy rank-to-quantile conversion is retained.
-    qhat = np.quantile(
-        cal_scores, np.ceil((cal_n + 1) * (1 - alpha)) / cal_n, method="higher"
-    )
-
-    return qhat
+    return conformal_order_statistic(cal_scores, alpha=alpha)
