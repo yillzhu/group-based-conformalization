@@ -1,8 +1,4 @@
-"""Section 4.5.1: Keras point and interval networks.
-
-Historical implementation; known issues are deliberately retained.
-See docs/findings.md and KNOWN-ISSUE markers.
-"""
+"""Section 4.5.1: Keras point and interval networks."""
 
 import tensorflow as tf
 from tensorflow import keras
@@ -64,6 +60,8 @@ def build_quantile_model(dim, alpha):
             layers.Dense(2),
         ]
     )
-    # KNOWN-ISSUE[ISSUE-07]: alpha argument is not bound into this loss.
-    model.compile(optimizer="adam", loss=interval_score_loss)
+    def configured_interval_score_loss(y_true, y_pred):
+        return interval_score_loss(y_true, y_pred, alpha=alpha)
+
+    model.compile(optimizer="adam", loss=configured_interval_score_loss)
     return model

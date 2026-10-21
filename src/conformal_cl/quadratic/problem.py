@@ -1,8 +1,4 @@
-"""Section 4.5.1: quadratic instances, noisy data, true feasibility.
-
-Historical implementation; known issues are deliberately retained.
-See docs/findings.md and KNOWN-ISSUE markers.
-"""
+"""Section 4.5.1: quadratic instances, noisy data, true feasibility."""
 
 import numpy as np
 import tensorflow as tf

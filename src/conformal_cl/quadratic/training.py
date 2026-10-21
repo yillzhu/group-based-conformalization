@@ -1,8 +1,4 @@
-"""Section 4.5.1: point, wrapper-ensemble, and quantile training.
-
-Historical implementation; known issues are deliberately retained.
-See docs/findings.md and KNOWN-ISSUE markers.
-"""
+"""Section 4.5.1: point, wrapper-ensemble, and quantile training."""
 
 from sklearn.model_selection import train_test_split
 from .models import build_model, build_quantile_model

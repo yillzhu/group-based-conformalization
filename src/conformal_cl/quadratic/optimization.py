@@ -1,21 +1,16 @@
-"""Section 4.5.1: true, standard, CQR, and wrapper optimization formulations.
-
-Historical implementation; known issues are deliberately retained.
-See docs/findings.md and KNOWN-ISSUE markers.
-"""
+"""Section 4.5.1: true, standard, CQR, and wrapper optimization formulations."""
 
 import numpy as np
 import gurobipy as gp
 from gurobipy import GRB
 from gurobi_ml.keras.keras import add_keras_constr
-import time
+from conformal_cl.solver import quiet_gurobi_env
 
 
 def optimize_compare(
     dim, main_model, quantile, wrapper, P, alpha, qhat, A_f, A_g, b_f, b_g, c_f, c_g
 ):
-    model = gp.Model()
-    model.Params.LogToConsole = 0
+    model = gp.Model(env=quiet_gurobi_env())
     model.Params.NonConvex = 2
 
     xx = model.addMVar(shape=dim, lb=-1, ub=1)
@@ -35,10 +30,8 @@ def optimize_compare(
     # True optimal
     tc = model.addConstr(yy == xx @ A_g @ xx + b_g.T @ xx + c_g)
 
-    start = time.time()
     model.optimize()
-    end = time.time()
-    t_true = end - start
+    t_true = model.Runtime
 
     if model.status == GRB.OPTIMAL:
         opt_true = xx.X
@@ -49,10 +42,8 @@ def optimize_compare(
     model.remove(tc)
     kc_mean = add_keras_constr(model, main_model, xx, yy)
 
-    start = time.time()
     model.optimize()
-    end = time.time()
-    t_abs = end - start
+    t_abs = model.Runtime
 
     if model.status == GRB.OPTIMAL:
         opt_abs = xx.X
@@ -68,10 +59,8 @@ def optimize_compare(
 
     qc = model.addConstr(yy_interval[1] + qhat <= 0)
 
-    start = time.time()
     model.optimize()
-    end = time.time()
-    t_cqr = end - start
+    t_cqr = model.Runtime
 
     if model.status == GRB.OPTIMAL:
         opt_cqr = xx.X
@@ -88,10 +77,8 @@ def optimize_compare(
 
     model.addConstr(wrapper_indicator.sum() >= P * (1 - alpha))
 
-    start = time.time()
     model.optimize()
-    end = time.time()
-    t_wrapper = end - start
+    t_wrapper = model.Runtime
 
     if model.status == GRB.OPTIMAL:
         opt_wrapper = xx.X

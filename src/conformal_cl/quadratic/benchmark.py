@@ -1,8 +1,4 @@
-"""Sections 4.5.1-4.5.2: benchmark orchestration and legacy CSV schema.
-
-Historical implementation; known issues are deliberately retained.
-See docs/findings.md and KNOWN-ISSUE markers.
-"""
+"""Sections 4.5.1-4.5.2: benchmark orchestration and legacy CSV schema."""
 
 import numpy as np
 import pandas as pd
@@ -54,11 +50,12 @@ def run_one(seed, dim, noise_std, P, alpha):
     except ValueError:
         opt_q = np.full((3, 2), np.nan)
 
-    # KNOWN-ISSUE[ISSUE-08]: RCC retrains its own quantile network; timing scopes differ.
-    opt_rcc, f_rcc, t_rcc, *_ = RCC.run_rcc(samples, alpha, delta=0.1)
+    # Use the same quantile network for selection and evaluation.
+    opt_rcc, f_rcc, t_rcc, *_ = RCC.run_rcc(
+        samples, alpha, delta=0.1, quantile=quantile
+    )
     emp_rcc = np.array([[0]], dtype=np.float64)
     if not np.isnan(opt_rcc).any():
-        # KNOWN-ISSUE[ISSUE-08]: evaluated with the first network, not RCC training.
         q_rcc = quantile.predict(opt_rcc.reshape(1, -1), verbose=0)[0, 1]
         for i in range(P):
             pred = wrapper[i].predict(opt_rcc.reshape(1, -1), verbose=0)
