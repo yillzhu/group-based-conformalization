@@ -38,6 +38,7 @@ If recovered, add those CSVs to `results/quadratic/` and rerun. See
 | `src/conformal_cl/enrollment/` | PyTorch models/training, data split, merit optimization, group adaptation (§4.6) |
 | `experiments/sec45_quadratic/` | Original quadratic sweep and sample entry point |
 | `experiments/sec46_enrollment/` | Original enrollment training, comparison, and legacy sample |
+| `experiments/workforce/` | Solver-free cross-trained workforce stress test and negative control |
 | `notebooks/thesis_results.ipynb` | Thesis table aggregation, diagnostics, input hashes, CSV exports |
 | `examples/illustrations.ipynb` | Original supplemental conceptual drawings, with a findings notice |
 | `results/` | Working enrollment copies, new quadratic outputs, aggregated table exports |
@@ -93,3 +94,13 @@ formal citation metadata is inferred by this refactor; settle these before publi
 The regular test suite does not require a solver license. To exercise one complete
 quadratic case in a licensed environment, run
 `RUN_GUROBI_INTEGRATION=1 python -m unittest tests.test_quadratic_solver_integration`.
+
+## Exploratory workforce example
+
+The solver-free experiment in `experiments/workforce/` tests a possible practical
+niche for group-based calibration: optimization with a predictive model trained
+under a narrower historical policy than the decision region explored by a later
+randomized pilot. It uses independent training, partition-design, final-
+calibration, and Monte Carlo evaluation samples. A 100-seed stress test and a
+uniform-training negative control can be run without Gurobi or an ML framework.
+See its README for the model, commands, limitations, and current benchmark summary.

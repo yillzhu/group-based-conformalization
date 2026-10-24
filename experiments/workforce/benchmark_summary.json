@@ -1,0 +1,50 @@
+{
+  "description": "Initial diagnostic; full ignored outputs are reproducible with the README commands.",
+  "seeds": [0, 99],
+  "replications": 100,
+  "alpha": 0.1,
+  "samples_per_replication": {
+    "training": 8000,
+    "partition_design": 8000,
+    "final_calibration": 10000,
+    "evaluation": 30000
+  },
+  "stress_test": {
+    "training_min_dedicated": 10,
+    "global_conformal_pto": {
+      "mean_cost": 41.952,
+      "mean_violation_probability": 0.075903,
+      "reliable_runs": 100
+    },
+    "group_based": {
+      "mean_cost": 40.404,
+      "mean_violation_probability": 0.08914366666666668,
+      "reliable_runs": 98
+    },
+    "oracle": {
+      "mean_cost": 39.6,
+      "mean_violation_probability": 0.09582433333333334,
+      "reliable_runs": 100
+    },
+    "group_vs_global": {"cheaper": 62, "equal": 34, "costlier": 4}
+  },
+  "uniform_training_negative_control": {
+    "training_min_dedicated": 4,
+    "global_conformal_pto": {
+      "mean_cost": 39.048,
+      "mean_violation_probability": 0.10187033333333334,
+      "reliable_runs": 77
+    },
+    "group_based": {
+      "mean_cost": 39.472,
+      "mean_violation_probability": 0.09962466666666668,
+      "reliable_runs": 78
+    },
+    "oracle": {
+      "mean_cost": 39.6,
+      "mean_violation_probability": 0.09582433333333334,
+      "reliable_runs": 100
+    },
+    "group_vs_global": {"cheaper": 6, "equal": 57, "costlier": 37}
+  }
+}
