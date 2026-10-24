@@ -88,3 +88,25 @@ violation probabilities around 12.5--12.7%, so the result does not justify an
 optimizer-level guarantee. In the negative control, localization did not improve
 cost or reliability. These failures are retained because they expose precisely
 where group-average conformal validity does not transfer to a selected point.
+
+A preliminary 30-seed sensitivity sweep reinforces that interpretation. With
+the historical-policy cutoff fixed at ten dedicated workers per class, increasing
+the split limit gave the following group-based results (the global mean cost was
+41.840 and all 30 global decisions met the empirical reliability target):
+
+| Split limit | Mean group cost | Reliable group runs |
+| ---: | ---: | ---: |
+| 0 | 41.840 | 30/30 |
+| 1 | 41.360 | 30/30 |
+| 2 | 40.960 | 30/30 |
+| 4 | 40.880 | 30/30 |
+| 6 | 40.573 | 30/30 |
+| 8 | 40.200 | 28/30 |
+| 10 | 40.307 | 28/30 |
+
+Thus, split depth behaves like a statistical regularization parameter: finer
+localization can reduce conservatism but eventually exposes the selected decision
+to noisier, more selective corrections. A separate cutoff sweep showed essentially
+no benefit under uniform training, with progressively larger cost reductions as
+the training support became narrower. These are exploratory sensitivity results,
+not tuned final comparisons.

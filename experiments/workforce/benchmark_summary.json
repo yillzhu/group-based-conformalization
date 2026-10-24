@@ -1,6 +1,6 @@
 {
   "description": "Initial diagnostic; full ignored outputs are reproducible with the README commands.",
-  "seeds": [0, 99],
+  "seed_range_inclusive": [0, 99],
   "replications": 100,
   "alpha": 0.1,
   "samples_per_replication": {
@@ -46,5 +46,23 @@
       "reliable_runs": 100
     },
     "group_vs_global": {"cheaper": 6, "equal": 57, "costlier": 37}
+  },
+  "preliminary_sensitivity_30_seeds": {
+    "split_limit_at_training_cutoff_10": [
+      {"splits": 0, "mean_group_cost": 41.84, "reliable_runs": 30},
+      {"splits": 1, "mean_group_cost": 41.36, "reliable_runs": 30},
+      {"splits": 2, "mean_group_cost": 40.96, "reliable_runs": 30},
+      {"splits": 4, "mean_group_cost": 40.88, "reliable_runs": 30},
+      {"splits": 6, "mean_group_cost": 40.57333333333333, "reliable_runs": 30},
+      {"splits": 8, "mean_group_cost": 40.2, "reliable_runs": 28},
+      {"splits": 10, "mean_group_cost": 40.306666666666665, "reliable_runs": 28}
+    ],
+    "training_cutoff_at_split_limit_6": [
+      {"cutoff": 4, "mean_global_cost": 39.04, "mean_group_cost": 39.54666666666667, "global_reliable_runs": 23, "group_reliable_runs": 23},
+      {"cutoff": 6, "mean_global_cost": 40.16, "mean_group_cost": 39.78666666666667, "global_reliable_runs": 30, "group_reliable_runs": 27},
+      {"cutoff": 8, "mean_global_cost": 40.96, "mean_group_cost": 40.0, "global_reliable_runs": 30, "group_reliable_runs": 28},
+      {"cutoff": 10, "mean_global_cost": 41.84, "mean_group_cost": 40.57333333333333, "global_reliable_runs": 30, "group_reliable_runs": 30},
+      {"cutoff": 12, "mean_global_cost": 42.306666666666665, "mean_group_cost": 40.50666666666667, "global_reliable_runs": 30, "group_reliable_runs": 29}
+    ]
   }
 }
