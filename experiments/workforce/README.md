@@ -110,3 +110,54 @@ to noisier, more selective corrections. A separate cutoff sweep showed essential
 no benefit under uniform training, with progressively larger cost reductions as
 the training support became narrower. These are exploratory sensitivity results,
 not tuned final comparisons.
+
+## Queueing follow-up
+
+`run_queueing.py` upgrades the workload proxy to a four-hour, two-class
+multiskill queue. Daily call volume and class mix vary, arrivals are Poisson,
+service times are lognormal, and flexible agents take the oldest waiting call
+after dedicated agents serve their own classes. A day violates the constraint
+when either class fails to have 80% of calls answered within one minute.
+
+```bash
+python experiments/workforce/run_queueing.py --smoke --replications 1
+python experiments/workforce/run_queueing.py --replications 30
+```
+
+The implementation compares point PTO, global conformal PTO, global conformal
+PTO after equal-information model refitting, calibration restricted to a known
+decision domain, rectangular RCC, oblique-halfspace RCC, fixed predicted-risk
+strata, and a Monte Carlo oracle. Oblique partitions are included because the
+dedicated/flexible substitution frontier is diagonal rather than axis aligned.
+
+The initial queueing configuration trained the predictor on incumbent policies
+with seven or eight dedicated workers per class, while partition design and
+final calibration sampled the full grid. Before adding the refitting baseline,
+a frozen 30-seed run looked exceptionally favorable to RCC:
+
+| Method | Returned solution | Reliable solution | Mean cost when returned |
+| --- | ---: | ---: | ---: |
+| Global conformal PTO | 14/30 | 0/30 | 17.257 |
+| Rectangular group-based | 30/30 | 30/30 | 16.213 |
+| Oblique group-based | 30/30 | 30/30 | 16.187 |
+| Oracle | 30/30 | 30/30 | 16.000 |
+
+A separate 30,000-day evaluation placed the violation probabilities of the two
+RCC-selected frontier plans at 0.0810 for `(8,0)` and 0.0850 for `(7,1)`; the
+nearby cheaper plan `(7,0)` was clearly unreliable at 0.2049.
+
+This is **not** yet a defensible showcase. The partition-design observations are
+labeled. Using those same labels to refit the quadratic quantile model, followed
+by ordinary calibration on the untouched final split, produced a reliable
+oracle-cost solution in nine of the first ten seeds and a conservative reliable
+solution in the tenth. With a deliberately linear predictor, the refitted global
+method was reliable and oracle-cost in all ten diagnostic seeds, while RCC was
+often unsafe or infeasible. A known-domain calibration baseline also matches or
+beats RCC when the operational domain is specified in advance.
+
+The queueing example therefore identifies a necessary condition for a convincing
+RCC application: localized calibration must add value beyond both (i) refitting
+the predictive model with the same labeled information and (ii) calibrating on
+any operational subgroup known before seeing calibration responses. Until an
+example passes those comparisons, the queueing study should be presented as a
+negative result and design diagnostic, not evidence of RCC excellence.

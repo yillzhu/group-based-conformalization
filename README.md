@@ -103,4 +103,6 @@ under a narrower historical policy than the decision region explored by a later
 randomized pilot. It uses independent training, partition-design, final-
 calibration, and Monte Carlo evaluation samples. A 100-seed stress test and a
 uniform-training negative control can be run without Gurobi or an ML framework.
-See its README for the model, commands, limitations, and current benchmark summary.
+The same directory now contains a discrete-event multiskill queueing follow-up.
+See its README for the models, commands, limitations, positive diagnostics, and
+the equal-information baseline that prevents treating the queue as a showcase.

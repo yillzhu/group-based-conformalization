@@ -64,5 +64,21 @@
       {"cutoff": 10, "mean_global_cost": 41.84, "mean_group_cost": 40.57333333333333, "global_reliable_runs": 30, "group_reliable_runs": 30},
       {"cutoff": 12, "mean_global_cost": 42.306666666666665, "mean_group_cost": 40.50666666666667, "global_reliable_runs": 30, "group_reliable_runs": 29}
     ]
+  },
+  "queueing_follow_up": {
+    "status": "negative_after_equal_information_baseline",
+    "initial_30_seed_comparison": {
+      "oracle_simulations": 4000,
+      "global_conformal_pto": {"selected": 14, "reliable": 0, "mean_selected_cost": 17.25714285714286},
+      "rectangular_group_based": {"selected": 30, "reliable": 30, "mean_selected_cost": 16.21333333333333},
+      "oblique_group_based": {"selected": 30, "reliable": 30, "mean_selected_cost": 16.186666666666664},
+      "oracle": {"selected": 30, "reliable": 30, "mean_selected_cost": 16.0}
+    },
+    "frontier_validation_30000_days": [
+      {"dedicated_per_class": 8, "flexible": 0, "cost": 16.0, "violation_probability": 0.08103},
+      {"dedicated_per_class": 7, "flexible": 1, "cost": 16.4, "violation_probability": 0.08497},
+      {"dedicated_per_class": 7, "flexible": 0, "cost": 14.0, "violation_probability": 0.20493}
+    ],
+    "fairness_check": "Refitting on the labeled partition-design sample followed by untouched final calibration matched or beat RCC in the initial diagnostics."
   }
 }
