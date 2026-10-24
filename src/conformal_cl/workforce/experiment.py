@@ -73,6 +73,13 @@ def run_experiment(config: ExperimentConfig) -> dict:
 
     design_x, design_y = sample_dataset(candidates, config.design_size, design_rng)
     design_scores = design_y - upper_model.predict(design_x)
+    refit_upper_model = fit_quantile(
+        np.vstack((train_x, design_x)),
+        np.concatenate((train_y, design_y)),
+        1.0 - config.alpha,
+        iterations=config.quantile_iterations,
+    )
+    candidate_refit_upper = refit_upper_model.predict(candidates)
     cells = design_partition(
         design_x,
         design_scores,
@@ -87,7 +94,11 @@ def run_experiment(config: ExperimentConfig) -> dict:
         candidates, config.calibration_size, cal_rng
     )
     calibration_scores = calibration_y - upper_model.predict(calibration_x)
+    refit_calibration_scores = (
+        calibration_y - refit_upper_model.predict(calibration_x)
+    )
     q_global = global_correction(calibration_scores, config.alpha)
+    q_refit_global = global_correction(refit_calibration_scores, config.alpha)
     partition = calibrate_partition(
         cells, calibration_x, calibration_scores, alpha=config.alpha
     )
@@ -96,6 +107,7 @@ def run_experiment(config: ExperimentConfig) -> dict:
     methods = {
         "point_pto": candidate_point,
         "global_conformal_pto": candidate_upper + q_global,
+        "refit_global_conformal_pto": candidate_refit_upper + q_refit_global,
         "group_based": candidate_upper + partition.correction(candidates),
         "oracle": violation - config.alpha,
     }
@@ -124,9 +136,13 @@ def run_experiment(config: ExperimentConfig) -> dict:
             "quantile": 1.0 - config.alpha,
             "point_coefficient": point_model.coefficient.tolist(),
             "upper_quantile_coefficient": upper_model.coefficient.tolist(),
+            "refit_upper_quantile_coefficient": (
+                refit_upper_model.coefficient.tolist()
+            ),
             "feature_center": upper_model.center.tolist(),
             "feature_scale": upper_model.scale.tolist(),
             "global_correction": float(q_global),
+            "refit_global_correction": float(q_refit_global),
             "partition_cells": len(cells),
             "partition": [
                 {

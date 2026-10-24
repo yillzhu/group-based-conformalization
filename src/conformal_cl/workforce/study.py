@@ -9,7 +9,13 @@ import numpy as np
 from .experiment import ExperimentConfig, run_experiment
 
 
-METHODS = ("point_pto", "global_conformal_pto", "group_based", "oracle")
+METHODS = (
+    "point_pto",
+    "global_conformal_pto",
+    "refit_global_conformal_pto",
+    "group_based",
+    "oracle",
+)
 
 
 def run_study(

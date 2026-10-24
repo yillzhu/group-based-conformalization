@@ -100,7 +100,13 @@ class WorkforceTests(unittest.TestCase):
         self.assertEqual(first, second)
         self.assertEqual(
             set(first["methods"]),
-            {"point_pto", "global_conformal_pto", "group_based", "oracle"},
+            {
+                "point_pto",
+                "global_conformal_pto",
+                "refit_global_conformal_pto",
+                "group_based",
+                "oracle",
+            },
         )
 
     def test_uniform_training_negative_control_runs(self):
