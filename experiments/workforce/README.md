@@ -89,6 +89,26 @@ optimizer-level guarantee. In the negative control, localization did not improve
 cost or reliability. These failures are retained because they expose precisely
 where group-average conformal validity does not transfer to a selected point.
 
+### Equal-information correction
+
+The preceding table records the initial diagnostic, but it omits an essential
+baseline. The partition-design sample is labeled. A fair comparison can use the
+same observations to refit the quantile model, while continuing to reserve the
+final calibration sample. After adding that baseline and rerunning seeds 0--99,
+the apparent RCC advantage disappeared:
+
+| Method | Mean cost | Mean violation probability | Runs at or below 10% violation |
+| --- | ---: | ---: | ---: |
+| Original global conformal | 41.952 | 0.0759 | 100/100 |
+| Refitted global conformal | 39.912 | 0.0931 | 100/100 |
+| Group-based | 40.708 | 0.0863 | 99/100 |
+| Oracle | 39.600 | 0.0958 | 100/100 |
+
+The refitted global method is cheaper and more reliable than the group-based
+method. Consequently, the initial stress-test result should not be cited as
+evidence that RCC adds value. It remains useful as a warning that information
+budgets, and not only nominal training sample sizes, must be equal across methods.
+
 A preliminary 30-seed sensitivity sweep reinforces that interpretation. With
 the historical-policy cutoff fixed at ten dedicated workers per class, increasing
 the split limit gave the following group-based results (the global mean cost was
@@ -155,7 +175,7 @@ method was reliable and oracle-cost in all ten diagnostic seeds, while RCC was
 often unsafe or infeasible. A known-domain calibration baseline also matches or
 beats RCC when the operational domain is specified in advance.
 
-The queueing example therefore identifies a necessary condition for a convincing
+Together, the workload and queueing examples identify a necessary condition for a convincing
 RCC application: localized calibration must add value beyond both (i) refitting
 the predictive model with the same labeled information and (ii) calibrating on
 any operational subgroup known before seeing calibration responses. Until an

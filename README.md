@@ -97,12 +97,13 @@ quadratic case in a licensed environment, run
 
 ## Exploratory workforce example
 
-The solver-free experiment in `experiments/workforce/` tests a possible practical
+The solver-free experiments in `experiments/workforce/` test a possible practical
 niche for group-based calibration: optimization with a predictive model trained
 under a narrower historical policy than the decision region explored by a later
 randomized pilot. It uses independent training, partition-design, final-
 calibration, and Monte Carlo evaluation samples. A 100-seed stress test and a
 uniform-training negative control can be run without Gurobi or an ML framework.
-The same directory now contains a discrete-event multiskill queueing follow-up.
-See its README for the models, commands, limitations, positive diagnostics, and
-the equal-information baseline that prevents treating the queue as a showcase.
+The same directory contains a discrete-event multiskill queueing follow-up. In
+both models, an equal-information baseline that refits the predictor using the
+labeled partition-design sample matches or beats RCC. See the experiment README
+for the positive initial diagnostics, decisive baselines, and negative conclusion.
