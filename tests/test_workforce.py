@@ -6,6 +6,7 @@ from conformal_cl.workforce.conformal import (
     calibrate_partition,
     calibrate_prediction_strata,
     design_oblique_partition,
+    design_optimization_partition,
     design_partition,
 )
 from conformal_cl.workforce.experiment import ExperimentConfig, run_experiment
@@ -90,6 +91,26 @@ class WorkforceTests(unittest.TestCase):
             max_splits=3,
             min_design_size=40,
         )
+        membership = sum(cell.contains(candidates).astype(int) for cell in cells)
+        np.testing.assert_array_equal(membership, np.ones(len(candidates), dtype=int))
+
+    def test_optimization_partition_splits_at_surrogate_boundary(self):
+        candidates = staffing_grid(range(4, 8), range(0, 5))
+        rng = np.random.default_rng(23)
+        design_x = candidates[rng.integers(0, len(candidates), size=1000)]
+        scores = np.zeros(len(design_x))
+        upper = 6.5 - candidates[:, 0] - candidates[:, 1]
+        cells = design_optimization_partition(
+            design_x,
+            scores,
+            candidates,
+            upper - 1.0,
+            upper,
+            alpha=0.1,
+            max_splits=1,
+            min_design_size=40,
+        )
+        self.assertEqual(len(cells), 2)
         membership = sum(cell.contains(candidates).astype(int) for cell in cells)
         np.testing.assert_array_equal(membership, np.ones(len(candidates), dtype=int))
 

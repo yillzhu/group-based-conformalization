@@ -11,6 +11,7 @@ from .conformal import (
     calibrate_prediction_strata,
     design_partition,
     design_oblique_partition,
+    design_optimization_partition,
     global_correction,
 )
 from .models import fit_mean, fit_quantile
@@ -113,13 +114,25 @@ def run_queue_experiment(
         iterations=config.quantile_iterations,
         quadratic=config.quadratic_model,
     )
+    lower_model = fit_quantile(
+        train_x,
+        train_y,
+        config.alpha,
+        iterations=config.quantile_iterations,
+        quadratic=config.quadratic_model,
+    )
     candidate_point = point_model.predict(candidates)
+    candidate_lower = lower_model.predict(candidates)
     candidate_upper = upper_model.predict(candidates)
 
     design_x, design_y = _sample_dataset(
         candidates, config.design_size, design_rng, queue_config
     )
     design_scores = design_y - upper_model.predict(design_x)
+    design_cqr_scores = np.maximum(
+        design_y - upper_model.predict(design_x),
+        lower_model.predict(design_x) - design_y,
+    )
     refit_upper_model = fit_quantile(
         np.vstack((train_x, design_x)),
         np.concatenate((train_y, design_y)),
@@ -146,15 +159,30 @@ def run_queue_experiment(
         max_splits=config.max_splits,
         min_design_size=config.min_design_size,
     )
+    optimization_cells = design_optimization_partition(
+        design_x,
+        design_cqr_scores,
+        candidates,
+        candidate_lower,
+        candidate_upper,
+        alpha=config.alpha,
+        max_splits=config.max_splits,
+        min_design_size=config.min_design_size,
+    )
 
     calibration_x, calibration_y = _sample_dataset(
         candidates, config.calibration_size, cal_rng, queue_config
     )
     calibration_scores = calibration_y - upper_model.predict(calibration_x)
+    calibration_cqr_scores = np.maximum(
+        calibration_y - upper_model.predict(calibration_x),
+        lower_model.predict(calibration_x) - calibration_y,
+    )
     refit_calibration_scores = (
         calibration_y - refit_upper_model.predict(calibration_x)
     )
     q_global = global_correction(calibration_scores, config.alpha)
+    q_global_cqr = global_correction(calibration_cqr_scores, config.alpha)
     q_refit_global = global_correction(refit_calibration_scores, config.alpha)
     calibration_in_domain = (
         calibration_x[:, 0] >= config.decision_min_dedicated
@@ -167,6 +195,9 @@ def run_queue_experiment(
     )
     oblique_partition = calibrate_partition(
         oblique_cells, calibration_x, calibration_scores, alpha=config.alpha
+    )
+    optimization_partition = calibrate_partition(
+        optimization_cells, calibration_x, calibration_cqr_scores, alpha=config.alpha
     )
     risk_strata = calibrate_prediction_strata(
         candidate_upper,
@@ -181,11 +212,14 @@ def run_queue_experiment(
     methods = {
         "point_pto": candidate_point,
         "global_conformal_pto": candidate_upper + q_global,
+        "global_cqr_pto": candidate_upper + q_global_cqr,
         "refit_global_conformal_pto": candidate_refit_upper + q_refit_global,
         "domain_conformal_pto": candidate_upper + q_domain,
         "group_based": candidate_upper + partition.correction(candidates),
         "oblique_group_based": candidate_upper
         + oblique_partition.correction(candidates),
+        "rcc_group_based": candidate_upper
+        + optimization_partition.correction(candidates),
         "risk_stratified": candidate_upper
         + risk_strata.correction(candidate_upper),
         "oracle": violation - config.alpha,
@@ -196,12 +230,19 @@ def run_queue_experiment(
         )
         for name, measure in methods.items()
     }
+    _add_selected_cell_diagnostic(
+        results["rcc_group_based"],
+        optimization_partition,
+        candidates,
+        violation,
+    )
     return {
         "config": asdict(config),
         "oracle": {"seed": oracle["seed"], "simulations": oracle["simulations"]},
         "model": {
             "target": "worst-class daily service-level shortfall",
             "point_coefficient": point_model.coefficient.tolist(),
+            "lower_quantile_coefficient": lower_model.coefficient.tolist(),
             "upper_quantile_coefficient": upper_model.coefficient.tolist(),
             "refit_upper_quantile_coefficient": (
                 refit_upper_model.coefficient.tolist()
@@ -209,6 +250,7 @@ def run_queue_experiment(
             "feature_center": upper_model.center.tolist(),
             "feature_scale": upper_model.scale.tolist(),
             "global_correction": float(q_global),
+            "global_cqr_correction": float(q_global_cqr),
             "refit_global_correction": float(q_refit_global),
             "domain_correction": float(q_domain),
             "domain_calibration_count": int(calibration_in_domain.sum()),
@@ -238,6 +280,20 @@ def run_queue_experiment(
                     oblique_partition.cells,
                     oblique_partition.calibration_counts,
                     oblique_partition.corrections,
+                    strict=True,
+                )
+            ],
+            "optimization_partition": [
+                {
+                    "bounds": [list(bound) for bound in cell.bounds],
+                    "design_count": int(cell.contains(design_x).sum()),
+                    "calibration_count": int(count),
+                    "correction": float(correction),
+                }
+                for cell, count, correction in zip(
+                    optimization_partition.cells,
+                    optimization_partition.calibration_counts,
+                    optimization_partition.corrections,
                     strict=True,
                 )
             ],
@@ -274,6 +330,29 @@ def summarize_queue_runs(runs: list[dict]) -> dict:
                     [result["estimated_violation_probability"] for result in selected]
                 )
             )
+            selected_cells = [
+                result["selected_cell"]
+                for result in selected
+                if "selected_cell" in result
+            ]
+            if len(selected_cells) == len(selected):
+                method_summary["mean_selected_cell_uniform_violation"] = float(
+                    np.mean(
+                        [
+                            cell["uniform_mean_violation_probability"]
+                            for cell in selected_cells
+                        ]
+                    )
+                )
+                method_summary["mean_optimizer_selection_gap"] = float(
+                    np.mean(
+                        [
+                            cell["selected_violation_probability"]
+                            - cell["uniform_mean_violation_probability"]
+                            for cell in selected_cells
+                        ]
+                    )
+                )
         summary["methods"][method] = method_summary
     return summary
 
@@ -299,4 +378,38 @@ def _select(candidates, costs, violation, measure, alpha, eligible):
         "estimated_violation_probability": float(violation[index]),
         "empirically_reliable": bool(violation[index] <= alpha),
         "fitted_feasibility_margin": float(measure[index]),
+    }
+
+
+def _add_selected_cell_diagnostic(
+    result: dict,
+    partition,
+    candidates: np.ndarray,
+    violation: np.ndarray,
+) -> None:
+    """Contrast optimizer risk with uniform risk over its RCC cell."""
+
+    if result["status"] != "selected":
+        return
+    selected = np.asarray(
+        [result["dedicated_per_class"], result["flexible"]], dtype=float
+    )
+    selected_index = int(np.flatnonzero(np.all(candidates == selected, axis=1))[0])
+    containing = [
+        index
+        for index, cell in enumerate(partition.cells)
+        if bool(cell.contains(candidates[[selected_index]])[0])
+    ]
+    if len(containing) != 1:
+        raise RuntimeError("selected decision must belong to exactly one RCC cell")
+    cell_index = containing[0]
+    member = partition.cells[cell_index].contains(candidates)
+    cell_violation = violation[member]
+    result["selected_cell"] = {
+        "index": cell_index,
+        "candidate_count": int(member.sum()),
+        "uniform_mean_violation_probability": float(np.mean(cell_violation)),
+        "minimum_violation_probability": float(np.min(cell_violation)),
+        "maximum_violation_probability": float(np.max(cell_violation)),
+        "selected_violation_probability": float(violation[selected_index]),
     }

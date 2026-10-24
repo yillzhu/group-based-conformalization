@@ -32,15 +32,21 @@ class QueueingExperimentTests(unittest.TestCase):
             {
                 "point_pto",
                 "global_conformal_pto",
+                "global_cqr_pto",
                 "refit_global_conformal_pto",
                 "domain_conformal_pto",
                 "group_based",
                 "oblique_group_based",
+                "rcc_group_based",
                 "risk_stratified",
                 "oracle",
             },
         )
         self.assertGreaterEqual(len(result["model"]["partition"]), 1)
+        rcc = result["methods"]["rcc_group_based"]
+        if rcc["status"] == "selected":
+            self.assertIn("selected_cell", rcc)
+            self.assertGreaterEqual(rcc["selected_cell"]["candidate_count"], 1)
 
     def test_oracle_configuration_mismatch_is_rejected(self):
         with self.assertRaises(ValueError):

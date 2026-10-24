@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+from dataclasses import replace
 import json
 from pathlib import Path
 
@@ -24,6 +25,11 @@ if __name__ == "__main__":
     parser.add_argument("--oracle-seed", type=int, default=92821)
     parser.add_argument("--oracle-simulations", type=int, default=4000)
     parser.add_argument(
+        "--max-splits",
+        type=int,
+        help="override the RCC partition split limit",
+    )
+    parser.add_argument(
         "--oracle-file",
         type=Path,
         help="reuse a JSON oracle produced by estimate_queue_oracle",
@@ -36,6 +42,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if args.replications <= 0 or args.oracle_simulations <= 0:
         parser.error("replication and oracle simulation counts must be positive")
+    if args.max_splits is not None and args.max_splits < 0:
+        parser.error("max splits must be nonnegative")
 
     if args.oracle_file:
         oracle = json.loads(args.oracle_file.read_text())
@@ -50,11 +58,14 @@ if __name__ == "__main__":
             if args.smoke
             else QueueExperimentConfig(seed=seed)
         )
+        if args.max_splits is not None:
+            config = replace(config, max_splits=args.max_splits)
         runs.append(run_queue_experiment(config, oracle))
     result = {
         "study": {
             "seeds": list(range(args.seed, args.seed + args.replications)),
             "smoke": args.smoke,
+            "max_splits": args.max_splits,
         },
         "oracle": oracle,
         "summary": summarize_queue_runs(runs),

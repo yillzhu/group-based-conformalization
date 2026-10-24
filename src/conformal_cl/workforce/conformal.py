@@ -278,6 +278,137 @@ def design_oblique_partition(
     return tuple(cells)
 
 
+def design_optimization_partition(
+    x_design: np.ndarray,
+    scores: np.ndarray,
+    candidates: np.ndarray,
+    lower_prediction: np.ndarray,
+    upper_prediction: np.ndarray,
+    *,
+    alpha: float,
+    max_splits: int = 6,
+    min_design_size: int = 100,
+    feasibility_tolerance: float = 1e-12,
+) -> tuple[PolyhedralCell, ...]:
+    """Construct the optimization-driven partition used by one-sided RCC.
+
+    This is the discrete-grid analogue of the splitting rule in Chapter 4.
+    Within a cell, a design-sample correction conformalizes the fitted upper
+    endpoint.  Cells whose corrected endpoint is uniformly safe or uniformly
+    unsafe are terminal.  An ambiguous cell is split by a hyperplane normal to
+    the segment joining the endpoint minimizer and maximizer, at the estimated
+    zero crossing along that segment (or at its midpoint if the corrected
+    surface does not cross zero).
+
+    Design responses affect the temporary corrections that guide the search,
+    but not the final cell corrections.  Those must be computed later from an
+    independent calibration sample with :func:`calibrate_partition`.
+    """
+
+    x_design = np.asarray(x_design, dtype=float)
+    scores = np.asarray(scores, dtype=float).reshape(-1)
+    candidates = np.asarray(candidates, dtype=float)
+    lower_prediction = np.asarray(lower_prediction, dtype=float).reshape(-1)
+    upper_prediction = np.asarray(upper_prediction, dtype=float).reshape(-1)
+    if (
+        len(x_design) != len(scores)
+        or len(candidates) != len(lower_prediction)
+        or len(candidates) != len(upper_prediction)
+    ):
+        raise ValueError("features, scores, candidates, and predictions must align")
+    if max_splits < 0 or min_design_size < 2:
+        raise ValueError("invalid partition-size parameters")
+
+    cells = [PolyhedralCell()]
+    for _ in range(max_splits):
+        split = None
+        for cell_index, cell in enumerate(cells):
+            design_member = cell.contains(x_design)
+            candidate_indices = np.flatnonzero(cell.contains(candidates))
+            if design_member.sum() < 2 * min_design_size or len(candidate_indices) < 2:
+                continue
+
+            correction = _empirical_upper_quantile(
+                scores[design_member], 1.0 - alpha
+            )
+            local_values = upper_prediction[candidate_indices] + correction
+            local_lower = lower_prediction[candidate_indices] - correction
+            minimum_position = int(np.argmin(local_values))
+            maximum_position = int(np.argmax(local_values))
+            minimum_value = float(local_values[minimum_position])
+            maximum_value = float(local_values[maximum_position])
+
+            # As in Chapter 4, a region is terminal only when its upper endpoint
+            # is uniformly safe or its lower endpoint is uniformly infeasible.
+            # The lower endpoint is used to recognize ambiguity, not to enforce
+            # the one-sided chance constraint.
+            uniformly_safe = maximum_value <= feasibility_tolerance
+            uniformly_infeasible = (
+                float(np.min(local_lower)) >= -feasibility_tolerance
+            )
+            if uniformly_safe or uniformly_infeasible:
+                continue
+
+            minimum_x = candidates[candidate_indices[minimum_position]]
+            maximum_x = candidates[candidate_indices[maximum_position]]
+            normal = maximum_x - minimum_x
+            norm = float(np.linalg.norm(normal))
+            if not np.isfinite(norm) or norm <= feasibility_tolerance:
+                continue
+            normal = normal / norm
+
+            if minimum_value <= feasibility_tolerance and not np.isclose(
+                maximum_value, minimum_value, atol=feasibility_tolerance, rtol=0.0
+            ):
+                split_point = minimum_x - minimum_value * (
+                    maximum_x - minimum_x
+                ) / (maximum_value - minimum_value)
+            else:
+                split_point = (minimum_x + maximum_x) / 2.0
+            desired_threshold = float(normal @ split_point)
+            projections = np.unique(candidates[candidate_indices] @ normal)
+            separated = np.diff(projections) > 4e-12
+            gap_thresholds = (
+                projections[:-1][separated] + projections[1:][separated]
+            ) / 2.0
+            if len(gap_thresholds) == 0:
+                continue
+            children = None
+            for gap_index in np.argsort(np.abs(gap_thresholds - desired_threshold)):
+                threshold = float(gap_thresholds[gap_index])
+                left_bound = (float(normal[0]), float(normal[1]), threshold, 1)
+                right_bound = (float(normal[0]), float(normal[1]), threshold, -1)
+                left = PolyhedralCell((*cell.bounds, left_bound))
+                right = PolyhedralCell((*cell.bounds, right_bound))
+                if min(
+                    int(left.contains(x_design).sum()),
+                    int(right.contains(x_design).sum()),
+                ) < min_design_size:
+                    continue
+                if not left.contains(candidates).any() or not right.contains(candidates).any():
+                    continue
+                children = (left, right)
+                break
+            if children is None:
+                continue
+            left, right = children
+
+            # Process the most strongly ambiguous cell first.  This is only a
+            # deterministic queue priority; the split itself is fixed by the
+            # regional extrema above.
+            ambiguity = maximum_value - minimum_value
+            proposal = (ambiguity, -cell_index)
+            if split is None or proposal > split[0]:
+                split = (proposal, cell_index, left, right)
+
+        if split is None:
+            break
+        _, cell_index, left, right = split
+        cells.pop(cell_index)
+        cells.extend((left, right))
+    return tuple(cells)
+
+
 def calibrate_partition(
     cells: tuple[Cell | PolyhedralCell, ...],
     x_calibration: np.ndarray,
