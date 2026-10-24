@@ -46,7 +46,10 @@ if __name__ == "__main__":
         parser.error("max splits must be nonnegative")
 
     if args.oracle_file:
-        oracle = json.loads(args.oracle_file.read_text())
+        loaded_oracle = json.loads(args.oracle_file.read_text())
+        # Accept either a standalone oracle or a prior queueing result, whose
+        # full reusable oracle is stored under the top-level ``oracle`` key.
+        oracle = loaded_oracle.get("oracle", loaded_oracle)
         oracle_simulations = oracle["simulations"]
     else:
         oracle_simulations = 30 if args.smoke else args.oracle_simulations
