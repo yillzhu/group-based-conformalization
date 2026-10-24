@@ -209,6 +209,29 @@ A preliminary ten-seed smoke sensitivity run, evaluated with the stored
 | 10 | 11.0 | 1/10 |
 | 16 | 16.3 | 6/10 |
 
+The full-size 30-seed runs make the optimizer-selection effect sharper. They can
+be reproduced without resimulating the oracle by passing the earlier result as
+`--oracle-file`:
+
+```bash
+python experiments/workforce/run_queueing.py --replications 30 --max-splits 6 \
+  --oracle-file results/corrected/workforce/queueing_30_seeds.json \
+  --output results/corrected/workforce/queueing_rcc_30_seeds.json
+python experiments/workforce/run_queueing.py --replications 30 --max-splits 16 \
+  --oracle-file results/corrected/workforce/queueing_30_seeds.json \
+  --output results/corrected/workforce/queueing_rcc_30_seeds_splits16.json
+```
+
+| Maximum splits | Reliable selections | Mean cost | Mean selected risk | Mean selected-cell risk | Mean selection gap |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 6 | 0/30 | 12.640 | 0.536 | 0.176 | 0.360 |
+| 16 | 0/30 | 10.627 | 0.665 | 0.109 | 0.556 |
+
+Thus, deeper recursion brings the average risk of the selected cells closer to
+the nominal 0.10 level but makes the selected decisions worse in this experiment.
+Finer groups create more locally favorable corrections for the optimizer to
+exploit without establishing pointwise validity inside those groups.
+
 The recursion cannot refine much further at the smoke design-sample size because
 of the minimum cell-mass requirement. More importantly, the failures illustrate
 the difference between group-average and optimizer-level validity. For seed 3
