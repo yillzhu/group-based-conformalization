@@ -24,6 +24,7 @@ class Cell:
 class CalibratedPartition:
     cells: tuple[Cell, ...]
     corrections: np.ndarray
+    calibration_counts: np.ndarray
 
     def correction(self, x: np.ndarray) -> np.ndarray:
         x = np.asarray(x, dtype=float)
@@ -135,7 +136,8 @@ def calibrate_partition(
         if member.sum() < math.ceil(1.0 / alpha):
             raise ValueError("a partition cell has insufficient final calibration data")
         corrections.append(conformal_order_statistic(scores[member], alpha=alpha))
-    return CalibratedPartition(cells, np.asarray(corrections))
+    counts = np.asarray([cell.contains(x_calibration).sum() for cell in cells])
+    return CalibratedPartition(cells, np.asarray(corrections), counts)
 
 
 def _empirical_upper_quantile(values: np.ndarray, probability: float) -> float:

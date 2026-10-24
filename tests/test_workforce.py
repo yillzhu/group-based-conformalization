@@ -35,6 +35,7 @@ class WorkforceTests(unittest.TestCase):
         second = calibrate_partition(cells, cal_x, np.ones(1000), alpha=0.1)
         self.assertTrue(np.all(first.corrections == 0.0))
         self.assertTrue(np.all(second.corrections == 1.0))
+        self.assertEqual(int(first.calibration_counts.sum()), 1000)
 
     def test_smoke_experiment_is_deterministic_and_returns_all_methods(self):
         config = ExperimentConfig.smoke(seed=2)

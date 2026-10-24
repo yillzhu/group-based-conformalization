@@ -122,9 +122,27 @@ def run_experiment(config: ExperimentConfig) -> dict:
         "model": {
             "target": "one-sided conditional response quantile",
             "quantile": 1.0 - config.alpha,
+            "point_coefficient": point_model.coefficient.tolist(),
+            "upper_quantile_coefficient": upper_model.coefficient.tolist(),
+            "feature_center": upper_model.center.tolist(),
+            "feature_scale": upper_model.scale.tolist(),
             "global_correction": float(q_global),
             "partition_cells": len(cells),
-            "local_corrections": partition.corrections.tolist(),
+            "partition": [
+                {
+                    "lower": cell.lower.tolist(),
+                    "upper": cell.upper.tolist(),
+                    "design_count": int(cell.contains(design_x).sum()),
+                    "calibration_count": int(count),
+                    "correction": float(correction),
+                }
+                for cell, count, correction in zip(
+                    partition.cells,
+                    partition.calibration_counts,
+                    partition.corrections,
+                    strict=True,
+                )
+            ],
         },
         "methods": results,
     }
