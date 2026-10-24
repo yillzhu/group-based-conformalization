@@ -52,6 +52,24 @@ def sample_dataset(
     return x, sample_responses(x, rng)
 
 
+def sample_continuous_dataset(
+    lower: np.ndarray,
+    upper: np.ndarray,
+    size: int,
+    rng: np.random.Generator,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Sample continuous FTE decisions uniformly from a rectangular domain."""
+
+    lower = np.asarray(lower, dtype=float).reshape(-1)
+    upper = np.asarray(upper, dtype=float).reshape(-1)
+    if lower.shape != (2,) or upper.shape != (2,) or np.any(lower >= upper):
+        raise ValueError("bounds must define a nonempty two-dimensional rectangle")
+    if size <= 0:
+        raise ValueError("size must be positive")
+    x = rng.uniform(lower, upper, size=(size, 2))
+    return x, sample_responses(x, rng)
+
+
 def violation_probabilities(
     decisions: np.ndarray, simulations: int, rng: np.random.Generator
 ) -> np.ndarray:
@@ -75,6 +93,53 @@ def violation_probabilities(
     )
     response = overflow - 9.0 * f
     return np.mean(response > 0.0, axis=1)
+
+
+def approximate_continuous_oracle(
+    *,
+    domain_lower: np.ndarray,
+    domain_upper: np.ndarray,
+    alpha: float,
+    simulations: int,
+    rng: np.random.Generator,
+    dedicated_grid_size: int = 2001,
+) -> tuple[np.ndarray, float, float]:
+    """Optimize the empirical chance constraint over continuous flexible FTE.
+
+    Dedicated FTE is searched on a fine grid; for each value, the minimum
+    flexible FTE is the empirical upper quantile of scenario overflow divided by
+    its per-FTE capacity.  The RCC methods do not use this benchmark grid.
+    """
+
+    lower = np.asarray(domain_lower, dtype=float).reshape(2)
+    upper = np.asarray(domain_upper, dtype=float).reshape(2)
+    if not 0.0 < alpha < 1.0 or simulations <= 0 or dedicated_grid_size < 2:
+        raise ValueError("invalid oracle parameters")
+    total = rng.lognormal(
+        np.log(180.0) - 0.5 * 0.28**2, 0.28, simulations
+    )
+    total *= 1.0 + 0.35 * (rng.random(simulations) < 0.08)
+    mix = 1.0 / (1.0 + np.exp(-rng.normal(0.0, 1.05, simulations)))
+    dedicated_values = np.linspace(lower[0], upper[0], dedicated_grid_size)
+    rank = min(simulations - 1, int(np.ceil((1.0 - alpha) * simulations)) - 1)
+    best = None
+    for dedicated in dedicated_values:
+        capacity = 10.0 * dedicated
+        overflow = np.maximum(0.0, mix * total - capacity)
+        overflow += np.maximum(0.0, (1.0 - mix) * total - capacity)
+        required_flexible = float(np.partition(overflow / 9.0, rank)[rank])
+        flexible = max(lower[1], required_flexible)
+        if flexible > upper[1]:
+            continue
+        cost = 2.0 * dedicated + 2.4 * flexible
+        violation = float(np.mean(overflow - 9.0 * flexible > 0.0))
+        proposal = (cost, dedicated, flexible)
+        if best is None or proposal < best[0]:
+            best = (proposal, violation)
+    if best is None:
+        raise ValueError("continuous oracle found no empirically reliable decision")
+    proposal, violation = best
+    return np.asarray(proposal[1:]), float(proposal[0]), violation
 
 
 def _decisions(values: np.ndarray) -> np.ndarray:
