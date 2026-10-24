@@ -187,6 +187,50 @@ any operational subgroup known before seeing calibration responses. Until an
 example passes those comparisons, the queueing study should be presented as a
 negative result and design diagnostic, not evidence of RCC excellence.
 
+## Continuous-FTE RCC experiment
+
+`run_continuous.py` returns to the domain assumed by the original Chapter 4
+code. The decisions are real-valued dedicated and flexible FTE capacity over
+`[4,15] x [0,18]`; the workload simulator in `problem.py` is already defined for
+real-valued capacity. The fitted quantile endpoints are affine, so their extrema
+over every polyhedral region and the final linear-objective problems are solved
+exactly by polygon vertex enumeration. There is no staffing grid in RCC. The
+Monte Carlo oracle alone searches dedicated FTE on a documented fine grid while
+optimizing flexible FTE continuously.
+
+This implementation deliberately reproduces the original adaptive algorithm:
+the same calibration sample constructs the partition and its local CQR
+corrections; the original delta-based representation test is used; undersized
+children inherit their parent's correction and enter the unresolved queue;
+surrogate-safe and unresolved regions are optimized separately; and all regions
+remaining at the split limit are treated as unresolved. It therefore reproduces
+the original computation, including the adaptive-partition statistical caveat,
+rather than the independent partition-design variant.
+
+```bash
+python experiments/workforce/run_continuous.py --smoke --replications 1
+python experiments/workforce/run_continuous.py --replications 30 \
+  --output results/corrected/workforce/continuous_rcc_30_seeds.json
+```
+
+The initial full-size 30-seed run gives a modest comparison rather than a
+showcase:
+
+| Method | Reliable selections | Mean cost | Mean violation probability |
+| --- | ---: | ---: | ---: |
+| Point PTO | 0/30 | 23.882 | 0.8283 |
+| Global CQR PTO | 26/30 | 40.658 | 0.0862 |
+| Continuous RCC | 27/30 | 40.864 | 0.0844 |
+| Monte Carlo oracle | 16/30 | 39.143 | 0.1001 |
+
+RCC was cheaper than global CQR in 6 runs, tied in 1, and costlier in 23; its
+mean paired cost difference was `+0.207`. The oracle is constructed on the
+empirical 0.10 boundary, so independent Monte Carlo evaluation places it above
+or below 0.10 with roughly equal frequency; its 16/30 classification should not
+be read as an oracle failure. These results show that the literal continuous
+implementation works and yields sensible fractional solutions, but they do not
+yet demonstrate a material RCC advantage over global CQR.
+
 ### Optimization-driven RCC diagnostic
 
 The earlier queueing results called residual-heterogeneity partitions RCC, but
