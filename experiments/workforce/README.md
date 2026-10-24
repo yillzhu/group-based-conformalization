@@ -144,11 +144,16 @@ python experiments/workforce/run_queueing.py --smoke --replications 1
 python experiments/workforce/run_queueing.py --replications 30
 ```
 
-The implementation compares point PTO, global conformal PTO, global conformal
-PTO after equal-information model refitting, calibration restricted to a known
-decision domain, rectangular RCC, oblique-halfspace RCC, fixed predicted-risk
-strata, and a Monte Carlo oracle. Oblique partitions are included because the
-dedicated/flexible substitution frontier is diagonal rather than axis aligned.
+The implementation compares point PTO, one-sided and two-endpoint CQR global
+conformal PTO, global conformal PTO after equal-information model refitting,
+calibration restricted to a known
+decision domain, residual-heterogeneity rectangular and oblique partitions,
+the optimization-driven RCC partition from Chapter 4, fixed predicted-risk
+strata, and a Monte Carlo oracle. The optimization-driven partition uses a
+separate design sample to construct hyperplanes from regional extrema and an
+untouched final sample to calibrate the resulting cells. Oblique alternatives
+are included because the dedicated/flexible substitution frontier is diagonal
+rather than axis aligned.
 
 The initial queueing configuration trained the predictor on incumbent policies
 with seven or eight dedicated workers per class, while partition design and
@@ -181,3 +186,41 @@ the predictive model with the same labeled information and (ii) calibrating on
 any operational subgroup known before seeing calibration responses. Until an
 example passes those comparisons, the queueing study should be presented as a
 negative result and design diagnostic, not evidence of RCC excellence.
+
+### Optimization-driven RCC diagnostic
+
+The earlier queueing results called residual-heterogeneity partitions RCC, but
+their split rule did not match Chapter 4. The implementation now also includes
+`rcc_group_based`, a discrete-grid version of the chapter's rule. It fits both
+quantile endpoints, forms the CQR score
+`max(y - upper, lower - y)`, and recursively splits an ambiguous region with a
+hyperplane normal to the segment joining the regional minimizer and maximizer
+of the conformalized upper endpoint. On the discrete grid, the cut is moved to
+the nearest parallel gap that leaves the required number of design observations
+on both sides. Final corrections use only the independent calibration sample.
+
+A preliminary ten-seed smoke sensitivity run, evaluated with the stored
+4,000-day oracle, shows the locality/mass tradeoff directly:
+
+| Maximum splits | Mean terminal cells | Reliable RCC selections |
+| ---: | ---: | ---: |
+| 4 | 5.0 | 0/10 |
+| 6 | 7.0 | 0/10 |
+| 10 | 11.0 | 1/10 |
+| 16 | 16.3 | 6/10 |
+
+The recursion cannot refine much further at the smoke design-sample size because
+of the minimum cell-mass requirement. More importantly, the failures illustrate
+the difference between group-average and optimizer-level validity. For seed 3
+with 16 splits, RCC selected `(4,3)`, whose oracle violation probability is
+0.28075. The four staffing plans in its terminal cell have uniform-average
+violation probability 0.08194: the optimizer selected the riskiest point inside
+an acceptable-looking group. Each RCC result now records this selected-cell
+diagnostic, and the summary reports the average optimizer-selection gap.
+
+These numbers are diagnostic rather than a final benchmark: they use the smoke
+training, design, and calibration sizes. They nevertheless give the call-center
+example a useful theoretical role. It exhibits exactly why restricted
+conditional coverage over a region does not automatically provide a guarantee
+at a data-dependent optimizer inside that region, and why the shrinking-cell
+conditions in the chapter matter.
