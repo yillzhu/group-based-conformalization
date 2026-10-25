@@ -60,6 +60,7 @@ python -m pip install -e '.[enrollment,quadratic]'
 python experiments/sec46_enrollment/train.py  # writes results/corrected/enrollment
 python experiments/sec46_enrollment/run.py    # writes results/corrected/enrollment
 python experiments/sec46_enrollment/audit.py  # solver-free validity diagnostics
+python experiments/sec46_enrollment/oracle_benchmark.py  # known-oracle follow-up
 python experiments/sec45_quadratic/run.py     # writes results/corrected/quadratic
 ```
 

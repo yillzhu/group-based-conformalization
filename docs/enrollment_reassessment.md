@@ -61,6 +61,34 @@ the main statistical validation of RCC. Probability calibration and monotonic
 architectures can improve its surrogate, but cannot reconstruct an unreported
 oracle after the fact.
 
+## Known-oracle follow-up and negative control
+
+`oracle_benchmark.py` implements the proposed follow-up as a cohort-level tuition
+experiment. It publishes a monotone Bernoulli response mechanism, observes repeated
+cohort enrollment rates, trains a merit-monotone point model and interval model,
+uses independent conformal calibration data, and evaluates optimized decisions
+against the oracle. Cohort size is supplied to every predictive method because it
+is known and determines sampling variance.
+
+```bash
+python experiments/sec46_enrollment/oracle_benchmark.py
+python experiments/sec46_enrollment/oracle_stress.py --runs 30 --jobs 4
+```
+
+The 30-seed equal-information stress test is negative. Global CQR averaged
+$9,718.05 in cohort-weighted merit per student and localized calibration averaged
+$9,730.94. Localization was cheaper in 10 runs, costlier in 19, and tied in one;
+its mean "saving" was -$12.89, with a range from -$154.32 to $211.02. Global CQR
+met the oracle 90% predictive criterion in all 360 segment decisions. Localization
+missed once (oracle success probability 0.875).
+
+An intentionally incomplete baseline that omitted known cohort size made
+localization appear to save about $484 per student. Giving cohort size to the
+quantile model eliminated that apparent advantage. The omitted-feature result is
+therefore a diagnostic ablation, not evidence for RCC. This benchmark currently
+provides no evidence that localization improves the tuition decision when all
+methods receive the same information.
+
 Primary sources:
 
 - Bergman et al., *JANOS: An Integrated Predictive and Prescriptive Modeling
