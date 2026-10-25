@@ -13,15 +13,23 @@ from .continuous_experiment import (
     run_continuous_experiment,
     summarize_continuous_runs,
 )
+from .continuous_queue_experiment import (
+    ContinuousQueueExperimentConfig,
+    run_continuous_queue_experiment,
+    summarize_continuous_queue_runs,
+)
 
 __all__ = [
     "ExperimentConfig",
     "ContinuousExperimentConfig",
+    "ContinuousQueueExperimentConfig",
     "QueueExperimentConfig",
     "estimate_queue_oracle",
     "run_experiment",
     "run_continuous_experiment",
+    "run_continuous_queue_experiment",
     "summarize_continuous_runs",
+    "summarize_continuous_queue_runs",
     "run_queue_experiment",
     "run_study",
     "summarize_runs",
