@@ -44,7 +44,8 @@ If recovered, add those CSVs to `results/quadratic/` and rerun. See
 | `results/` | Working enrollment copies, new quadratic outputs, aggregated table exports |
 
 [Thesis crosswalk](docs/thesis_map.md) · [Findings](docs/findings.md) ·
-[Refactor policy](docs/refactor_policy.md) · [Data](data/README.md)
+[Refactor policy](docs/refactor_policy.md) ·
+[Enrollment reassessment](docs/enrollment_reassessment.md) · [Data](data/README.md)
 
 ## Running the corrected experiments
 
@@ -58,6 +59,7 @@ required to solve either experiment.
 python -m pip install -e '.[enrollment,quadratic]'
 python experiments/sec46_enrollment/train.py  # writes results/corrected/enrollment
 python experiments/sec46_enrollment/run.py    # writes results/corrected/enrollment
+python experiments/sec46_enrollment/audit.py  # solver-free validity diagnostics
 python experiments/sec45_quadratic/run.py     # writes results/corrected/quadratic
 ```
 
