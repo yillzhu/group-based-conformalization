@@ -231,6 +231,73 @@ be read as an oracle failure. These results show that the literal continuous
 implementation works and yields sensible fractional solutions, but they do not
 yet demonstrate a material RCC advantage over global CQR.
 
+## Continuous-capacity QED call-center experiment
+
+`run_continuous_queue.py` restores the congestion and pooling structure that the
+continuous workload proxy lacked. For scenario-specific offered loads (L_i),
+the square-root staffing approximation requires
+
+```text
+r_i = L_i + beta * sqrt(L_i)
+```
+
+capacity in class `i`. Dedicated FTE is used first and a shared cross-trained
+pool covers the remaining requirement, giving the continuous response
+
+```text
+y(d, f) = sum_i max(r_i - d, 0) / eta - f.
+```
+
+A day violates the service requirement when `y(d,f) > 0`. Daily volume, surge
+incidence, and class mix are random. The default parameters use `beta=1.6`,
+cross-training efficiency `eta=0.9`, and cost `2 d + 1.4 f`. The operational
+domain is `[4,12] x [0,9]`; the Monte Carlo oracle is interior, near `(5.5,4.3)`.
+Predictive models are trained on incumbent policies in `[4,9] x [1,6]`.
+
+The first ten seeds were used exploratorily to choose a prespecified safety
+buffer: both global CQR and RCC are calibrated at 5% miscoverage and evaluated
+against a 10% operational violation target. This buffer is essential. On the
+30-seed holdout `10--39`, nominal 10% RCC was unsafe in all 30 runs, with mean
+risk 0.1283. The frozen buffered specification gave:
+
+| Method | Reliable selections | Mean cost | Mean violation probability |
+| --- | ---: | ---: | ---: |
+| Point PTO | 0/30 | 12.999 | 0.6371 |
+| Buffered global CQR | 30/30 | 22.323 | 0.0069 |
+| Buffered RCC | 30/30 | 18.445 | 0.0669 |
+| Monte Carlo oracle | boundary estimate | 17.052 | 0.1005 |
+
+The same frozen configuration was then evaluated on 100 untouched seeds
+`40--139`:
+
+| Method | Reliable selections | Mean cost | Mean violation probability |
+| --- | ---: | ---: | ---: |
+| Point PTO | 0/100 | 12.983 | 0.6403 |
+| Buffered global CQR | 100/100 | 22.373 | 0.0071 |
+| Buffered RCC | 100/100 | 18.444 | 0.0672 |
+| Monte Carlo oracle | boundary estimate | 17.058 | 0.1003 |
+
+RCC was cheaper than global CQR in all 100 confirmation runs, by `3.929` on
+average, and recovered approximately 74% of the global-to-oracle cost gap. Its
+largest independently estimated violation probability was 0.0953. Reproduce the
+confirmation with:
+
+```bash
+python experiments/workforce/run_continuous_queue.py --buffered \
+  --seed 40 --replications 100 \
+  --output results/corrected/workforce/continuous_queue_confirmation.json
+```
+
+This is promising evidence for the operational value of localization: the
+global safety buffer is extremely conservative because it must accommodate the
+whole decision domain, while RCC spends the same buffer locally and approaches
+the oracle cost. It is not a nominal optimizer-level coverage theorem. Every
+selected RCC solution came from an unresolved region, and the unbuffered
+negative control demonstrates the adaptive optimizer-selection gap directly.
+The model is a standard square-root staffing approximation rather than a full
+discrete-event queue, so a later study should test whether the result survives a
+higher-fidelity simulator.
+
 ### Optimization-driven RCC diagnostic
 
 The earlier queueing results called residual-heterogeneity partitions RCC, but
