@@ -168,6 +168,8 @@ def run_power_audit(config: PowerAuditConfig) -> dict:
             "status": rcc.status,
             "splits": rcc.splits,
             "terminal_regions": rcc.terminal_regions,
+            "certified_safe_regions": rcc.certified_safe_regions,
+            "uncertified_regions": rcc.uncertified_regions,
             "discarded_regions": rcc.discarded_regions,
         }
     else:
@@ -191,8 +193,12 @@ def run_power_audit(config: PowerAuditConfig) -> dict:
             "response_quantile": float(np.quantile(response, 1. - config.alpha)),
             "splits": rcc.splits,
             "terminal_regions": rcc.terminal_regions,
+            "certified_safe_regions": rcc.certified_safe_regions,
+            "uncertified_regions": rcc.uncertified_regions,
             "discarded_regions": rcc.discarded_regions,
-            "scope": "finite candidate approximation to Chapter 4 RCC",
+            "scope": (
+                "finite candidate safe-region approximation to Chapter 4 RCC"
+            ),
         }
 
     leaves = []

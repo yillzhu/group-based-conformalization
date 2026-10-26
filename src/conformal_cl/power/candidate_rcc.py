@@ -21,6 +21,8 @@ class CandidateRCCResult:
     correction: float | None
     splits: int
     terminal_regions: int
+    certified_safe_regions: int
+    uncertified_regions: int
     discarded_regions: int
 
 
@@ -66,7 +68,8 @@ def run_candidate_rcc(
     root = Group()
     root.conformalize(design_x, design_scores, alpha=alpha, delta=delta)
     queue = deque([root]) if root.Xhat else deque()
-    terminal = [] if root.Xhat else [root]
+    terminal = []
+    uncertified = 0 if root.Xhat else 1
     discarded = 0
     splits = 0
     while queue and splits < max_splits:
@@ -109,11 +112,14 @@ def run_candidate_rcc(
             if child.Xhat:
                 queue.append(child)
             else:
-                terminal.append(child)
+                # A child rejected by the chapter's delta-based representation
+                # rule is not eligible for a final safe-region certificate.
+                uncertified += 1
         splits += 1
     terminal.extend(queue)
 
     best = None
+    certified = 0
     for region in terminal:
         calibration_mask = _membership(region, calibration_x)
         try:
@@ -121,22 +127,32 @@ def run_candidate_rcc(
                 calibration_scores[calibration_mask], alpha=alpha
             )
         except InsufficientCalibrationError:
+            uncertified += 1
             continue
         candidate_mask = _membership(region, candidate_x)
-        feasible = candidate_mask & (prediction + correction <= 0.)
-        indices = np.flatnonzero(feasible)
+        indices = np.flatnonzero(candidate_mask)
         if not len(indices):
             continue
+        # Safe-region interpretation: the independently recalibrated upper
+        # bound must certify the entire finite region.  It is not enough that
+        # the optimizer can find one apparently feasible point inside an
+        # otherwise unresolved region.
+        if np.max(prediction[indices] + correction) > 0.:
+            uncertified += 1
+            continue
+        certified += 1
         index = int(indices[np.argmin(cost[indices])])
         proposal = (float(cost[index]), index, float(correction))
         if best is None or proposal < best:
             best = proposal
     if best is None:
         return CandidateRCCResult(
-            "no_candidate", None, None, splits, len(terminal), discarded
+            "no_safe_region", None, None, splits, len(terminal), certified,
+            uncertified, discarded,
         )
     return CandidateRCCResult(
-        "selected", best[1], best[2], splits, len(terminal), discarded
+        "selected", best[1], best[2], splits, len(terminal), certified,
+        uncertified, discarded,
     )
 
 
