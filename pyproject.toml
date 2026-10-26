@@ -17,6 +17,7 @@ quadratic = ["tensorflow==2.18.0", "scikit-learn", "gurobipy", "gurobi-machinele
 illustrations = ["matplotlib"]
 test = ["scikit-learn"]
 workforce-neural = ["torch"]
+power = ["scikit-learn", "scipy"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
