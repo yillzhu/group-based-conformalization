@@ -1,0 +1,590 @@
+{
+  "config": {
+    "seed": 0,
+    "replications": 200,
+    "calibration_size": 4000,
+    "alpha": 0.1,
+    "beta": 0.05,
+    "delta": 0.1
+  },
+  "environment": {
+    "python": "3.12.15",
+    "numpy": "2.5.4"
+  },
+  "population": [
+    {
+      "case": "homogeneous",
+      "edges": [
+        0.0,
+        4.0
+      ],
+      "scales": [
+        0.1
+      ],
+      "methods": {
+        "global_cqr": {
+          "status": "selected",
+          "capacity_cost": 1.09,
+          "exact_violation_probability": 0.0499999999999996
+        },
+        "rcc": {
+          "status": "selected",
+          "capacity_cost": 1.09,
+          "exact_violation_probability": 0.0499999999999996,
+          "interval": [
+            0.0,
+            1.09
+          ],
+          "correction_width": 0.09,
+          "route": "unresolved",
+          "sufficiently_represented": true,
+          "splits": 1,
+          "safe_regions": 1,
+          "unresolved_regions": 1,
+          "selected_cell_crosses_scale_boundary": false
+        },
+        "known_regions_cqr": {
+          "status": "selected",
+          "capacity_cost": 1.09,
+          "exact_violation_probability": 0.0499999999999996
+        },
+        "known_scale_cqr": {
+          "status": "selected",
+          "capacity_cost": 1.09,
+          "exact_violation_probability": 0.0499999999999996
+        },
+        "chance_oracle": {
+          "status": "selected",
+          "capacity_cost": 1.08,
+          "exact_violation_probability": 0.09999999999999964
+        }
+      }
+    },
+    {
+      "case": "aligned",
+      "edges": [
+        0.0,
+        1.2,
+        4.0
+      ],
+      "scales": [
+        0.1,
+        0.4
+      ],
+      "methods": {
+        "global_cqr": {
+          "status": "selected",
+          "capacity_cost": 1.342857142857143,
+          "exact_violation_probability": 0.07142857142857129
+        },
+        "rcc": {
+          "status": "selected",
+          "capacity_cost": 1.09,
+          "exact_violation_probability": 0.0499999999999996,
+          "interval": [
+            0.0,
+            1.09
+          ],
+          "correction_width": 0.09,
+          "route": "unresolved",
+          "sufficiently_represented": true,
+          "splits": 4,
+          "safe_regions": 1,
+          "unresolved_regions": 4,
+          "selected_cell_crosses_scale_boundary": false
+        },
+        "known_regions_cqr": {
+          "status": "selected",
+          "capacity_cost": 1.09,
+          "exact_violation_probability": 0.0499999999999996
+        },
+        "known_scale_cqr": {
+          "status": "selected",
+          "capacity_cost": 1.09,
+          "exact_violation_probability": 0.0499999999999996
+        },
+        "chance_oracle": {
+          "status": "selected",
+          "capacity_cost": 1.08,
+          "exact_violation_probability": 0.09999999999999964
+        }
+      }
+    },
+    {
+      "case": "interior_quiet_region",
+      "edges": [
+        0.0,
+        0.9,
+        1.4,
+        4.0
+      ],
+      "scales": [
+        0.4,
+        0.1,
+        0.4
+      ],
+      "methods": {
+        "global_cqr": {
+          "status": "selected",
+          "capacity_cost": 1.3542857142857143,
+          "exact_violation_probability": 0.0
+        },
+        "rcc": {
+          "status": "selected",
+          "capacity_cost": 1.2835430463576158,
+          "exact_violation_probability": 0.0,
+          "interval": [
+            1.2835430463576158,
+            1.3398095238095238
+          ],
+          "correction_width": 0.28354304635761596,
+          "route": "unresolved",
+          "sufficiently_represented": false,
+          "splits": 12,
+          "safe_regions": 1,
+          "unresolved_regions": 12,
+          "selected_cell_crosses_scale_boundary": false
+        },
+        "known_regions_cqr": {
+          "status": "selected",
+          "capacity_cost": 1.09,
+          "exact_violation_probability": 0.0499999999999996
+        },
+        "known_scale_cqr": {
+          "status": "selected",
+          "capacity_cost": 1.09,
+          "exact_violation_probability": 0.0499999999999996
+        },
+        "chance_oracle": {
+          "status": "selected",
+          "capacity_cost": 1.08,
+          "exact_violation_probability": 0.09999999999999964
+        }
+      }
+    }
+  ],
+  "population_delta_sensitivity": [
+    {
+      "case": "homogeneous",
+      "delta": 0.2,
+      "rcc": {
+        "status": "selected",
+        "capacity_cost": 1.09,
+        "exact_violation_probability": 0.0499999999999996,
+        "interval": [
+          0.0,
+          1.09
+        ],
+        "correction_width": 0.09,
+        "route": "unresolved",
+        "sufficiently_represented": true,
+        "splits": 1,
+        "safe_regions": 1,
+        "unresolved_regions": 1,
+        "selected_cell_crosses_scale_boundary": false
+      }
+    },
+    {
+      "case": "homogeneous",
+      "delta": 0.1,
+      "rcc": {
+        "status": "selected",
+        "capacity_cost": 1.09,
+        "exact_violation_probability": 0.0499999999999996,
+        "interval": [
+          0.0,
+          1.09
+        ],
+        "correction_width": 0.09,
+        "route": "unresolved",
+        "sufficiently_represented": true,
+        "splits": 1,
+        "safe_regions": 1,
+        "unresolved_regions": 1,
+        "selected_cell_crosses_scale_boundary": false
+      }
+    },
+    {
+      "case": "homogeneous",
+      "delta": 0.05,
+      "rcc": {
+        "status": "selected",
+        "capacity_cost": 1.09,
+        "exact_violation_probability": 0.0499999999999996,
+        "interval": [
+          0.0,
+          1.09
+        ],
+        "correction_width": 0.09,
+        "route": "unresolved",
+        "sufficiently_represented": true,
+        "splits": 1,
+        "safe_regions": 1,
+        "unresolved_regions": 1,
+        "selected_cell_crosses_scale_boundary": false
+      }
+    },
+    {
+      "case": "homogeneous",
+      "delta": 0.02,
+      "rcc": {
+        "status": "selected",
+        "capacity_cost": 1.09,
+        "exact_violation_probability": 0.0499999999999996,
+        "interval": [
+          0.0,
+          1.09
+        ],
+        "correction_width": 0.09,
+        "route": "unresolved",
+        "sufficiently_represented": true,
+        "splits": 1,
+        "safe_regions": 1,
+        "unresolved_regions": 1,
+        "selected_cell_crosses_scale_boundary": false
+      }
+    },
+    {
+      "case": "homogeneous",
+      "delta": 0.01,
+      "rcc": {
+        "status": "selected",
+        "capacity_cost": 1.09,
+        "exact_violation_probability": 0.0499999999999996,
+        "interval": [
+          0.0,
+          1.09
+        ],
+        "correction_width": 0.09,
+        "route": "unresolved",
+        "sufficiently_represented": true,
+        "splits": 1,
+        "safe_regions": 1,
+        "unresolved_regions": 1,
+        "selected_cell_crosses_scale_boundary": false
+      }
+    },
+    {
+      "case": "aligned",
+      "delta": 0.2,
+      "rcc": {
+        "status": "selected",
+        "capacity_cost": 1.09,
+        "exact_violation_probability": 0.0499999999999996,
+        "interval": [
+          0.0,
+          1.09
+        ],
+        "correction_width": 0.09,
+        "route": "unresolved",
+        "sufficiently_represented": true,
+        "splits": 4,
+        "safe_regions": 1,
+        "unresolved_regions": 4,
+        "selected_cell_crosses_scale_boundary": false
+      }
+    },
+    {
+      "case": "aligned",
+      "delta": 0.1,
+      "rcc": {
+        "status": "selected",
+        "capacity_cost": 1.09,
+        "exact_violation_probability": 0.0499999999999996,
+        "interval": [
+          0.0,
+          1.09
+        ],
+        "correction_width": 0.09,
+        "route": "unresolved",
+        "sufficiently_represented": true,
+        "splits": 4,
+        "safe_regions": 1,
+        "unresolved_regions": 4,
+        "selected_cell_crosses_scale_boundary": false
+      }
+    },
+    {
+      "case": "aligned",
+      "delta": 0.05,
+      "rcc": {
+        "status": "selected",
+        "capacity_cost": 1.09,
+        "exact_violation_probability": 0.0499999999999996,
+        "interval": [
+          0.0,
+          1.09
+        ],
+        "correction_width": 0.09,
+        "route": "unresolved",
+        "sufficiently_represented": true,
+        "splits": 21,
+        "safe_regions": 1,
+        "unresolved_regions": 21,
+        "selected_cell_crosses_scale_boundary": false
+      }
+    },
+    {
+      "case": "aligned",
+      "delta": 0.02,
+      "rcc": {
+        "status": "selected",
+        "capacity_cost": 1.09,
+        "exact_violation_probability": 0.0499999999999996,
+        "interval": [
+          0.0,
+          1.09
+        ],
+        "correction_width": 0.09,
+        "route": "unresolved",
+        "sufficiently_represented": true,
+        "splits": 21,
+        "safe_regions": 1,
+        "unresolved_regions": 21,
+        "selected_cell_crosses_scale_boundary": false
+      }
+    },
+    {
+      "case": "aligned",
+      "delta": 0.01,
+      "rcc": {
+        "status": "selected",
+        "capacity_cost": 1.09,
+        "exact_violation_probability": 0.0499999999999996,
+        "interval": [
+          0.0,
+          1.09
+        ],
+        "correction_width": 0.09,
+        "route": "unresolved",
+        "sufficiently_represented": true,
+        "splits": 21,
+        "safe_regions": 1,
+        "unresolved_regions": 21,
+        "selected_cell_crosses_scale_boundary": false
+      }
+    },
+    {
+      "case": "interior_quiet_region",
+      "delta": 0.2,
+      "rcc": {
+        "status": "selected",
+        "capacity_cost": 1.3398095238095238,
+        "exact_violation_probability": 0.0,
+        "interval": [
+          1.3398095238095238,
+          1.3542857142857143
+        ],
+        "correction_width": 0.33980952380952384,
+        "route": "unresolved",
+        "sufficiently_represented": false,
+        "splits": 9,
+        "safe_regions": 1,
+        "unresolved_regions": 9,
+        "selected_cell_crosses_scale_boundary": false
+      }
+    },
+    {
+      "case": "interior_quiet_region",
+      "delta": 0.1,
+      "rcc": {
+        "status": "selected",
+        "capacity_cost": 1.2835430463576158,
+        "exact_violation_probability": 0.0,
+        "interval": [
+          1.2835430463576158,
+          1.3398095238095238
+        ],
+        "correction_width": 0.28354304635761596,
+        "route": "unresolved",
+        "sufficiently_represented": false,
+        "splits": 12,
+        "safe_regions": 1,
+        "unresolved_regions": 12,
+        "selected_cell_crosses_scale_boundary": false
+      }
+    },
+    {
+      "case": "interior_quiet_region",
+      "delta": 0.05,
+      "rcc": {
+        "status": "selected",
+        "capacity_cost": 1.09,
+        "exact_violation_probability": 0.0499999999999996,
+        "interval": [
+          0.9767239041311888,
+          1.09
+        ],
+        "correction_width": 0.09,
+        "route": "unresolved",
+        "sufficiently_represented": false,
+        "splits": 15,
+        "safe_regions": 1,
+        "unresolved_regions": 14,
+        "selected_cell_crosses_scale_boundary": false
+      }
+    },
+    {
+      "case": "interior_quiet_region",
+      "delta": 0.02,
+      "rcc": {
+        "status": "selected",
+        "capacity_cost": 1.09,
+        "exact_violation_probability": 0.0499999999999996,
+        "interval": [
+          0.9767239041311888,
+          1.09
+        ],
+        "correction_width": 0.09,
+        "route": "unresolved",
+        "sufficiently_represented": true,
+        "splits": 19,
+        "safe_regions": 2,
+        "unresolved_regions": 15,
+        "selected_cell_crosses_scale_boundary": false
+      }
+    },
+    {
+      "case": "interior_quiet_region",
+      "delta": 0.01,
+      "rcc": {
+        "status": "selected",
+        "capacity_cost": 1.09,
+        "exact_violation_probability": 0.0499999999999996,
+        "interval": [
+          0.9767239041311888,
+          1.09
+        ],
+        "correction_width": 0.09,
+        "route": "unresolved",
+        "sufficiently_represented": true,
+        "splits": 24,
+        "safe_regions": 3,
+        "unresolved_regions": 18,
+        "selected_cell_crosses_scale_boundary": false
+      }
+    }
+  ],
+  "finite_sample": [
+    {
+      "case": "homogeneous",
+      "summary": {
+        "global_cqr": {
+          "selected": 200,
+          "reliable": 200,
+          "mean_cost": 1.0899960371350184,
+          "mean_exact_risk": 0.05001981432490782,
+          "max_exact_risk": 0.05610246261994867
+        },
+        "rcc": {
+          "selected": 200,
+          "reliable": 200,
+          "mean_cost": 1.0894838354146987,
+          "mean_exact_risk": 0.052580822926506954,
+          "max_exact_risk": 0.06844082631857051
+        },
+        "known_regions_cqr": {
+          "selected": 200,
+          "reliable": 200,
+          "mean_cost": 1.0899960371350184,
+          "mean_exact_risk": 0.05001981432490782,
+          "max_exact_risk": 0.05610246261994867
+        },
+        "known_scale_cqr": {
+          "selected": 200,
+          "reliable": 200,
+          "mean_cost": 1.0899960371350184,
+          "mean_exact_risk": 0.05001981432490782,
+          "max_exact_risk": 0.05610246261994867
+        },
+        "simultaneous_tolerance": {
+          "selected": 200,
+          "reliable": 187,
+          "mean_cost": 1.0815318379744752,
+          "mean_exact_risk": 0.09234081012762427,
+          "max_exact_risk": 0.10727112089357904
+        }
+      }
+    },
+    {
+      "case": "aligned",
+      "summary": {
+        "global_cqr": {
+          "selected": 200,
+          "reliable": 200,
+          "mean_cost": 1.342973361913541,
+          "mean_exact_risk": 0.07128329760807357,
+          "max_exact_risk": 0.07935274579644003
+        },
+        "rcc": {
+          "selected": 200,
+          "reliable": 200,
+          "mean_cost": 1.0898888093478747,
+          "mean_exact_risk": 0.050555953260627146,
+          "max_exact_risk": 0.0653463159391161
+        },
+        "known_regions_cqr": {
+          "selected": 200,
+          "reliable": 200,
+          "mean_cost": 1.0900974203770273,
+          "mean_exact_risk": 0.0495128981148633,
+          "max_exact_risk": 0.06159654338065601
+        },
+        "known_scale_cqr": {
+          "selected": 200,
+          "reliable": 200,
+          "mean_cost": 1.0900329180017287,
+          "mean_exact_risk": 0.0498354099913565,
+          "max_exact_risk": 0.05767823569771746
+        },
+        "simultaneous_tolerance": {
+          "selected": 200,
+          "reliable": 198,
+          "mean_cost": 1.0834822652444884,
+          "mean_exact_risk": 0.08258867377755756,
+          "max_exact_risk": 0.1031574376784723
+        }
+      }
+    },
+    {
+      "case": "interior_quiet_region",
+      "summary": {
+        "global_cqr": {
+          "selected": 200,
+          "reliable": 200,
+          "mean_cost": 1.3545291563485375,
+          "mean_exact_risk": 0.0,
+          "max_exact_risk": 0.0
+        },
+        "rcc": {
+          "selected": 200,
+          "reliable": 200,
+          "mean_cost": 1.2369824033650243,
+          "mean_exact_risk": 0.01260266796997799,
+          "max_exact_risk": 0.07744035163876295
+        },
+        "known_regions_cqr": {
+          "selected": 200,
+          "reliable": 200,
+          "mean_cost": 1.0901561630858414,
+          "mean_exact_risk": 0.04921918457079305,
+          "max_exact_risk": 0.06771408281798741
+        },
+        "known_scale_cqr": {
+          "selected": 200,
+          "reliable": 200,
+          "mean_cost": 1.09005766825908,
+          "mean_exact_risk": 0.04971165870460013,
+          "max_exact_risk": 0.05534509159587597
+        },
+        "simultaneous_tolerance": {
+          "selected": 200,
+          "reliable": 197,
+          "mean_cost": 1.0856684110330683,
+          "mean_exact_risk": 0.07165794483465868,
+          "max_exact_risk": 0.11416467710083267
+        }
+      }
+    }
+  ]
+}

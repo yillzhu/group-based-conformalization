@@ -22,3 +22,6 @@ results/power/*
 !results/power/audit_seed0_rcc.json
 !results/power/audit_seed1_rcc.json
 !results/power/audit_seed2_rcc.json
+!results/transparent/
+results/transparent/*
+!results/transparent/capacity_audit.json

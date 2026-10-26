@@ -40,6 +40,7 @@ If recovered, add those CSVs to `results/quadratic/` and rerun. See
 | `experiments/sec46_enrollment/` | Original enrollment training, comparison, and legacy sample |
 | `experiments/workforce/` | Solver-free cross-trained workforce stress test and negative control |
 | `experiments/power/` | IEEE 39-bus security-dispatch RCC falsification audit |
+| `experiments/transparent/` | One-variable capacity example with exact risk, population RCC, and calibration assumptions |
 | `notebooks/thesis_results.ipynb` | Thesis table aggregation, diagnostics, input hashes, CSV exports |
 | `examples/illustrations.ipynb` | Original supplemental conceptual drawings, with a findings notice |
 | `results/` | Working enrollment copies, new quadratic outputs, aggregated table exports |
@@ -125,3 +126,15 @@ entire finite candidate set is certified feasible. The earlier point-selection
 interpretation could return an apparent saving, but that decision violated the 10%
 risk target badly. This negative result is retained to prevent example selection by
 favorable seed. See [the experiment notes](experiments/power/README.md).
+
+## Transparent RCC mechanism study
+
+The [one-variable capacity study](experiments/transparent/README.md) isolates the
+partition mechanism with an exact mean predictor, iid full-domain calibration
+inputs, and analytic optimization and risk. In one constructed case RCC lowers
+population cost from 1.343 to 1.090 while reducing true risk from 7.14% to 5%.
+An interior low-noise region reveals sensitivity to the group-size threshold.
+A correctly scaled conformal predictor matches or improves on RCC throughout.
+The notes also give a separate optimizer-valid calibration construction under
+explicit assumptions on residual laws within fixed groups; this is not claimed
+as a guarantee for the adaptive RCC algorithm.
