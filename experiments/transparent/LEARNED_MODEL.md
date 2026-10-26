@@ -1,5 +1,8 @@
 # Learning conditional quantiles in the capacity example
 
+For quantitative bounds, exact population-versus-sampling diagnostics, and
+harder-model stresses, see [Quantifying RCC](QUANTIFYING_RCC.md).
+
 This follow-up addresses criterion 3: a good ML model learned from full-domain
 observations. The original study supplied an exact mean and omitted residual
 scale from the unscaled interval model. Here the mean, the locations where
