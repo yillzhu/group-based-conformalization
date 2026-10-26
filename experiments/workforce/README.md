@@ -298,6 +298,58 @@ The model is a standard square-root staffing approximation rather than a full
 discrete-event queue, so a later study should test whether the result survives a
 higher-fidelity simulator.
 
+### Predictive-capacity stress test
+
+The original call-center comparison uses affine point and quantile regressions.
+To determine whether this low-capacity choice creates the RCC advantage,
+`run_continuous_queue.py` also supports continuous piecewise-affine models in
+dedicated staffing through `--spline-knots`. The flexible-staff effect remains
+linear, matching the simulator. RCC intersects each polyhedral region with the
+spline strips, so all regional extrema and final optimization problems remain
+exact over the continuous domain; this diagnostic does not introduce a staffing
+grid.
+
+We fixed capacities at 0, 3, 7, and 15 equally spaced knots and compared two
+training designs on the same seeds 140--169. The incumbent design uses only
+historical policies in `[4,9] x [1,6]`; the full-support design samples the whole
+operational domain `[4,12] x [0,9]`. All runs retain the prespecified 5% conformal
+calibration buffer and the 10% operational risk target.
+
+| Training support | Knots | Upper pinball loss | Global cost | Global risk | RCC cost | RCC risk | RCC minus global cost |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Incumbent | 0 | 0.6145 | 22.464 | 0.0062 | 18.515 | 0.0642 | -3.949 |
+| Incumbent | 3 | 0.4704 | 21.225 | 0.0115 | 18.532 | 0.0466 | -2.693 |
+| Incumbent | 7 | 0.4337 | 20.479 | 0.0262 | 18.448 | 0.0494 | -2.030 |
+| Incumbent | 15 | 0.7888 | 20.449 | 0.0342 | 18.334 | 0.0542 | -2.115 |
+| Full domain | 0 | 0.1488 | 16.804 | 0.1459 | 16.930 | 0.1374 | +0.126 |
+| Full domain | 3 | 0.1312 | 18.175 | 0.0549 | 18.332 | 0.0500 | +0.156 |
+| Full domain | 7 | 0.1321 | 18.258 | 0.0530 | 18.361 | 0.0511 | +0.103 |
+| Full domain | 15 | 0.1336 | 18.255 | 0.0534 | 18.281 | 0.0538 | +0.026 |
+
+With incumbent-only data, added spline capacity improves upper-quantile loss and
+shrinks the RCC advantage, but cannot remove the need to extrapolate. The
+15-knot loss deterioration confirms that extra parameters alone do not solve
+the support problem. With full-domain data, an affine uncertainty model is too
+misspecified to meet the risk target, despite its low global conformal
+correction. Once three or more knots are used, both uncertainty-aware methods
+are reliable and their costs are essentially equal; RCC is slightly more
+conservative on average. Thus the large showcase result is best understood as
+localized repair of prediction error under limited training support, not a
+general advantage over a well-specified conditional-quantile model.
+
+The point-PTO decisions remain unsafe even with splines (mean risks roughly
+0.46--0.47 for the nonlinear fits), because improving a conditional-mean model
+does not turn it into a chance-constraint model. Reproduce the paired comparison
+with, for each `K` in `0 3 7 15`:
+
+```bash
+python experiments/workforce/run_continuous_queue.py --buffered \
+  --spline-knots K --seed 140 --replications 30 --output incumbent-K.json
+python experiments/workforce/run_continuous_queue.py --buffered \
+  --full-support-training --spline-knots K --seed 140 --replications 30 \
+  --output full-support-K.json
+```
+
 ### Optimization-driven RCC diagnostic
 
 The earlier queueing results called residual-heterogeneity partitions RCC, but
