@@ -315,7 +315,7 @@ historical policies in `[4,9] x [1,6]`; the full-support design samples the whol
 operational domain `[4,12] x [0,9]`. All runs retain the prespecified 5% conformal
 calibration buffer and the 10% operational risk target.
 
-| Training support | Knots | Upper pinball loss | Global cost | Global risk | RCC cost | RCC risk | RCC minus global cost |
+| Training support | Model capacity | Upper pinball loss | Global cost | Global risk | RCC cost | RCC risk | RCC minus global cost |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | Incumbent | 0 | 0.6145 | 22.464 | 0.0062 | 18.515 | 0.0642 | -3.949 |
 | Incumbent | 3 | 0.4704 | 21.225 | 0.0115 | 18.532 | 0.0466 | -2.693 |
@@ -325,6 +325,8 @@ calibration buffer and the 10% operational risk target.
 | Full domain | 3 | 0.1312 | 18.175 | 0.0549 | 18.332 | 0.0500 | +0.156 |
 | Full domain | 7 | 0.1321 | 18.258 | 0.0530 | 18.361 | 0.0511 | +0.103 |
 | Full domain | 15 | 0.1336 | 18.255 | 0.0534 | 18.281 | 0.0538 | +0.026 |
+| Incumbent, ReLU | 16 units | 0.1581 | 18.124 | 0.0589 | 18.184 | 0.0562 | +0.061 |
+| Full domain, ReLU | 16 units | 0.1343 | 17.828 | 0.0675 | 18.128 | 0.0569 | +0.300 |
 
 With incumbent-only data, added spline capacity improves upper-quantile loss and
 shrinks the RCC advantage, but cannot remove the need to extrapolate. The
@@ -337,6 +339,25 @@ conservative on average. Thus the large showcase result is best understood as
 localized repair of prediction error under limited training support, not a
 general advantage over a well-specified conditional-quantile model.
 
+As a separate nonlinear check, the last two rows use a one-hidden-layer neural
+network with 16 ReLU units. The point network minimizes squared error. The two
+quantiles share a hidden layer and minimize pinball loss; their output heads are
+parameterized so that the upper prediction is at least the lower prediction for
+every input. This avoids relying on a soft crossing penalty, which can fail when
+the optimizer extrapolates beyond the training domain. The fitted networks had
+zero crossings on all independent diagnostic points. A one-hidden-layer ReLU
+network is piecewise affine. In this two-dimensional example, the implementation
+enumerates its activation polygons inside each RCC region, so regional extrema
+and final decisions are again continuous and exact rather than grid based.
+
+The neural result reinforces the qualified interpretation. Its upper-quantile
+loss under incumbent-only training is much lower than the spline losses, and the
+large RCC cost advantage disappears: RCC costs `0.061` more on average for a
+small risk reduction. With full-domain training it costs `0.300` more. Global
+CQR and RCC satisfy the empirical 10% target in all 30 incumbent runs and in all
+30 full-domain runs. The flexible uncertainty model has absorbed most of the
+regional structure that RCC previously corrected.
+
 The point-PTO decisions remain unsafe even with splines (mean risks roughly
 0.46--0.47 for the nonlinear fits), because improving a conditional-mean model
 does not turn it into a chance-constraint model. Reproduce the paired comparison
@@ -348,6 +369,11 @@ python experiments/workforce/run_continuous_queue.py --buffered \
 python experiments/workforce/run_continuous_queue.py --buffered \
   --full-support-training --spline-knots K --seed 140 --replications 30 \
   --output full-support-K.json
+python experiments/workforce/run_continuous_queue.py --buffered \
+  --neural-network --seed 140 --replications 30 --output incumbent-nn.json
+python experiments/workforce/run_continuous_queue.py --buffered \
+  --neural-network --full-support-training --seed 140 --replications 30 \
+  --output full-support-nn.json
 ```
 
 ### Optimization-driven RCC diagnostic
