@@ -16,7 +16,7 @@ from conformal_cl.transparent.learned import run_learned_replication
 
 def summarize(runs):
     methods = {}
-    for method in ("raw_quantile", "global_cqr", "rcc"):
+    for method in runs[0]["methods"]:
         selected = [r["methods"][method] for r in runs if r["methods"][method]["status"] == "selected"]
         costs = [r["capacity_cost"] for r in selected]
         risks = [r["exact_violation_probability"] for r in selected]

@@ -111,14 +111,17 @@ def model_diagnostics(case, model, x, *, alpha=.1):
 
 
 def run_learned_replication(case, stream, *, training_size=8000, validation_size=4000,
-                            calibration_size=4000, evaluation_size=20000, alpha=.1):
+                            calibration_size=4000, evaluation_size=20000, alpha=.1,
+                            fit_options=None, population_diagnostics=False,
+                            scaled_baseline=False, refit_baseline=False):
     train_rng, validation_rng, calibration_rng, evaluation_rng = [
         np.random.default_rng(child) for child in stream.spawn(4)
     ]
     tx, te = case.draw(training_size, train_rng)
     vx, ve = case.draw(validation_size, validation_rng)
     cx, ce = case.draw(calibration_size, calibration_rng)
-    model, metadata = fit_quantiles(tx, 1. - tx + te, vx, 1. - vx + ve, alpha=alpha)
+    model, metadata = fit_quantiles(tx, 1. - tx + te, vx, 1. - vx + ve, alpha=alpha,
+                                   **(fit_options or {}))
     response = 1. - cx + ce
     predicted = model.predict(cx)
     scores = np.maximum(response - predicted[:, 1], predicted[:, 0] - response)
@@ -130,18 +133,54 @@ def run_learned_replication(case, stream, *, training_size=8000, validation_size
         "global_cqr": _report(case, model.cheapest_feasible(lower, upper, correction), correction=correction),
         "rcc": _report(case, rcc_decision, **rcc_details),
     }
-    for method in methods.values():
+    if scaled_baseline:
+        from .quantile_models import QuantileSpline
+
+        widths = (predicted[:, 1] - predicted[:, 0]) / 2.
+        if np.any(widths <= 0.):
+            raise ValueError("scaled calibration requires positive learned interval widths")
+        scaled_correction = conformal_order_statistic(
+            scores / widths, alpha=alpha, level_adjustment=1. / len(cx))
+        knot_widths = (model.upper - model.lower) / 2.
+        adjusted = QuantileSpline(model.knots,
+            model.lower - scaled_correction * knot_widths,
+            model.upper + scaled_correction * knot_widths, model.mean_coefficient)
+        methods["scaled_global_cqr"] = _report(
+            case, adjusted.cheapest_feasible(lower, upper),
+            normalized_correction=scaled_correction)
+    refit_model = None
+    if refit_baseline:
+        # Same labeled-data budget: use half the original calibration labels
+        # for refitting, and reserve the other half for independent calibration.
+        split = len(cx) // 2
+        refit_model, refit_metadata = fit_quantiles(
+            np.r_[tx, cx[:split]], np.r_[1. - tx + te, response[:split]],
+            vx, 1. - vx + ve, alpha=alpha, **(fit_options or {}))
+        rp = refit_model.predict(cx[split:])
+        rs = np.maximum(response[split:] - rp[:, 1], rp[:, 0] - response[split:])
+        rq = conformal_order_statistic(rs, alpha=alpha, level_adjustment=1. / len(rs))
+        methods["refit_global_cqr"] = _report(
+            case, refit_model.cheapest_feasible(lower, upper, rq),
+            correction=rq, refit_selected_leaves=refit_metadata["selected_leaves"])
+    for name, method in methods.items():
         if method["status"] == "selected":
             point = method["capacity_cost"]
-            lo, hi = model.predict([point])[0]
+            diagnostic_model = refit_model if name == "refit_global_cqr" else model
+            lo, hi = diagnostic_model.predict([point])[0]
             s, m = float(case.scale(point)), 1. - point
             method["selected_point_raw_upper_coverage"] = float(np.clip((hi - m + s) / (2. * s), 0., 1.))
             method["selected_point_upper_quantile_error"] = float(hi - (m + (1. - alpha) * s))
     evaluation_x = evaluation_rng.uniform(lower, upper, evaluation_size)
     local_x = evaluation_rng.uniform(1., 1.2, evaluation_size)
-    return {
+    result = {
         "model": metadata,
         "full_domain_quality": model_diagnostics(case, model, evaluation_x, alpha=alpha),
         "near_optimum_quality": model_diagnostics(case, model, local_x, alpha=alpha),
         "methods": methods,
     }
+    if population_diagnostics:
+        from .population import correction_decomposition
+
+        result["correction_decomposition"] = correction_decomposition(
+            case, model, correction, rcc_details, alpha=alpha)
+    return result

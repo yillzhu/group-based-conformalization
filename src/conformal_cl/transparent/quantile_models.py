@@ -74,6 +74,7 @@ def pinball(y, prediction, quantile):
 def fit_quantiles(
     train_x, train_y, validation_x, validation_y, *, domain=(0., 4.),
     alpha=.1, leaf_candidates=(1, 2, 3, 4, 6, 8, 12), seed=0,
+    min_samples_leaf=None,
 ):
     """OLS mean plus a validation-selected residual-quantile tree.
 
@@ -82,6 +83,8 @@ def fit_quantiles(
     across the gap between neighboring training inputs, giving globally ordered,
     continuous piecewise-affine quantiles with no supplied regime boundaries.
     The validation criterion is the sum of lower and upper pinball losses.
+    An explicit minimum leaf size overrides the historical sample-fraction
+    default, allowing model resolution to grow in finite-data stress studies.
     """
 
     from sklearn.tree import DecisionTreeRegressor
@@ -90,6 +93,10 @@ def fit_quantiles(
     validation_x, validation_y = _data(validation_x, validation_y, domain)
     if not 0. < alpha < 1.:
         raise ValueError("alpha must lie in (0,1)")
+    if min_samples_leaf is not None and (
+        not isinstance(min_samples_leaf, (int, np.integer)) or min_samples_leaf < 1
+    ):
+        raise ValueError("min_samples_leaf must be a positive integer")
     mean_coefficient = np.linalg.lstsq(
         np.column_stack((np.ones(len(train_x)), train_x)), train_y, rcond=None
     )[0]
@@ -101,7 +108,8 @@ def fit_quantiles(
         else:
             tree = DecisionTreeRegressor(
                 max_leaf_nodes=leaves,
-                min_samples_leaf=max(40, int(np.ceil(.01 * len(train_x)))),
+                min_samples_leaf=(max(40, int(np.ceil(.01 * len(train_x))))
+                                  if min_samples_leaf is None else min_samples_leaf),
                 random_state=seed,
             ).fit(train_x[:, None], residual ** 2)
             cuts = np.sort(tree.tree_.threshold[tree.tree_.children_left != -1])

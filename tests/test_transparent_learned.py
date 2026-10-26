@@ -4,7 +4,7 @@ import numpy as np
 
 from conformal_cl.order_stats import conformal_order_statistic
 from conformal_cl.transparent.capacity import CASES
-from conformal_cl.transparent.learned import model_diagnostics, solve_learned_rcc
+from conformal_cl.transparent.learned import model_diagnostics, solve_learned_rcc, run_learned_replication
 from conformal_cl.transparent.quantile_models import QuantileSpline, fit_quantiles
 
 
@@ -38,6 +38,20 @@ class TestTransparentLearned(unittest.TestCase):
             np.testing.assert_allclose(difference[0], difference[1], atol=1e-7)
         self.assertLessEqual(metadata["validation_pinball"],
                              min(c["validation_pinball"] for c in metadata["candidates"]))
+
+    def test_optional_controls_do_not_change_original_comparison(self):
+        settings = dict(training_size=200, validation_size=200,
+                        calibration_size=400, evaluation_size=200)
+        original = run_learned_replication(CASES[1], np.random.SeedSequence(80), **settings)
+        extended = run_learned_replication(CASES[1], np.random.SeedSequence(80), **settings,
+                                          scaled_baseline=True, refit_baseline=True,
+                                          population_diagnostics=True)
+        for name, method in original["methods"].items():
+            self.assertEqual(method, extended["methods"][name])
+        self.assertEqual(original["full_domain_quality"], extended["full_domain_quality"])
+        for name in ("scaled_global_cqr", "refit_global_cqr"):
+            self.assertEqual(extended["methods"][name]["status"], "selected")
+        self.assertIsNotNone(extended["correction_decomposition"])
 
     def test_reduced_solver_matches_existing_continuous_rcc(self):
         from conformal_cl.workforce.continuous_rcc import run_continuous_rcc
