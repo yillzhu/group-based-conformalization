@@ -1,4 +1,4 @@
-"""Small dependency-free regression models for the workforce experiment."""
+"""Small dependency-free affine and spline models for workforce experiments."""
 
 from __future__ import annotations
 
@@ -13,17 +13,32 @@ class LinearModel:
     center: np.ndarray
     scale: np.ndarray
     quadratic: bool = False
+    dedicated_knots: tuple[float, ...] = ()
 
     def predict(self, x: np.ndarray) -> np.ndarray:
-        return _features(x, self.center, self.scale, self.quadratic) @ self.coefficient
+        return _features(
+            x,
+            self.center,
+            self.scale,
+            self.quadratic,
+            self.dedicated_knots,
+        ) @ self.coefficient
 
 
-def fit_mean(x: np.ndarray, y: np.ndarray, *, quadratic: bool = False) -> LinearModel:
-    """Fit the deliberately low-capacity point-prediction baseline."""
+def fit_mean(
+    x: np.ndarray,
+    y: np.ndarray,
+    *,
+    quadratic: bool = False,
+    dedicated_spline_knots: int = 0,
+) -> LinearModel:
+    """Fit a point predictor with optional dedicated-staff hinge features."""
 
-    matrix, center, scale = _training_features(x, quadratic)
+    matrix, center, scale, knots = _training_features(
+        x, quadratic, dedicated_spline_knots
+    )
     coefficient = np.linalg.lstsq(matrix, _response(y, len(matrix)), rcond=None)[0]
-    return LinearModel(coefficient, center, scale, quadratic)
+    return LinearModel(coefficient, center, scale, quadratic, knots)
 
 
 def fit_quantile(
@@ -34,12 +49,15 @@ def fit_quantile(
     iterations: int = 2500,
     learning_rate: float = 0.04,
     quadratic: bool = False,
+    dedicated_spline_knots: int = 0,
 ) -> LinearModel:
     """Fit linear quantile regression with deterministic Adam iterations."""
 
     if not 0.0 < quantile < 1.0:
         raise ValueError("quantile must be in (0, 1)")
-    matrix, center, scale = _training_features(x, quadratic)
+    matrix, center, scale, knots = _training_features(
+        x, quadratic, dedicated_spline_knots
+    )
     response = _response(y, len(matrix))
     coefficient = np.linalg.lstsq(matrix, response, rcond=None)[0]
     first = np.zeros_like(coefficient)
@@ -55,7 +73,7 @@ def fit_quantile(
         second_hat = second / (1.0 - 0.999**step)
         coefficient -= learning_rate * first_hat / (np.sqrt(second_hat) + 1e-8)
 
-    return LinearModel(coefficient, center, scale, quadratic)
+    return LinearModel(coefficient, center, scale, quadratic, knots)
 
 
 def pinball_loss(y: np.ndarray, prediction: np.ndarray, quantile: float) -> float:
@@ -64,8 +82,10 @@ def pinball_loss(y: np.ndarray, prediction: np.ndarray, quantile: float) -> floa
 
 
 def _training_features(
-    x: np.ndarray, quadratic: bool
-) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    x: np.ndarray,
+    quadratic: bool,
+    dedicated_spline_knots: int = 0,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, tuple[float, ...]]:
     x = np.asarray(x, dtype=float)
     if x.ndim != 2 or x.shape[1] != 2 or not np.isfinite(x).all():
         raise ValueError("x must be a finite array with shape (n, 2)")
@@ -73,7 +93,14 @@ def _training_features(
     scale = (x.max(axis=0) - x.min(axis=0)) / 2.0
     if np.any(scale <= 0.0):
         raise ValueError("each decision feature must vary in the training data")
-    return _features(x, center, scale, quadratic), center, scale
+    if dedicated_spline_knots < 0:
+        raise ValueError("dedicated_spline_knots must be nonnegative")
+    if quadratic and dedicated_spline_knots:
+        raise ValueError("quadratic and spline features cannot be combined")
+    knots = tuple(
+        np.linspace(-1.0, 1.0, dedicated_spline_knots + 2)[1:-1]
+    )
+    return _features(x, center, scale, quadratic, knots), center, scale, knots
 
 
 def _features(
@@ -81,6 +108,7 @@ def _features(
     center: np.ndarray,
     scale: np.ndarray,
     quadratic: bool = False,
+    dedicated_knots: tuple[float, ...] = (),
 ) -> np.ndarray:
     x = np.asarray(x, dtype=float)
     if x.ndim != 2 or x.shape[1] != 2 or not np.isfinite(x).all():
@@ -95,8 +123,11 @@ def _features(
                 normalized[:, 1] ** 2,
             ]
         )
-    # The workload experiment deliberately remains linear.  The queueing model
-    # uses quadratic terms to represent its curved pooling frontier on support.
+    columns.extend(
+        np.maximum(normalized[:, 0] - knot, 0.0) for knot in dedicated_knots
+    )
+    # The workload experiment deliberately remains linear. Queueing diagnostics
+    # can use quadratic terms or a continuous piecewise-affine staffing spline.
     return np.column_stack(columns)
 
 

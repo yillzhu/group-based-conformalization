@@ -49,6 +49,25 @@ class ContinuousQueueTests(unittest.TestCase):
         self.assertGreater(oracle["flexible_fte"], 0.0)
         self.assertLess(oracle["flexible_fte"], 12.0)
 
+    def test_spline_experiment_runs_over_continuous_domain(self):
+        result = run_continuous_queue_experiment(
+            ContinuousQueueExperimentConfig(
+                seed=3,
+                training_size=200,
+                calibration_size=300,
+                evaluation_size=500,
+                oracle_size=500,
+                oracle_grid_size=51,
+                quantile_iterations=100,
+                max_splits=4,
+                diagnostic_size=200,
+                dedicated_spline_knots=3,
+            )
+        )
+        self.assertEqual(len(result["model"]["dedicated_spline_breakpoints"]), 3)
+        self.assertEqual(result["methods"]["rcc"]["status"], "selected")
+        self.assertIn("upper_pinball_loss", result["predictive_diagnostics"])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -27,6 +27,17 @@ if __name__ == "__main__":
         help="calibrate at 5%% for the fixed 10%% operational risk target",
     )
     parser.add_argument(
+        "--spline-knots",
+        type=int,
+        default=0,
+        help="number of dedicated-staff hinge knots (0 gives the affine model)",
+    )
+    parser.add_argument(
+        "--full-support-training",
+        action="store_true",
+        help="train throughout the operational domain instead of incumbent policies",
+    )
+    parser.add_argument(
         "--output",
         type=Path,
         default=(
@@ -50,12 +61,23 @@ if __name__ == "__main__":
         )
         if args.buffered:
             config = replace(config, calibration_alpha=0.05)
+        if args.full_support_training:
+            config = replace(
+                config,
+                training_dedicated_lower=config.dedicated_lower,
+                training_dedicated_upper=config.dedicated_upper,
+                training_flexible_lower=config.flexible_lower,
+                training_flexible_upper=config.flexible_upper,
+            )
+        config = replace(config, dedicated_spline_knots=args.spline_knots)
         runs.append(run_continuous_queue_experiment(config))
     result = {
         "study": {
             "seeds": seeds,
             "smoke": args.smoke,
             "buffered": args.buffered,
+            "spline_knots": args.spline_knots,
+            "full_support_training": args.full_support_training,
         },
         "summary": summarize_continuous_queue_runs(runs),
         "runs": runs,

@@ -4,6 +4,8 @@ import numpy as np
 
 from conformal_cl.workforce.continuous_rcc import (
     clip_polygon,
+    minimize_piecewise_constraint,
+    model_extrema,
     run_continuous_rcc,
 )
 from conformal_cl.workforce.models import LinearModel
@@ -42,6 +44,27 @@ class ContinuousRCCTests(unittest.TestCase):
         self.assertGreater(result.splits, 0)
         np.testing.assert_allclose(result.decision, [1.0, 0.3], atol=1e-8)
         self.assertAlmostEqual(result.objective, 2.72)
+
+    def test_piecewise_affine_spline_is_optimized_exactly(self):
+        # 1.5 - d - f + 2 max(d - 0.5, 0), a V-shape in dedicated staffing.
+        model = LinearModel(
+            np.asarray([1.5, -1.0, -1.0, 2.0]),
+            np.zeros(2),
+            np.ones(2),
+            dedicated_knots=(0.5,),
+        )
+        square = np.asarray([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]])
+        minimum, argmin, maximum, _ = model_extrema(model, square)
+        self.assertAlmostEqual(minimum, 0.0)
+        np.testing.assert_allclose(argmin, [0.5, 1.0])
+        self.assertAlmostEqual(maximum, 1.5)
+        selected = minimize_piecewise_constraint(
+            model, 0.0, square, np.asarray([2.0, 1.0])
+        )
+        self.assertIsNotNone(selected)
+        decision, objective = selected
+        np.testing.assert_allclose(decision, [0.5, 1.0])
+        self.assertAlmostEqual(objective, 2.0)
 
     def test_continuous_experiment_smoke_run(self):
         result = run_continuous_experiment(

@@ -28,11 +28,107 @@ class ContinuousRCCResult:
 def affine_parameters(model: LinearModel) -> tuple[float, np.ndarray]:
     """Return ``intercept, slope`` for a nonquadratic fitted model."""
 
-    if model.quadratic or len(model.coefficient) != 3:
+    if model.quadratic or model.dedicated_knots or len(model.coefficient) != 3:
         raise ValueError("continuous RCC currently requires an affine model")
     slope = np.asarray(model.coefficient[1:], dtype=float) / model.scale
     intercept = float(model.coefficient[0] - slope @ model.center)
     return intercept, slope
+
+
+def piecewise_affine_parameters(
+    model: LinearModel,
+) -> list[tuple[float, float, np.ndarray]]:
+    """Return ``right endpoint, intercept, slope`` for each affine spline piece."""
+
+    if model.quadratic:
+        raise ValueError("continuous RCC does not support quadratic fitted models")
+    knots = np.asarray(model.dedicated_knots, dtype=float)
+    if len(model.coefficient) != 3 + len(knots):
+        raise ValueError("model coefficients and spline knots do not align")
+    breakpoints = model.center[0] + model.scale[0] * knots
+    pieces = []
+    for piece in range(len(knots) + 1):
+        active = np.arange(len(knots)) < piece
+        dedicated_weight = float(
+            model.coefficient[1] + np.sum(model.coefficient[3:][active])
+        )
+        slope = np.asarray(
+            [dedicated_weight / model.scale[0], model.coefficient[2] / model.scale[1]]
+        )
+        intercept = float(
+            model.coefficient[0]
+            - model.coefficient[1] * model.center[0] / model.scale[0]
+            - model.coefficient[2] * model.center[1] / model.scale[1]
+        )
+        if piece:
+            intercept += float(
+                np.sum(
+                    model.coefficient[3 : 3 + piece]
+                    * (-model.center[0] / model.scale[0] - knots[:piece])
+                )
+            )
+        right = float(breakpoints[piece]) if piece < len(knots) else np.inf
+        pieces.append((right, intercept, slope))
+    return pieces
+
+
+def model_pieces(
+    model: LinearModel, vertices: np.ndarray
+) -> list[tuple[np.ndarray, float, np.ndarray]]:
+    """Intersect a polygon with every affine piece of a fitted spline."""
+
+    remaining = np.asarray(vertices, dtype=float).reshape(-1, 2)
+    result = []
+    for right, intercept, slope in piecewise_affine_parameters(model):
+        if len(remaining) == 0:
+            break
+        if np.isfinite(right):
+            piece = clip_polygon(remaining, np.asarray([1.0, 0.0]), right)
+            remaining = clip_polygon(remaining, np.asarray([-1.0, 0.0]), -right)
+        else:
+            piece = remaining
+            remaining = np.empty((0, 2))
+        if len(piece):
+            result.append((piece, intercept, slope))
+    return result
+
+
+def model_extrema(
+    model: LinearModel, vertices: np.ndarray
+) -> tuple[float, np.ndarray, float, np.ndarray]:
+    """Return the exact minimum/argmin and maximum/argmax over a polygon."""
+
+    candidates = []
+    for piece, intercept, slope in model_pieces(model, vertices):
+        candidates.extend((float(intercept + slope @ x), x) for x in piece)
+    if not candidates:
+        raise ValueError("cannot optimize a model over an empty polygon")
+    minimum = min(candidates, key=lambda item: (item[0], *item[1]))
+    maximum = max(candidates, key=lambda item: (item[0], *item[1]))
+    return minimum[0], minimum[1].copy(), maximum[0], maximum[1].copy()
+
+
+def minimize_piecewise_constraint(
+    model: LinearModel,
+    correction: float,
+    vertices: np.ndarray,
+    objective_slope: np.ndarray,
+) -> tuple[np.ndarray, float] | None:
+    """Minimize a linear cost subject to a piecewise-affine upper bound."""
+
+    best = None
+    for piece, intercept, slope in model_pieces(model, vertices):
+        feasible = clip_polygon(piece, slope, -intercept - correction)
+        candidate = minimize_over_vertices(feasible, objective_slope)
+        if candidate is None:
+            continue
+        decision, objective = candidate
+        proposal = (objective, decision[0], decision[1])
+        if best is None or proposal < best[0]:
+            best = (proposal, decision)
+    if best is None:
+        return None
+    return best[1], float(best[0][0])
 
 
 def run_continuous_rcc(
@@ -51,10 +147,11 @@ def run_continuous_rcc(
 ) -> ContinuousRCCResult:
     """Run the Chapter 4 RCC algorithm over a continuous rectangular domain.
 
-    The fitted interval endpoints are affine, so all regional extrema and final
-    linear-objective solves are exact vertex calculations over continuous
-    polygons.  Partition construction and local calibration deliberately use
-    the same calibration sample, matching the original adaptive algorithm.
+    The fitted interval endpoints are affine or piecewise-affine splines, so all
+    regional extrema and final linear-objective solves are exact vertex
+    calculations over continuous polygons. Partition construction and local
+    calibration deliberately use the same calibration sample, matching the
+    original adaptive algorithm.
     """
 
     calibration_x = np.asarray(calibration_x, dtype=float)
@@ -71,8 +168,6 @@ def run_continuous_rcc(
     if objective_slope.shape != (2,) or max_splits < 0:
         raise ValueError("invalid objective or split limit")
 
-    lower_intercept, lower_slope = affine_parameters(lower_model)
-    upper_intercept, upper_slope = affine_parameters(upper_model)
     lower_prediction = lower_model.predict(calibration_x)
     upper_prediction = upper_model.predict(calibration_x)
     scores = np.maximum(
@@ -99,22 +194,20 @@ def run_continuous_rcc(
             discarded += 1
             continue
 
-        upper_values = upper_intercept + vertices @ upper_slope + region.qhat
-        lower_values = lower_intercept + vertices @ lower_slope - region.qhat
-        maximum_index = int(np.argmax(upper_values))
-        minimum_index = int(np.argmin(upper_values))
-        maximum_value = float(upper_values[maximum_index])
-        minimum_value = float(upper_values[minimum_index])
+        minimum_value, minimum_x, maximum_value, maximum_x = model_extrema(
+            upper_model, vertices
+        )
+        lower_minimum, _, _, _ = model_extrema(lower_model, vertices)
+        maximum_value += region.qhat
+        minimum_value += region.qhat
 
         if maximum_value <= feasibility_tolerance:
             safe.append(region)
             continue
-        if float(np.min(lower_values)) >= -feasibility_tolerance:
+        if lower_minimum - region.qhat >= -feasibility_tolerance:
             discarded += 1
             continue
 
-        maximum_x = vertices[maximum_index]
-        minimum_x = vertices[minimum_index]
         normal = maximum_x - minimum_x
         norm = float(np.linalg.norm(normal))
         if not np.isfinite(norm) or norm <= feasibility_tolerance:
@@ -162,12 +255,14 @@ def run_continuous_rcc(
         for region in regions:
             vertices = region_vertices(region, lower, upper)
             if route == "unresolved":
-                vertices = clip_polygon(
+                candidate = minimize_piecewise_constraint(
+                    upper_model,
+                    region.qhat,
                     vertices,
-                    upper_slope,
-                    -upper_intercept - region.qhat,
+                    objective_slope,
                 )
-            candidate = minimize_over_vertices(vertices, objective_slope)
+            else:
+                candidate = minimize_over_vertices(vertices, objective_slope)
             if candidate is None:
                 continue
             decision, objective = candidate

@@ -16,12 +16,10 @@ from .continuous_queue import (
     sample_continuous_queue_dataset,
 )
 from .continuous_rcc import (
-    affine_parameters,
-    clip_polygon,
-    minimize_over_vertices,
+    minimize_piecewise_constraint,
     run_continuous_rcc,
 )
-from .models import fit_mean, fit_quantile
+from .models import fit_mean, fit_quantile, pinball_loss
 
 
 @dataclass(frozen=True)
@@ -37,6 +35,8 @@ class ContinuousQueueExperimentConfig:
     oracle_grid_size: int = 2001
     max_splits: int = 64
     quantile_iterations: int = 2500
+    dedicated_spline_knots: int = 0
+    diagnostic_size: int = 10000
     dedicated_lower: float = 4.0
     dedicated_upper: float = 12.0
     flexible_lower: float = 0.0
@@ -81,8 +81,8 @@ def run_continuous_queue_experiment(
         dtype=float,
     )
     seed_sequence = np.random.SeedSequence(config.seed)
-    train_rng, cal_rng, eval_rng, oracle_rng = map(
-        np.random.default_rng, seed_sequence.spawn(4)
+    train_rng, cal_rng, eval_rng, oracle_rng, diagnostic_rng = map(
+        np.random.default_rng, seed_sequence.spawn(5)
     )
     train_x, train_y = sample_continuous_queue_dataset(
         training_lower,
@@ -98,18 +98,24 @@ def run_continuous_queue_experiment(
         cal_rng,
         queue_config,
     )
-    point_model = fit_mean(train_x, train_y)
+    point_model = fit_mean(
+        train_x,
+        train_y,
+        dedicated_spline_knots=config.dedicated_spline_knots,
+    )
     lower_model = fit_quantile(
         train_x,
         train_y,
         config.calibration_alpha,
         iterations=config.quantile_iterations,
+        dedicated_spline_knots=config.dedicated_spline_knots,
     )
     upper_model = fit_quantile(
         train_x,
         train_y,
         1.0 - config.calibration_alpha,
         iterations=config.quantile_iterations,
+        dedicated_spline_knots=config.dedicated_spline_knots,
     )
     calibration_scores = np.maximum(
         calibration_y - upper_model.predict(calibration_x),
@@ -140,7 +146,7 @@ def run_continuous_queue_experiment(
         ("point_pto", point_model, 0.0),
         ("global_cqr_pto", upper_model, q_global),
     ):
-        selected = _optimize_affine_constraint(
+        selected = _optimize_model_constraint(
             model,
             correction,
             domain_lower,
@@ -202,6 +208,15 @@ def run_continuous_queue_experiment(
     }
     for name in ("point_pto", "global_cqr_pto", "rcc", "oracle"):
         methods.setdefault(name, {"status": "no_solution"})
+    diagnostic_x, diagnostic_y = sample_continuous_queue_dataset(
+        domain_lower,
+        domain_upper,
+        config.diagnostic_size,
+        diagnostic_rng,
+        queue_config,
+    )
+    diagnostic_lower = lower_model.predict(diagnostic_x)
+    diagnostic_upper = upper_model.predict(diagnostic_x)
     return {
         "config": asdict(config),
         "queue_config": asdict(queue_config),
@@ -210,6 +225,27 @@ def run_continuous_queue_experiment(
             "lower_quantile_coefficient": lower_model.coefficient.tolist(),
             "upper_quantile_coefficient": upper_model.coefficient.tolist(),
             "global_correction": float(q_global),
+            "dedicated_spline_breakpoints": (
+                lower_model.center[0]
+                + lower_model.scale[0] * np.asarray(lower_model.dedicated_knots)
+            ).tolist(),
+        },
+        "predictive_diagnostics": {
+            "lower_pinball_loss": pinball_loss(
+                diagnostic_y, diagnostic_lower, config.calibration_alpha
+            ),
+            "upper_pinball_loss": pinball_loss(
+                diagnostic_y, diagnostic_upper, 1.0 - config.calibration_alpha
+            ),
+            "raw_interval_coverage": float(
+                np.mean(
+                    (diagnostic_lower <= diagnostic_y)
+                    & (diagnostic_y <= diagnostic_upper)
+                )
+            ),
+            "raw_interval_mean_width": float(
+                np.mean(diagnostic_upper - diagnostic_lower)
+            ),
         },
         "methods": methods,
     }
@@ -219,18 +255,16 @@ def summarize_continuous_queue_runs(runs: list[dict]) -> dict:
     return summarize_continuous_runs(runs)
 
 
-def _optimize_affine_constraint(
+def _optimize_model_constraint(
     model,
     correction,
     domain_lower,
     domain_upper,
     objective,
 ):
-    intercept, slope = affine_parameters(model)
     lo = np.asarray(domain_lower, dtype=float)
     hi = np.asarray(domain_upper, dtype=float)
     polygon = np.asarray(
         [[lo[0], lo[1]], [hi[0], lo[1]], [hi[0], hi[1]], [lo[0], hi[1]]]
     )
-    feasible = clip_polygon(polygon, slope, -intercept - correction)
-    return minimize_over_vertices(feasible, objective)
+    return minimize_piecewise_constraint(model, correction, polygon, objective)
