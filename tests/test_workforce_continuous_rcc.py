@@ -8,7 +8,7 @@ from conformal_cl.workforce.continuous_rcc import (
     model_extrema,
     run_continuous_rcc,
 )
-from conformal_cl.workforce.models import LinearModel
+from conformal_cl.workforce.models import LinearModel, ReLUModel
 from conformal_cl.workforce.continuous_experiment import (
     ContinuousExperimentConfig,
     run_continuous_experiment,
@@ -65,6 +65,31 @@ class ContinuousRCCTests(unittest.TestCase):
         decision, objective = selected
         np.testing.assert_allclose(decision, [0.5, 1.0])
         self.assertAlmostEqual(objective, 2.0)
+
+    def test_shallow_relu_network_is_optimized_exactly(self):
+        # abs(d - 0.5) - f, represented by three hidden ReLU units.
+        model = ReLUModel(
+            hidden_weight=np.asarray(
+                [[1.0, 0.0], [-1.0, 0.0], [0.0, 1.0]]
+            ),
+            hidden_bias=np.asarray([-0.5, 0.5, 0.0]),
+            output_weight=np.asarray([1.0, 1.0, -1.0]),
+            output_bias=0.0,
+            center=np.zeros(2),
+            scale=np.ones(2),
+        )
+        square = np.asarray([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]])
+        minimum, argmin, maximum, _ = model_extrema(model, square)
+        self.assertAlmostEqual(minimum, -1.0)
+        np.testing.assert_allclose(argmin, [0.5, 1.0])
+        self.assertAlmostEqual(maximum, 0.5)
+        selected = minimize_piecewise_constraint(
+            model, 0.0, square, np.asarray([2.0, 1.0])
+        )
+        self.assertIsNotNone(selected)
+        decision, objective = selected
+        np.testing.assert_allclose(decision, [0.0, 0.5])
+        self.assertAlmostEqual(objective, 0.5)
 
     def test_continuous_experiment_smoke_run(self):
         result = run_continuous_experiment(

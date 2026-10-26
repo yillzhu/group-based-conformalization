@@ -9,7 +9,7 @@ import numpy as np
 
 from conformal_cl.groups import Group
 
-from .models import LinearModel
+from .models import LinearModel, ReLUModel
 
 
 @dataclass(frozen=True)
@@ -73,6 +73,16 @@ def piecewise_affine_parameters(
 
 
 def model_pieces(
+    model: LinearModel | ReLUModel, vertices: np.ndarray
+) -> list[tuple[np.ndarray, float, np.ndarray]]:
+    """Intersect a polygon with every affine piece of a fitted model."""
+
+    if isinstance(model, ReLUModel):
+        return _relu_model_pieces(model, vertices)
+    return _spline_model_pieces(model, vertices)
+
+
+def _spline_model_pieces(
     model: LinearModel, vertices: np.ndarray
 ) -> list[tuple[np.ndarray, float, np.ndarray]]:
     """Intersect a polygon with every affine piece of a fitted spline."""
@@ -93,8 +103,50 @@ def model_pieces(
     return result
 
 
+def _relu_model_pieces(
+    model: ReLUModel, vertices: np.ndarray
+) -> list[tuple[np.ndarray, float, np.ndarray]]:
+    """Enumerate a shallow ReLU network's activation regions in a polygon."""
+
+    polygons = [np.asarray(vertices, dtype=float).reshape(-1, 2)]
+    normals = model.hidden_weight / model.scale
+    offsets = model.hidden_bias - normals @ model.center
+    for normal, offset in zip(normals, offsets, strict=True):
+        split = []
+        for polygon in polygons:
+            inactive = clip_polygon(polygon, normal, -offset)
+            active = clip_polygon(polygon, -normal, offset)
+            if _has_area(inactive):
+                split.append(inactive)
+            if _has_area(active):
+                split.append(active)
+        polygons = split
+        if not polygons:
+            break
+
+    result = []
+    for polygon in polygons:
+        representative = np.mean(polygon, axis=0)
+        active = normals @ representative + offsets > 0.0
+        slope = model.output_weight[active] @ normals[active]
+        intercept = float(
+            model.output_bias + model.output_weight[active] @ offsets[active]
+        )
+        result.append((polygon, intercept, np.asarray(slope, dtype=float)))
+    return result
+
+
+def _has_area(vertices: np.ndarray, tolerance: float = 1e-12) -> bool:
+    if len(vertices) < 3:
+        return False
+    x = vertices[:, 0]
+    y = vertices[:, 1]
+    area = 0.5 * abs(float(x @ np.roll(y, 1) - y @ np.roll(x, 1)))
+    return area > tolerance
+
+
 def model_extrema(
-    model: LinearModel, vertices: np.ndarray
+    model: LinearModel | ReLUModel, vertices: np.ndarray
 ) -> tuple[float, np.ndarray, float, np.ndarray]:
     """Return the exact minimum/argmin and maximum/argmax over a polygon."""
 
@@ -109,7 +161,7 @@ def model_extrema(
 
 
 def minimize_piecewise_constraint(
-    model: LinearModel,
+    model: LinearModel | ReLUModel,
     correction: float,
     vertices: np.ndarray,
     objective_slope: np.ndarray,
@@ -132,8 +184,8 @@ def minimize_piecewise_constraint(
 
 
 def run_continuous_rcc(
-    lower_model: LinearModel,
-    upper_model: LinearModel,
+    lower_model: LinearModel | ReLUModel,
+    upper_model: LinearModel | ReLUModel,
     calibration_x: np.ndarray,
     calibration_y: np.ndarray,
     *,

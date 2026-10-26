@@ -36,6 +36,9 @@ class ContinuousQueueExperimentConfig:
     max_splits: int = 64
     quantile_iterations: int = 2500
     dedicated_spline_knots: int = 0
+    model_family: str = "spline"
+    neural_hidden_units: int = 16
+    neural_epochs: int = 750
     diagnostic_size: int = 10000
     dedicated_lower: float = 4.0
     dedicated_upper: float = 12.0
@@ -98,25 +101,7 @@ def run_continuous_queue_experiment(
         cal_rng,
         queue_config,
     )
-    point_model = fit_mean(
-        train_x,
-        train_y,
-        dedicated_spline_knots=config.dedicated_spline_knots,
-    )
-    lower_model = fit_quantile(
-        train_x,
-        train_y,
-        config.calibration_alpha,
-        iterations=config.quantile_iterations,
-        dedicated_spline_knots=config.dedicated_spline_knots,
-    )
-    upper_model = fit_quantile(
-        train_x,
-        train_y,
-        1.0 - config.calibration_alpha,
-        iterations=config.quantile_iterations,
-        dedicated_spline_knots=config.dedicated_spline_knots,
-    )
+    point_model, lower_model, upper_model = _fit_models(train_x, train_y, config)
     calibration_scores = np.maximum(
         calibration_y - upper_model.predict(calibration_x),
         lower_model.predict(calibration_x) - calibration_y,
@@ -222,12 +207,24 @@ def run_continuous_queue_experiment(
         "queue_config": asdict(queue_config),
         "domain": {"lower": domain_lower.tolist(), "upper": domain_upper.tolist()},
         "model": {
-            "lower_quantile_coefficient": lower_model.coefficient.tolist(),
-            "upper_quantile_coefficient": upper_model.coefficient.tolist(),
+            "family": config.model_family,
+            "lower": _model_metadata(lower_model),
+            "upper": _model_metadata(upper_model),
+            "lower_quantile_coefficient": (
+                lower_model.coefficient.tolist()
+                if hasattr(lower_model, "coefficient")
+                else None
+            ),
+            "upper_quantile_coefficient": (
+                upper_model.coefficient.tolist()
+                if hasattr(upper_model, "coefficient")
+                else None
+            ),
             "global_correction": float(q_global),
             "dedicated_spline_breakpoints": (
                 lower_model.center[0]
-                + lower_model.scale[0] * np.asarray(lower_model.dedicated_knots)
+                + lower_model.scale[0]
+                * np.asarray(getattr(lower_model, "dedicated_knots", ()))
             ).tolist(),
         },
         "predictive_diagnostics": {
@@ -246,6 +243,9 @@ def run_continuous_queue_experiment(
             "raw_interval_mean_width": float(
                 np.mean(diagnostic_upper - diagnostic_lower)
             ),
+            "quantile_crossing_rate": float(
+                np.mean(diagnostic_lower > diagnostic_upper)
+            ),
         },
         "methods": methods,
     }
@@ -253,6 +253,70 @@ def run_continuous_queue_experiment(
 
 def summarize_continuous_queue_runs(runs: list[dict]) -> dict:
     return summarize_continuous_runs(runs)
+
+
+def _fit_models(train_x, train_y, config):
+    if config.model_family == "spline":
+        point = fit_mean(
+            train_x,
+            train_y,
+            dedicated_spline_knots=config.dedicated_spline_knots,
+        )
+        lower = fit_quantile(
+            train_x,
+            train_y,
+            config.calibration_alpha,
+            iterations=config.quantile_iterations,
+            dedicated_spline_knots=config.dedicated_spline_knots,
+        )
+        upper = fit_quantile(
+            train_x,
+            train_y,
+            1.0 - config.calibration_alpha,
+            iterations=config.quantile_iterations,
+            dedicated_spline_knots=config.dedicated_spline_knots,
+        )
+        return point, lower, upper
+    if config.model_family == "relu":
+        if config.dedicated_spline_knots:
+            raise ValueError("spline knots are incompatible with a ReLU model")
+        from .neural_models import fit_relu_mean, fit_relu_quantiles
+
+        point = fit_relu_mean(
+            train_x,
+            train_y,
+            hidden_units=config.neural_hidden_units,
+            epochs=config.neural_epochs,
+            seed=config.seed + 100_000,
+        )
+        lower, upper = fit_relu_quantiles(
+            train_x,
+            train_y,
+            config.calibration_alpha,
+            1.0 - config.calibration_alpha,
+            hidden_units=config.neural_hidden_units,
+            epochs=config.neural_epochs,
+            seed=config.seed + 200_000,
+        )
+        return point, lower, upper
+    raise ValueError(f"unknown model_family: {config.model_family!r}")
+
+
+def _model_metadata(model):
+    if hasattr(model, "coefficient"):
+        return {
+            "coefficient": model.coefficient.tolist(),
+            "center": model.center.tolist(),
+            "scale": model.scale.tolist(),
+        }
+    return {
+        "hidden_weight": model.hidden_weight.tolist(),
+        "hidden_bias": model.hidden_bias.tolist(),
+        "output_weight": model.output_weight.tolist(),
+        "output_bias": model.output_bias,
+        "center": model.center.tolist(),
+        "scale": model.scale.tolist(),
+    }
 
 
 def _optimize_model_constraint(

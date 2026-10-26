@@ -38,6 +38,13 @@ if __name__ == "__main__":
         help="train throughout the operational domain instead of incumbent policies",
     )
     parser.add_argument(
+        "--neural-network",
+        action="store_true",
+        help="use a one-hidden-layer ReLU point and shared-quantile network",
+    )
+    parser.add_argument("--nn-hidden-units", type=int, default=16)
+    parser.add_argument("--nn-epochs", type=int, default=750)
+    parser.add_argument(
         "--output",
         type=Path,
         default=(
@@ -70,6 +77,13 @@ if __name__ == "__main__":
                 training_flexible_upper=config.flexible_upper,
             )
         config = replace(config, dedicated_spline_knots=args.spline_knots)
+        if args.neural_network:
+            config = replace(
+                config,
+                model_family="relu",
+                neural_hidden_units=args.nn_hidden_units,
+                neural_epochs=args.nn_epochs,
+            )
         runs.append(run_continuous_queue_experiment(config))
     result = {
         "study": {
@@ -78,6 +92,9 @@ if __name__ == "__main__":
             "buffered": args.buffered,
             "spline_knots": args.spline_knots,
             "full_support_training": args.full_support_training,
+            "neural_network": args.neural_network,
+            "nn_hidden_units": args.nn_hidden_units,
+            "nn_epochs": args.nn_epochs,
         },
         "summary": summarize_continuous_queue_runs(runs),
         "runs": runs,

@@ -25,6 +25,29 @@ class LinearModel:
         ) @ self.coefficient
 
 
+@dataclass(frozen=True)
+class ReLUModel:
+    """A dependency-free representation of a one-hidden-layer ReLU network."""
+
+    hidden_weight: np.ndarray
+    hidden_bias: np.ndarray
+    output_weight: np.ndarray
+    output_bias: float
+    center: np.ndarray
+    scale: np.ndarray
+
+    def predict(self, x: np.ndarray) -> np.ndarray:
+        x = np.asarray(x, dtype=float)
+        if x.ndim != 2 or x.shape[1] != 2 or not np.isfinite(x).all():
+            raise ValueError("x must be a finite array with shape (n, 2)")
+        normalized = (x - self.center) / self.scale
+        hidden = np.maximum(
+            normalized @ self.hidden_weight.T + self.hidden_bias,
+            0.0,
+        )
+        return self.output_bias + hidden @ self.output_weight
+
+
 def fit_mean(
     x: np.ndarray,
     y: np.ndarray,

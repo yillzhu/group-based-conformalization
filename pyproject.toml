@@ -16,6 +16,7 @@ enrollment = ["torch", "scikit-learn", "tqdm", "gurobipy", "gurobi-machinelearni
 quadratic = ["tensorflow==2.18.0", "scikit-learn", "gurobipy", "gurobi-machinelearning"]
 illustrations = ["matplotlib"]
 test = ["scikit-learn"]
+workforce-neural = ["torch"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
