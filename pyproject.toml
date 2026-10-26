@@ -18,7 +18,7 @@ illustrations = ["matplotlib"]
 test = ["scikit-learn"]
 workforce-neural = ["torch"]
 power = ["scikit-learn", "scipy"]
-transparent = ["scipy"]
+transparent = ["scipy", "scikit-learn"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
