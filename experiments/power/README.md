@@ -49,28 +49,39 @@ Two local methods are reported. `local_diagnostic` is a residual regression tree
 it is useful only for detecting residual geography and is not RCC. `candidate_rcc`
 uses the Chapter 4 queue geometry over a finite set of 200,000 candidates, with
 the chapter's delta-based group-size restriction during partition design and an
-independent final recalibration. Because its extrema and optimization are over a
-finite candidate set, it is an audit analogue rather than an exact continuous RCC
-implementation.
+independent final recalibration. A region is eligible only if the recalibrated upper
+bound is nonpositive at **every** candidate in that region; the optimizer may not
+select an individually feasible-looking point from an unresolved region. Because
+its extrema and optimization are over a finite candidate set, it is an audit
+analogue rather than an exact continuous RCC implementation.
 
 ## Initial result: no reliable advantage
 
 The table reports cost and fresh Monte Carlo violation probability. Each risk
 estimate uses 100,000 new uncertainty realizations.
 
-| Seed | Global cost | Global risk | Candidate-RCC cost | Candidate-RCC risk |
-| ---: | ---: | ---: | ---: | ---: |
-| 0 | 141,750 | 6.99% | 141,750 | 6.99% |
-| 1 | 146,271 | 11.02% | no candidate | -- |
-| 2 | 141,751 | 7.58% | 140,894 | 20.39% |
+| Seed | Global cost | Global risk | Safe-region RCC |
+| ---: | ---: | ---: | :--- |
+| 0 | 141,750 | 6.99% | no certified safe region |
+| 1 | 146,271 | 11.02% | no certified safe region |
+| 2 | 141,751 | 7.58% | no certified safe region |
 
 The uncorrected model's marginal upper coverage on the independent calibration
 sets is 88.8%--89.2%, close to the nominal 90%. Physics features also eliminate
 the gross optimizer exploitation seen in preliminary formulations. Nevertheless,
-RCC does not yield a valid, repeatable cost improvement. In seed 2 it finds a
-cheaper point only by selecting a locally optimistic part of a region. This is
-precisely why average or groupwise calibration should not be interpreted as a
-pointwise guarantee at an optimizer-selected decision.
+RCC does not yield a valid, repeatable cost improvement. An earlier implementation
+allowed selection of a point satisfying its local corrected prediction even when
+other candidates in the same terminal region were unsafe. In seed 2 that rule
+reduced cost to 140,894 but incurred 20.39% risk. The corrected safe-region rule
+rejects that solution and every other terminal region in the three runs.
+
+This correction identifies a concrete obstacle rather than merely increasing
+conservatism. Partition design places a boundary where its own corrected prediction
+is approximately zero. A slightly larger correction from the independent final
+calibration sample then revokes the whole-region certificate. Any proposed remedy
+needs a prespecified design-stage safety margin or a valid simultaneous calibration
+argument; reusing final-calibration outcomes to move the boundary would recreate
+the adaptivity problem.
 
 This case should therefore remain a negative control unless a principled change
 to the statistical guarantee or partition algorithm reverses the result across

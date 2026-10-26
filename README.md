@@ -119,7 +119,9 @@ dispatch experiment based on the PGLib-OPF IEEE 39-bus case. It deliberately
 combines full-domain training support with extra sampling in the operationally
 relevant security region, physics-derived ML features, independent partition-
 design and calibration samples, and 100,000-scenario decision evaluation. The
-initial three-seed audit does **not** establish an RCC advantage: one run ties the
-global method, one finds no RCC candidate, and one apparent saving violates the
-10% risk target badly. This negative result is retained to prevent example
-selection by favorable seed. See [the experiment notes](experiments/power/README.md).
+initial three-seed audit does **not** establish an RCC advantage. Under the corrected
+safe-region interpretation, RCC finds no independently recalibrated region whose
+entire finite candidate set is certified feasible. The earlier point-selection
+interpretation could return an apparent saving, but that decision violated the 10%
+risk target badly. This negative result is retained to prevent example selection by
+favorable seed. See [the experiment notes](experiments/power/README.md).

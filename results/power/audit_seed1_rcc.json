@@ -151,9 +151,11 @@
       "response_quantile": 0.0033031394782458054
     },
     "candidate_rcc": {
-      "status": "no_candidate",
+      "status": "no_safe_region",
       "splits": 3,
-      "terminal_regions": 2,
+      "terminal_regions": 0,
+      "certified_safe_regions": 0,
+      "uncertified_regions": 2,
       "discarded_regions": 2
     }
   }

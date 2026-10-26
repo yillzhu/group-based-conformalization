@@ -151,29 +151,12 @@
       "response_quantile": 0.011402650664667157
     },
     "candidate_rcc": {
-      "status": "selected",
-      "cost": 140893.7991098112,
-      "dispatch": [
-        854.785916599817,
-        625.8179322246187,
-        694.5685625987917,
-        576.9157996100818,
-        489.34048724701637,
-        575.2477453574261,
-        525.9083431215643,
-        16.649797334150293,
-        831.4913593978647,
-        1063.5040565086579
-      ],
-      "predicted_quantile": 0.0018316753916194956,
-      "correction": -0.0021109229518050873,
-      "estimated_violation_probability": 0.20391,
-      "evaluation_standard_error": 0.0012740907028151488,
-      "response_quantile": 0.009596440182926099,
+      "status": "no_safe_region",
       "splits": 32,
-      "terminal_regions": 33,
-      "discarded_regions": 0,
-      "scope": "finite candidate approximation to Chapter 4 RCC"
+      "terminal_regions": 1,
+      "certified_safe_regions": 0,
+      "uncertified_regions": 33,
+      "discarded_regions": 0
     }
   }
 }
