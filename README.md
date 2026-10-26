@@ -138,3 +138,10 @@ A correctly scaled conformal predictor matches or improves on RCC throughout.
 The notes also give a separate optimizer-valid calibration construction under
 explicit assumptions on residual laws within fixed groups; this is not claimed
 as a guarantee for the adaptive RCC algorithm.
+
+The [trained-quantile follow-up](experiments/transparent/LEARNED_MODEL.md) learns
+the mean and uncertainty from full-domain observations. At 8,000 training rows,
+all 300 fitted models pass the declared global and near-optimum quality checks.
+RCC's formerly large benefit falls to a small cost saving with higher risk
+(approximately 0.06% in the favorable case). The study includes learning-size
+sensitivity and exact decision-risk evaluation.

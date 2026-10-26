@@ -25,3 +25,4 @@ results/power/*
 !results/transparent/
 results/transparent/*
 !results/transparent/capacity_audit.json
+!results/transparent/learned_quantile_audit.json

@@ -220,6 +220,14 @@ less modeling effort, than those alternatives while supporting a valid
 calibration argument. The current study exposes that question rather than
 settling it.
 
+The [learned conditional-quantile follow-up](LEARNED_MODEL.md) addresses model
+quality directly. It learns the mean and tail behavior from full-domain noisy
+data without supplied scales or regime boundaries. Across 100 seeds at 8,000
+training rows, the models have low oracle-relative quantile loss, but the large
+RCC benefit disappears: the favorable case's mean saving is about 0.06%, with
+higher risk. The supplied-mean mechanism comparison above remains a separate
+experiment.
+
 ## Reproduce
 
 ```bash

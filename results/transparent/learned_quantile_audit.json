@@ -1,0 +1,826 @@
+{
+  "config": {
+    "training_sizes": [
+      2000,
+      8000,
+      32000
+    ],
+    "replications": 100,
+    "seed": 20261026,
+    "validation_size": 4000,
+    "calibration_size": 4000,
+    "evaluation_size": 20000,
+    "alpha": 0.1,
+    "delta": 0.1,
+    "max_splits": 64,
+    "leaf_candidates": [
+      1,
+      2,
+      3,
+      4,
+      6,
+      8,
+      12
+    ],
+    "quality_gate": {
+      "relative_excess_pinball_at_most": 0.1,
+      "upper_cdf_mae_at_most": 0.025
+    },
+    "near_optimum_evaluation_interval": [
+      1.0,
+      1.2
+    ]
+  },
+  "environment": {
+    "python": "3.12.15",
+    "numpy": "2.5.4",
+    "scikit_learn": "1.9.1"
+  },
+  "comparisons": [
+    {
+      "case": "homogeneous",
+      "training_size": 2000,
+      "replications": 100,
+      "methods": {
+        "raw_quantile": {
+          "selected": 100,
+          "reliable": 100,
+          "mean_cost": 1.0899459920301822,
+          "mean_exact_risk": 0.0502700398490882,
+          "max_exact_risk": 0.07441668223388276,
+          "mean_selected_raw_upper_coverage": 0.9497299601509117,
+          "min_selected_raw_upper_coverage": 0.9255833177661177,
+          "mean_abs_selected_upper_quantile_error": 0.001138634501176958
+        },
+        "global_cqr": {
+          "selected": 100,
+          "reliable": 100,
+          "mean_cost": 1.0902039276597086,
+          "mean_exact_risk": 0.048980361701458044,
+          "max_exact_risk": 0.06465196071331625,
+          "mean_selected_raw_upper_coverage": 0.9497302181380295,
+          "min_selected_raw_upper_coverage": 0.9256071883491934,
+          "mean_abs_selected_upper_quantile_error": 0.0011383572956251775
+        },
+        "rcc": {
+          "selected": 100,
+          "reliable": 100,
+          "mean_cost": 1.0897522598604814,
+          "mean_exact_risk": 0.05123870069759345,
+          "max_exact_risk": 0.07685411690098687,
+          "mean_selected_raw_upper_coverage": 0.9497301074942102,
+          "min_selected_raw_upper_coverage": 0.9255911060267631,
+          "mean_abs_selected_upper_quantile_error": 0.0011386392770304685
+        }
+      },
+      "full_domain_quality": {
+        "quality_gate_pass_count": 100,
+        "means": {
+          "expected_pinball": 0.00951393512873147,
+          "oracle_expected_pinball": 0.009500000000000005,
+          "relative_excess_pinball": 0.0014668556559436063,
+          "lower_quantile_mae": 0.0012117518202671798,
+          "upper_quantile_mae": 0.0012969501288769625,
+          "upper_cdf_mae": 0.006484750644384819,
+          "raw_upper_coverage": 0.9492970659110003,
+          "raw_interval_coverage": 0.8977127899774624,
+          "mean_predictor_rmse": 0.0015687325978363037
+        },
+        "max_relative_excess_pinball": 0.007410419669719781,
+        "max_upper_cdf_mae": 0.018483736208142032
+      },
+      "near_optimum_quality": {
+        "quality_gate_pass_count": 100,
+        "means": {
+          "expected_pinball": 0.00950889091238526,
+          "oracle_expected_pinball": 0.009500000000000005,
+          "relative_excess_pinball": 0.0009358855142371958,
+          "lower_quantile_mae": 0.0009557816917977016,
+          "upper_quantile_mae": 0.0011344693655030765,
+          "upper_cdf_mae": 0.005672346827515384,
+          "raw_upper_coverage": 0.9497341283569719,
+          "raw_interval_coverage": 0.8981696620735302,
+          "mean_predictor_rmse": 0.0011628143219148599
+        },
+        "max_relative_excess_pinball": 0.006217417599752917,
+        "max_upper_cdf_mae": 0.02429176310317597
+      },
+      "quality_gate_pass_both": 100,
+      "selected_leaves": {
+        "1": 63,
+        "2": 28,
+        "3": 5,
+        "4": 2,
+        "6": 1,
+        "8": 1
+      },
+      "rcc_minus_global_cost": {
+        "paired_runs": 100,
+        "mean": -0.00045166779922708235,
+        "min": -0.0032235402266578284,
+        "max": 0.0013923178007417825,
+        "rcc_cheaper": 63,
+        "rcc_costlier": 12,
+        "ties": 25,
+        "rcc_cheaper_and_both_reliable": 63
+      }
+    },
+    {
+      "case": "aligned",
+      "training_size": 2000,
+      "replications": 100,
+      "methods": {
+        "raw_quantile": {
+          "selected": 100,
+          "reliable": 100,
+          "mean_cost": 1.0901505303335872,
+          "mean_exact_risk": 0.0492473483320631,
+          "max_exact_risk": 0.08833069116141856,
+          "mean_selected_raw_upper_coverage": 0.9507526516679371,
+          "min_selected_raw_upper_coverage": 0.9116693088385813,
+          "mean_abs_selected_upper_quantile_error": 0.0018125601147249886
+        },
+        "global_cqr": {
+          "selected": 100,
+          "reliable": 100,
+          "mean_cost": 1.0908304883519697,
+          "mean_exact_risk": 0.045847558240151916,
+          "max_exact_risk": 0.07266638583885943,
+          "mean_selected_raw_upper_coverage": 0.9507496727054915,
+          "min_selected_raw_upper_coverage": 0.9115908074680215,
+          "mean_abs_selected_upper_quantile_error": 0.0018144284114461442
+        },
+        "rcc": {
+          "selected": 100,
+          "reliable": 100,
+          "mean_cost": 1.089831939078652,
+          "mean_exact_risk": 0.050840304606741785,
+          "max_exact_risk": 0.06984960469494883,
+          "mean_selected_raw_upper_coverage": 0.9507456820919638,
+          "min_selected_raw_upper_coverage": 0.911571599450387,
+          "mean_abs_selected_upper_quantile_error": 0.0018129330697228164
+        }
+      },
+      "full_domain_quality": {
+        "quality_gate_pass_count": 100,
+        "means": {
+          "expected_pinball": 0.029601481388987893,
+          "oracle_expected_pinball": 0.029454260750000027,
+          "relative_excess_pinball": 0.004994573465672414,
+          "lower_quantile_mae": 0.0037261526958528675,
+          "upper_quantile_mae": 0.004003238557662349,
+          "upper_cdf_mae": 0.006729783031365308,
+          "raw_upper_coverage": 0.9481737033569708,
+          "raw_interval_coverage": 0.8971568633679274,
+          "mean_predictor_rmse": 0.004468455858755086
+        },
+        "max_relative_excess_pinball": 0.041400755862842864,
+        "max_upper_cdf_mae": 0.020395546302229558
+      },
+      "near_optimum_quality": {
+        "quality_gate_pass_count": 98,
+        "means": {
+          "expected_pinball": 0.009565927116815559,
+          "oracle_expected_pinball": 0.009500000000000005,
+          "relative_excess_pinball": 0.006939696506900093,
+          "lower_quantile_mae": 0.0022419104137293383,
+          "upper_quantile_mae": 0.0022531816519544123,
+          "upper_cdf_mae": 0.00932520742833366,
+          "raw_upper_coverage": 0.9509618368580189,
+          "raw_interval_coverage": 0.9004174163691836,
+          "mean_predictor_rmse": 0.002771772255927779
+        },
+        "max_relative_excess_pinball": 0.04723897846052183,
+        "max_upper_cdf_mae": 0.03877108291550367
+      },
+      "quality_gate_pass_both": 98,
+      "selected_leaves": {
+        "2": 80,
+        "3": 15,
+        "4": 5
+      },
+      "rcc_minus_global_cost": {
+        "paired_runs": 100,
+        "mean": -0.0009985492733179746,
+        "min": -0.005618980947367458,
+        "max": 0.00317759362877279,
+        "rcc_cheaper": 67,
+        "rcc_costlier": 33,
+        "ties": 0,
+        "rcc_cheaper_and_both_reliable": 67
+      }
+    },
+    {
+      "case": "interior_quiet_region",
+      "training_size": 2000,
+      "replications": 100,
+      "methods": {
+        "raw_quantile": {
+          "selected": 100,
+          "reliable": 100,
+          "mean_cost": 1.0907587533085803,
+          "mean_exact_risk": 0.04719373344131043,
+          "max_exact_risk": 0.08423403196053125,
+          "mean_selected_raw_upper_coverage": 0.9528062665586894,
+          "min_selected_raw_upper_coverage": 0.9157659680394683,
+          "mean_abs_selected_upper_quantile_error": 0.0025897183776412702
+        },
+        "global_cqr": {
+          "selected": 100,
+          "reliable": 100,
+          "mean_cost": 1.0919138008976335,
+          "mean_exact_risk": 0.041439289573967794,
+          "max_exact_risk": 0.08249673713293837,
+          "mean_selected_raw_upper_coverage": 0.9527993853143826,
+          "min_selected_raw_upper_coverage": 0.9157633415257377,
+          "mean_abs_selected_upper_quantile_error": 0.002588851753564778
+        },
+        "rcc": {
+          "selected": 100,
+          "reliable": 99,
+          "mean_cost": 1.0912747410395047,
+          "mean_exact_risk": 0.044993559448586025,
+          "max_exact_risk": 0.10184656918645851,
+          "mean_selected_raw_upper_coverage": 0.9528034804304051,
+          "min_selected_raw_upper_coverage": 0.9157925953971968,
+          "mean_abs_selected_upper_quantile_error": 0.0025920564494003873
+        }
+      },
+      "full_domain_quality": {
+        "quality_gate_pass_count": 100,
+        "means": {
+          "expected_pinball": 0.034776184045766184,
+          "oracle_expected_pinball": 0.034430631500000024,
+          "relative_excess_pinball": 0.010032763949776771,
+          "lower_quantile_mae": 0.0063108873356591925,
+          "upper_quantile_mae": 0.0062303524247180955,
+          "upper_cdf_mae": 0.008777851150158274,
+          "raw_upper_coverage": 0.9481055895014966,
+          "raw_interval_coverage": 0.8964318498914047,
+          "mean_predictor_rmse": 0.005991526206483256
+        },
+        "max_relative_excess_pinball": 0.03951392671520315,
+        "max_upper_cdf_mae": 0.015851643186373665
+      },
+      "near_optimum_quality": {
+        "quality_gate_pass_count": 94,
+        "means": {
+          "expected_pinball": 0.00955890476956015,
+          "oracle_expected_pinball": 0.009500000000000005,
+          "relative_excess_pinball": 0.006200502058962427,
+          "lower_quantile_mae": 0.0025695187230662725,
+          "upper_quantile_mae": 0.002594547877853471,
+          "upper_cdf_mae": 0.011982243654902107,
+          "raw_upper_coverage": 0.9527582316309443,
+          "raw_interval_coverage": 0.9053490215490205,
+          "mean_predictor_rmse": 0.004659886057823955
+        },
+        "max_relative_excess_pinball": 0.13446522547149686,
+        "max_upper_cdf_mae": 0.050000000000000044
+      },
+      "quality_gate_pass_both": 94,
+      "selected_leaves": {
+        "3": 58,
+        "4": 30,
+        "6": 10,
+        "8": 2
+      },
+      "rcc_minus_global_cost": {
+        "paired_runs": 100,
+        "mean": -0.000639059858128641,
+        "min": -0.011645787583057121,
+        "max": 0.007179411679500314,
+        "rcc_cheaper": 52,
+        "rcc_costlier": 47,
+        "ties": 1,
+        "rcc_cheaper_and_both_reliable": 51
+      }
+    },
+    {
+      "case": "homogeneous",
+      "training_size": 8000,
+      "replications": 100,
+      "methods": {
+        "raw_quantile": {
+          "selected": 100,
+          "reliable": 100,
+          "mean_cost": 1.0899326669216265,
+          "mean_exact_risk": 0.05033666539186674,
+          "max_exact_risk": 0.0619878874137032,
+          "mean_selected_raw_upper_coverage": 0.9496633346081331,
+          "min_selected_raw_upper_coverage": 0.9380121125862969,
+          "mean_abs_selected_upper_quantile_error": 0.0005473909609476976
+        },
+        "global_cqr": {
+          "selected": 100,
+          "reliable": 100,
+          "mean_cost": 1.0900568804524007,
+          "mean_exact_risk": 0.04971559773799655,
+          "max_exact_risk": 0.06043341445026562,
+          "mean_selected_raw_upper_coverage": 0.9496633571042719,
+          "min_selected_raw_upper_coverage": 0.9380178931881507,
+          "mean_abs_selected_upper_quantile_error": 0.0005473875407643725
+        },
+        "rcc": {
+          "selected": 100,
+          "reliable": 100,
+          "mean_cost": 1.089667673423603,
+          "mean_exact_risk": 0.05166163288198456,
+          "max_exact_risk": 0.06573309869875543,
+          "mean_selected_raw_upper_coverage": 0.9496634256300698,
+          "min_selected_raw_upper_coverage": 0.9380183939768738,
+          "mean_abs_selected_upper_quantile_error": 0.0005474282217387179
+        }
+      },
+      "full_domain_quality": {
+        "quality_gate_pass_count": 100,
+        "means": {
+          "expected_pinball": 0.009504507568047391,
+          "oracle_expected_pinball": 0.009500000000000005,
+          "relative_excess_pinball": 0.0004744808470930528,
+          "lower_quantile_mae": 0.0006705022286614955,
+          "upper_quantile_mae": 0.0006460685139905804,
+          "upper_cdf_mae": 0.003230342569952906,
+          "raw_upper_coverage": 0.9495998825676102,
+          "raw_interval_coverage": 0.899530575939409,
+          "mean_predictor_rmse": 0.0008247557187810567
+        },
+        "max_relative_excess_pinball": 0.002689781473660835,
+        "max_upper_cdf_mae": 0.008130121026215076
+      },
+      "near_optimum_quality": {
+        "quality_gate_pass_count": 100,
+        "means": {
+          "expected_pinball": 0.00950491953312643,
+          "oracle_expected_pinball": 0.009500000000000005,
+          "relative_excess_pinball": 0.0005178455922550595,
+          "lower_quantile_mae": 0.000592623910557404,
+          "upper_quantile_mae": 0.0005787903449063153,
+          "upper_cdf_mae": 0.0028939517245315737,
+          "raw_upper_coverage": 0.9495445900504859,
+          "raw_interval_coverage": 0.8993681249702233,
+          "mean_predictor_rmse": 0.0006475511693395343
+        },
+        "max_relative_excess_pinball": 0.023266916206876154,
+        "max_upper_cdf_mae": 0.01855700703589103
+      },
+      "quality_gate_pass_both": 100,
+      "selected_leaves": {
+        "1": 54,
+        "2": 22,
+        "3": 12,
+        "4": 8,
+        "6": 3,
+        "12": 1
+      },
+      "rcc_minus_global_cost": {
+        "paired_runs": 100,
+        "mean": -0.0003892070287976024,
+        "min": -0.0030513902450315378,
+        "max": 0.001749594689723022,
+        "rcc_cheaper": 59,
+        "rcc_costlier": 18,
+        "ties": 23,
+        "rcc_cheaper_and_both_reliable": 59
+      }
+    },
+    {
+      "case": "aligned",
+      "training_size": 8000,
+      "replications": 100,
+      "methods": {
+        "raw_quantile": {
+          "selected": 100,
+          "reliable": 100,
+          "mean_cost": 1.0898584686160522,
+          "mean_exact_risk": 0.05070765691973957,
+          "max_exact_risk": 0.06190052783024491,
+          "mean_selected_raw_upper_coverage": 0.9492923430802602,
+          "min_selected_raw_upper_coverage": 0.9380994721697548,
+          "mean_abs_selected_upper_quantile_error": 0.0008819174785815173
+        },
+        "global_cqr": {
+          "selected": 100,
+          "reliable": 100,
+          "mean_cost": 1.090205641316073,
+          "mean_exact_risk": 0.048971793419634854,
+          "max_exact_risk": 0.0672670864585152,
+          "mean_selected_raw_upper_coverage": 0.9492928034586505,
+          "min_selected_raw_upper_coverage": 0.9380982478806003,
+          "mean_abs_selected_upper_quantile_error": 0.0008823013754557221
+        },
+        "rcc": {
+          "selected": 100,
+          "reliable": 100,
+          "mean_cost": 1.089560680564216,
+          "mean_exact_risk": 0.05219659717892095,
+          "max_exact_risk": 0.07263432725264929,
+          "mean_selected_raw_upper_coverage": 0.9492916657512421,
+          "min_selected_raw_upper_coverage": 0.9380958180452789,
+          "mean_abs_selected_upper_quantile_error": 0.0008817214820852349
+        }
+      },
+      "full_domain_quality": {
+        "quality_gate_pass_count": 100,
+        "means": {
+          "expected_pinball": 0.029491595709964128,
+          "oracle_expected_pinball": 0.029454260750000027,
+          "relative_excess_pinball": 0.0012673170345497819,
+          "lower_quantile_mae": 0.002141338176979321,
+          "upper_quantile_mae": 0.0020685386772788293,
+          "upper_cdf_mae": 0.003517961767057604,
+          "raw_upper_coverage": 0.949429980862922,
+          "raw_interval_coverage": 0.898970001534585,
+          "mean_predictor_rmse": 0.002504554781982038
+        },
+        "max_relative_excess_pinball": 0.007640404414785307,
+        "max_upper_cdf_mae": 0.0072968656608185245
+      },
+      "near_optimum_quality": {
+        "quality_gate_pass_count": 100,
+        "means": {
+          "expected_pinball": 0.00952247894107324,
+          "oracle_expected_pinball": 0.009500000000000005,
+          "relative_excess_pinball": 0.0023662043234982688,
+          "lower_quantile_mae": 0.0011885056976748377,
+          "upper_quantile_mae": 0.0010537153900974853,
+          "upper_cdf_mae": 0.004527428088011891,
+          "raw_upper_coverage": 0.949364872522941,
+          "raw_interval_coverage": 0.8999616348717278,
+          "mean_predictor_rmse": 0.0015660112297928447
+        },
+        "max_relative_excess_pinball": 0.015649017382928454,
+        "max_upper_cdf_mae": 0.012085536720653392
+      },
+      "quality_gate_pass_both": 100,
+      "selected_leaves": {
+        "2": 56,
+        "3": 23,
+        "4": 12,
+        "6": 5,
+        "8": 3,
+        "12": 1
+      },
+      "rcc_minus_global_cost": {
+        "paired_runs": 100,
+        "mean": -0.000644960751857222,
+        "min": -0.0035815445852840355,
+        "max": 0.0026148482502430515,
+        "rcc_cheaper": 70,
+        "rcc_costlier": 29,
+        "ties": 1,
+        "rcc_cheaper_and_both_reliable": 70
+      }
+    },
+    {
+      "case": "interior_quiet_region",
+      "training_size": 8000,
+      "replications": 100,
+      "methods": {
+        "raw_quantile": {
+          "selected": 100,
+          "reliable": 100,
+          "mean_cost": 1.0902205706495132,
+          "mean_exact_risk": 0.048897146752433424,
+          "max_exact_risk": 0.06640614524866706,
+          "mean_selected_raw_upper_coverage": 0.9511028532475665,
+          "min_selected_raw_upper_coverage": 0.9335938547513334,
+          "mean_abs_selected_upper_quantile_error": 0.0011716004320285543
+        },
+        "global_cqr": {
+          "selected": 100,
+          "reliable": 100,
+          "mean_cost": 1.0906686742014358,
+          "mean_exact_risk": 0.04665662899282233,
+          "max_exact_risk": 0.06899995695074224,
+          "mean_selected_raw_upper_coverage": 0.9511064930562168,
+          "min_selected_raw_upper_coverage": 0.9335969859334539,
+          "mean_abs_selected_upper_quantile_error": 0.0011717585193125211
+        },
+        "rcc": {
+          "selected": 100,
+          "reliable": 100,
+          "mean_cost": 1.0898321481733897,
+          "mean_exact_risk": 0.050839259133052456,
+          "max_exact_risk": 0.09427015072375045,
+          "mean_selected_raw_upper_coverage": 0.9511041371514345,
+          "min_selected_raw_upper_coverage": 0.9336030164276223,
+          "mean_abs_selected_upper_quantile_error": 0.0011717301827461669
+        }
+      },
+      "full_domain_quality": {
+        "quality_gate_pass_count": 100,
+        "means": {
+          "expected_pinball": 0.03454750759404149,
+          "oracle_expected_pinball": 0.034430631500000024,
+          "relative_excess_pinball": 0.003395116384932191,
+          "lower_quantile_mae": 0.003147363165458131,
+          "upper_quantile_mae": 0.003028480701421968,
+          "upper_cdf_mae": 0.0042350769915488265,
+          "raw_upper_coverage": 0.9496294007902213,
+          "raw_interval_coverage": 0.899028386738385,
+          "mean_predictor_rmse": 0.003043030768560903
+        },
+        "max_relative_excess_pinball": 0.013098303213096463,
+        "max_upper_cdf_mae": 0.009903465081111855
+      },
+      "near_optimum_quality": {
+        "quality_gate_pass_count": 100,
+        "means": {
+          "expected_pinball": 0.009512027654961917,
+          "oracle_expected_pinball": 0.009500000000000005,
+          "relative_excess_pinball": 0.0012660689433588424,
+          "lower_quantile_mae": 0.0012735840674141894,
+          "upper_quantile_mae": 0.0011730158597764659,
+          "upper_cdf_mae": 0.005865079298882333,
+          "raw_upper_coverage": 0.9510993827578329,
+          "raw_interval_coverage": 0.9018302896743606,
+          "mean_predictor_rmse": 0.002216314604767686
+        },
+        "max_relative_excess_pinball": 0.007870456629681222,
+        "max_upper_cdf_mae": 0.02292213229132662
+      },
+      "quality_gate_pass_both": 100,
+      "selected_leaves": {
+        "3": 60,
+        "4": 27,
+        "6": 8,
+        "8": 5
+      },
+      "rcc_minus_global_cost": {
+        "paired_runs": 100,
+        "mean": -0.0008365260280460251,
+        "min": -0.007946325034616564,
+        "max": 0.005382430435263208,
+        "rcc_cheaper": 61,
+        "rcc_costlier": 38,
+        "ties": 1,
+        "rcc_cheaper_and_both_reliable": 61
+      }
+    },
+    {
+      "case": "homogeneous",
+      "training_size": 32000,
+      "replications": 100,
+      "methods": {
+        "raw_quantile": {
+          "selected": 100,
+          "reliable": 100,
+          "mean_cost": 1.0899021597448943,
+          "mean_exact_risk": 0.05048920127552748,
+          "max_exact_risk": 0.08201691499059094,
+          "mean_selected_raw_upper_coverage": 0.9495107987244721,
+          "min_selected_raw_upper_coverage": 0.9179830850093641,
+          "mean_abs_selected_upper_quantile_error": 0.0003943167412476065
+        },
+        "global_cqr": {
+          "selected": 100,
+          "reliable": 100,
+          "mean_cost": 1.0899790806764849,
+          "mean_exact_risk": 0.050104596617576276,
+          "max_exact_risk": 0.08201180801723673,
+          "mean_selected_raw_upper_coverage": 0.9495036695224205,
+          "min_selected_raw_upper_coverage": 0.9172735353412983,
+          "mean_abs_selected_upper_quantile_error": 0.0003957254090179505
+        },
+        "rcc": {
+          "selected": 100,
+          "reliable": 100,
+          "mean_cost": 1.089578762303623,
+          "mean_exact_risk": 0.05210618848188552,
+          "max_exact_risk": 0.07530183698567572,
+          "mean_selected_raw_upper_coverage": 0.9494878897501172,
+          "min_selected_raw_upper_coverage": 0.9157132957759875,
+          "mean_abs_selected_upper_quantile_error": 0.00039893458391426187
+        }
+      },
+      "full_domain_quality": {
+        "quality_gate_pass_count": 100,
+        "means": {
+          "expected_pinball": 0.009501674503039148,
+          "oracle_expected_pinball": 0.009500000000000005,
+          "relative_excess_pinball": 0.00017626347780444362,
+          "lower_quantile_mae": 0.00036697603558850976,
+          "upper_quantile_mae": 0.00038429526216190904,
+          "upper_cdf_mae": 0.0019214763108095405,
+          "raw_upper_coverage": 0.9498749562644805,
+          "raw_interval_coverage": 0.8998089525423636,
+          "mean_predictor_rmse": 0.00040594056064519957
+        },
+        "max_relative_excess_pinball": 0.0007865400549009749,
+        "max_upper_cdf_mae": 0.00436221039339524
+      },
+      "near_optimum_quality": {
+        "quality_gate_pass_count": 100,
+        "means": {
+          "expected_pinball": 0.009501299625261693,
+          "oracle_expected_pinball": 0.009500000000000005,
+          "relative_excess_pinball": 0.0001368026591248439,
+          "lower_quantile_mae": 0.00031440663485657257,
+          "upper_quantile_mae": 0.00035222891659216003,
+          "upper_cdf_mae": 0.0017611445829607997,
+          "raw_upper_coverage": 0.9497865867733439,
+          "raw_interval_coverage": 0.8998348895289395,
+          "mean_predictor_rmse": 0.0003280816124180222
+        },
+        "max_relative_excess_pinball": 0.003196832047491993,
+        "max_upper_cdf_mae": 0.008647036843228404
+      },
+      "quality_gate_pass_both": 100,
+      "selected_leaves": {
+        "1": 28,
+        "2": 27,
+        "3": 15,
+        "4": 15,
+        "6": 7,
+        "8": 6,
+        "12": 2
+      },
+      "rcc_minus_global_cost": {
+        "paired_runs": 100,
+        "mean": -0.00040031837286185645,
+        "min": -0.003814166354324744,
+        "max": 0.0013419942063122026,
+        "rcc_cheaper": 59,
+        "rcc_costlier": 28,
+        "ties": 13,
+        "rcc_cheaper_and_both_reliable": 59
+      }
+    },
+    {
+      "case": "aligned",
+      "training_size": 32000,
+      "replications": 100,
+      "methods": {
+        "raw_quantile": {
+          "selected": 100,
+          "reliable": 100,
+          "mean_cost": 1.089925025347795,
+          "mean_exact_risk": 0.05037487326102614,
+          "max_exact_risk": 0.057030502429277874,
+          "mean_selected_raw_upper_coverage": 0.9496251267389739,
+          "min_selected_raw_upper_coverage": 0.9429694975707221,
+          "mean_abs_selected_upper_quantile_error": 0.00044685532022251714
+        },
+        "global_cqr": {
+          "selected": 100,
+          "reliable": 100,
+          "mean_cost": 1.090122094876136,
+          "mean_exact_risk": 0.04938952561932014,
+          "max_exact_risk": 0.0616457374624475,
+          "mean_selected_raw_upper_coverage": 0.9496250090419665,
+          "min_selected_raw_upper_coverage": 0.9429682268032809,
+          "mean_abs_selected_upper_quantile_error": 0.00044696402388234483
+        },
+        "rcc": {
+          "selected": 100,
+          "reliable": 100,
+          "mean_cost": 1.0896050668999693,
+          "mean_exact_risk": 0.05197466550015405,
+          "max_exact_risk": 0.07333823689425989,
+          "mean_selected_raw_upper_coverage": 0.9496252031398181,
+          "min_selected_raw_upper_coverage": 0.9429659418181685,
+          "mean_abs_selected_upper_quantile_error": 0.0004467334452825314
+        }
+      },
+      "full_domain_quality": {
+        "quality_gate_pass_count": 100,
+        "means": {
+          "expected_pinball": 0.02946752304692346,
+          "oracle_expected_pinball": 0.029454260750000027,
+          "relative_excess_pinball": 0.000450329364388935,
+          "lower_quantile_mae": 0.0011617333908851115,
+          "upper_quantile_mae": 0.0011991862193960314,
+          "upper_cdf_mae": 0.0019508596181028153,
+          "raw_upper_coverage": 0.9497333514504547,
+          "raw_interval_coverage": 0.899596879476557,
+          "mean_predictor_rmse": 0.0012581755939526991
+        },
+        "max_relative_excess_pinball": 0.0022180194390151176,
+        "max_upper_cdf_mae": 0.0048643780675147385
+      },
+      "near_optimum_quality": {
+        "quality_gate_pass_count": 100,
+        "means": {
+          "expected_pinball": 0.009503999360374889,
+          "oracle_expected_pinball": 0.009500000000000005,
+          "relative_excess_pinball": 0.0004209853026191279,
+          "lower_quantile_mae": 0.0004796641543785617,
+          "upper_quantile_mae": 0.00047737280097616424,
+          "upper_cdf_mae": 0.0022747009024005078,
+          "raw_upper_coverage": 0.9496346934987853,
+          "raw_interval_coverage": 0.8998711938747248,
+          "mean_predictor_rmse": 0.0008314074518466775
+        },
+        "max_relative_excess_pinball": 0.0030111208642982223,
+        "max_upper_cdf_mae": 0.0077352963575727015
+      },
+      "quality_gate_pass_both": 100,
+      "selected_leaves": {
+        "2": 42,
+        "3": 16,
+        "4": 15,
+        "6": 12,
+        "8": 10,
+        "12": 5
+      },
+      "rcc_minus_global_cost": {
+        "paired_runs": 100,
+        "mean": -0.0005170279761667796,
+        "min": -0.003573477999022856,
+        "max": 0.002385555298711761,
+        "rcc_cheaper": 68,
+        "rcc_costlier": 32,
+        "ties": 0,
+        "rcc_cheaper_and_both_reliable": 68
+      }
+    },
+    {
+      "case": "interior_quiet_region",
+      "training_size": 32000,
+      "replications": 100,
+      "methods": {
+        "raw_quantile": {
+          "selected": 100,
+          "reliable": 100,
+          "mean_cost": 1.090084898568004,
+          "mean_exact_risk": 0.04957550715997982,
+          "max_exact_risk": 0.05961858065235037,
+          "mean_selected_raw_upper_coverage": 0.9504244928400203,
+          "min_selected_raw_upper_coverage": 0.9403814193476497,
+          "mean_abs_selected_upper_quantile_error": 0.0005695147406140192
+        },
+        "global_cqr": {
+          "selected": 100,
+          "reliable": 100,
+          "mean_cost": 1.0904282933930904,
+          "mean_exact_risk": 0.04785853303454744,
+          "max_exact_risk": 0.07565584079584364,
+          "mean_selected_raw_upper_coverage": 0.9504246001330598,
+          "min_selected_raw_upper_coverage": 0.9403848806400023,
+          "mean_abs_selected_upper_quantile_error": 0.0005695133598750044
+        },
+        "rcc": {
+          "selected": 100,
+          "reliable": 100,
+          "mean_cost": 1.0896016063793241,
+          "mean_exact_risk": 0.05199196810337952,
+          "max_exact_risk": 0.09359821705035754,
+          "mean_selected_raw_upper_coverage": 0.9504258590027657,
+          "min_selected_raw_upper_coverage": 0.9403907452194299,
+          "mean_abs_selected_upper_quantile_error": 0.0005696890669046089
+        }
+      },
+      "full_domain_quality": {
+        "quality_gate_pass_count": 100,
+        "means": {
+          "expected_pinball": 0.03447683796447052,
+          "oracle_expected_pinball": 0.034430631500000024,
+          "relative_excess_pinball": 0.0013417282475996538,
+          "lower_quantile_mae": 0.0015767525569792679,
+          "upper_quantile_mae": 0.0016032094773102369,
+          "upper_cdf_mae": 0.0022549674858099145,
+          "raw_upper_coverage": 0.949736929704429,
+          "raw_interval_coverage": 0.8993908773437842,
+          "mean_predictor_rmse": 0.0016973576041187902
+        },
+        "max_relative_excess_pinball": 0.006670330373943711,
+        "max_upper_cdf_mae": 0.005335024392767482
+      },
+      "near_optimum_quality": {
+        "quality_gate_pass_count": 100,
+        "means": {
+          "expected_pinball": 0.009502722941928273,
+          "oracle_expected_pinball": 0.009500000000000005,
+          "relative_excess_pinball": 0.0002866254661332679,
+          "lower_quantile_mae": 0.000636020720388198,
+          "upper_quantile_mae": 0.0005712861926702044,
+          "upper_cdf_mae": 0.002856430963351023,
+          "raw_upper_coverage": 0.9504228257791627,
+          "raw_interval_coverage": 0.9008894742037097,
+          "mean_predictor_rmse": 0.0012583589055267322
+        },
+        "max_relative_excess_pinball": 0.001231681305063459,
+        "max_upper_cdf_mae": 0.009582827175774435
+      },
+      "quality_gate_pass_both": 100,
+      "selected_leaves": {
+        "3": 54,
+        "4": 16,
+        "6": 16,
+        "8": 9,
+        "12": 5
+      },
+      "rcc_minus_global_cost": {
+        "paired_runs": 100,
+        "mean": -0.000826687013766414,
+        "min": -0.007392526527834953,
+        "max": 0.005594671440900978,
+        "rcc_cheaper": 62,
+        "rcc_costlier": 37,
+        "ties": 1,
+        "rcc_cheaper_and_both_reliable": 62
+      }
+    }
+  ]
+}
