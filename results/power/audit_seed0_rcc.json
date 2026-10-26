@@ -1,0 +1,179 @@
+{
+  "config": {
+    "seed": 0,
+    "alpha": 0.1,
+    "training_size": 30000,
+    "design_size": 15000,
+    "calibration_size": 15000,
+    "candidate_size": 200000,
+    "evaluation_size": 100000,
+    "model_iterations": 400,
+    "model_leaf_size": 60,
+    "partition_leaves": 6,
+    "partition_leaf_size": 1000,
+    "outage_probability": 0.05,
+    "full_domain_fraction": 0.5
+  },
+  "case": {
+    "name": "PGLib-OPF IEEE 39-bus (case39_epri)",
+    "buses": 39,
+    "generators": 10,
+    "branches": 46,
+    "connected_single_line_outages": 35,
+    "nominal_demand_mw": 6254.23
+  },
+  "model": {
+    "kind": "histogram gradient-boosted quantile regression",
+    "sampling": "mixture of full dispatch domain and nominally secure polytope",
+    "features": "normalized dispatch, generator headroom, and nominal DC line utilizations",
+    "calibration_raw_upper_coverage": 0.8924666666666666,
+    "global_correction": 0.0019150647176580198
+  },
+  "partition": {
+    "kind": "held-out residual regression tree (diagnostic, not RCC)",
+    "leaves": [
+      {
+        "leaf": 3,
+        "design_count": 1004,
+        "calibration_count": 1500,
+        "design_mean_score": -0.03967830576244537,
+        "calibration_correction": 0.0021664616849236696,
+        "used_global_fallback": false
+      },
+      {
+        "leaf": 5,
+        "design_count": 2809,
+        "calibration_count": 2219,
+        "design_mean_score": -0.03692458998098408,
+        "calibration_correction": 0.0005053562544595352,
+        "used_global_fallback": false
+      },
+      {
+        "leaf": 7,
+        "design_count": 1611,
+        "calibration_count": 1406,
+        "design_mean_score": -0.04139811689569294,
+        "calibration_correction": -0.0013565267971847837,
+        "used_global_fallback": false
+      },
+      {
+        "leaf": 8,
+        "design_count": 1145,
+        "calibration_count": 1081,
+        "design_mean_score": -0.050941410646623254,
+        "calibration_correction": -0.0020010940016924605,
+        "used_global_fallback": false
+      },
+      {
+        "leaf": 9,
+        "design_count": 3458,
+        "calibration_count": 3645,
+        "design_mean_score": -0.05790655420082416,
+        "calibration_correction": -0.002288495239884114,
+        "used_global_fallback": false
+      },
+      {
+        "leaf": 10,
+        "design_count": 4973,
+        "calibration_count": 5149,
+        "design_mean_score": -0.05342299050556042,
+        "calibration_correction": 0.007514038247655286,
+        "used_global_fallback": false
+      }
+    ],
+    "correction_range": 0.0098025334875394
+  },
+  "methods": {
+    "raw_quantile": {
+      "status": "selected",
+      "cost": 141750.2256123232,
+      "dispatch": [
+        847.0374126738484,
+        616.0703143635075,
+        648.7874078842055,
+        598.8972197744545,
+        443.2210303004459,
+        626.3843072911627,
+        549.4859842624229,
+        47.46870394114417,
+        830.8643928864525,
+        1046.0132266223027
+      ],
+      "predicted_quantile": -0.002035576840074029,
+      "correction": 0.0,
+      "partition_leaf": 3,
+      "estimated_violation_probability": 0.06838,
+      "evaluation_standard_error": 0.0007981489560226211,
+      "response_quantile": -0.006183070211330139
+    },
+    "global_conformal": {
+      "status": "selected",
+      "cost": 141750.2256123232,
+      "dispatch": [
+        847.0374126738484,
+        616.0703143635075,
+        648.7874078842055,
+        598.8972197744545,
+        443.2210303004459,
+        626.3843072911627,
+        549.4859842624229,
+        47.46870394114417,
+        830.8643928864525,
+        1046.0132266223027
+      ],
+      "predicted_quantile": -0.002035576840074029,
+      "correction": 0.0019150647176580198,
+      "partition_leaf": 3,
+      "estimated_violation_probability": 0.06991,
+      "evaluation_standard_error": 0.0008063658716736466,
+      "response_quantile": -0.006089698862172921
+    },
+    "local_diagnostic": {
+      "status": "selected",
+      "cost": 141942.52290849556,
+      "dispatch": [
+        824.2211883048501,
+        615.9919612608772,
+        660.0301776714014,
+        605.4830928648631,
+        483.23160406527455,
+        561.2217288111351,
+        555.5277213214305,
+        81.87069204299945,
+        822.191624943314,
+        1044.4602087137685
+      ],
+      "predicted_quantile": -0.0041690465108619925,
+      "correction": 0.0021664616849236696,
+      "partition_leaf": 3,
+      "estimated_violation_probability": 0.06088,
+      "evaluation_standard_error": 0.0007561324328449349,
+      "response_quantile": -0.00839941956743148
+    },
+    "candidate_rcc": {
+      "status": "selected",
+      "cost": 141750.2256123232,
+      "dispatch": [
+        847.0374126738484,
+        616.0703143635075,
+        648.7874078842055,
+        598.8972197744545,
+        443.2210303004459,
+        626.3843072911627,
+        549.4859842624229,
+        47.46870394114417,
+        830.8643928864525,
+        1046.0132266223027
+      ],
+      "predicted_quantile": -0.002035576840074029,
+      "correction": 0.00186022016100491,
+      "estimated_violation_probability": 0.06989,
+      "evaluation_standard_error": 0.0008062591884747733,
+      "response_quantile": -0.006007087898046839,
+      "splits": 32,
+      "terminal_regions": 33,
+      "discarded_regions": 0,
+      "scope": "finite candidate approximation to Chapter 4 RCC"
+    }
+  }
+}

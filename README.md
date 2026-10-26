@@ -39,6 +39,7 @@ If recovered, add those CSVs to `results/quadratic/` and rerun. See
 | `experiments/sec45_quadratic/` | Original quadratic sweep and sample entry point |
 | `experiments/sec46_enrollment/` | Original enrollment training, comparison, and legacy sample |
 | `experiments/workforce/` | Solver-free cross-trained workforce stress test and negative control |
+| `experiments/power/` | IEEE 39-bus security-dispatch RCC falsification audit |
 | `notebooks/thesis_results.ipynb` | Thesis table aggregation, diagnostics, input hashes, CSV exports |
 | `examples/illustrations.ipynb` | Original supplemental conceptual drawings, with a findings notice |
 | `results/` | Working enrollment copies, new quadratic outputs, aggregated table exports |
@@ -110,3 +111,15 @@ The same directory contains a discrete-event multiskill queueing follow-up. In
 both models, an equal-information baseline that refits the predictor using the
 labeled partition-design sample matches or beats RCC. See the experiment README
 for the positive initial diagnostics, decisive baselines, and negative conclusion.
+
+## Exploratory power-system example
+
+`experiments/power/` contains a solver-free DC security-constrained economic
+dispatch experiment based on the PGLib-OPF IEEE 39-bus case. It deliberately
+combines full-domain training support with extra sampling in the operationally
+relevant security region, physics-derived ML features, independent partition-
+design and calibration samples, and 100,000-scenario decision evaluation. The
+initial three-seed audit does **not** establish an RCC advantage: one run ties the
+global method, one finds no RCC candidate, and one apparent saving violates the
+10% risk target badly. This negative result is retained to prevent example
+selection by favorable seed. See [the experiment notes](experiments/power/README.md).

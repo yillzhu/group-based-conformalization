@@ -17,3 +17,8 @@ results/quadratic/*
 !results/aggregated/
 results/aggregated/*
 !results/aggregated/.gitkeep
+!results/power/
+results/power/*
+!results/power/audit_seed0_rcc.json
+!results/power/audit_seed1_rcc.json
+!results/power/audit_seed2_rcc.json
