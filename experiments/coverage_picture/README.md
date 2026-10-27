@@ -97,3 +97,54 @@ Regenerate with the project installed and Matplotlib available:
 ```bash
 python experiments/coverage_picture/run_rcc.py
 ```
+
+## Simpler comparators on the same optimization problem
+
+`compare_baselines.py` keeps the same fitted mean, 240/240 train/calibration
+split, absolute-residual score, and finite-sample quantile convention. In
+addition to RCC and global calibration, it calibrates separately within two
+predeclared halves or ten predeclared equal-width bins; neither partition is
+fit from outcomes or optimization geometry. It solves the resulting 1-D
+piecewise constraint on a grid of spacing `0.0001` (RCC and global still use
+their exact piecewise-affine solves). The first sample gives:
+
+| Method | Chosen `x` | Exact conditional failure risk |
+| --- | ---: | ---: |
+| Oracle | 0.135 | 10.0% |
+| RCC | 0.130 | 13.8% |
+| Ten fixed bins | 0.139 | 7.1% |
+| Two fixed halves | 0.171 | 0.0% |
+| Global conformal | 0.971 | 20.4% |
+
+Across 100 prespecified seeds, `20261026` through `20261125`, the results are:
+
+| Method | Solutions | Mean chosen `x` (when returned) | Mean true risk (when returned) | Returned points at or below 10% risk |
+| --- | ---: | ---: | ---: | ---: |
+| RCC | 100/100 | 0.1446 | 4.1% | 90/100 |
+| Ten fixed bins | 100/100 | 0.1477 | 2.4% | 99/100 |
+| Two fixed halves | 100/100 | 0.1843 | 0.0% | 100/100 |
+| Global conformal | 53/100 | 0.9541 | 22.8% | 0/53 |
+
+The ten-bin comparison is especially informative: simple *predeclared*
+localization nearly matches RCC's decision cost and is safer in these draws.
+The selected decisions usually lie inside the first noise quarter, where
+several ten-bin cells happen to have approximately homogeneous residuals. This
+is an advantage of this deliberately simple response law, not evidence that
+fixed bins will work in higher dimensions. Moreover, calibrating cells and
+then choosing the cheapest among them does **not** give pointwise validity at
+the selected decision, even when the partition was fixed in advance. The table
+reports exact risks using the known simulation law, not formal guarantees.
+
+![Comparison of decisions on the first sample](figures/baseline-comparison.png)
+
+```bash
+python experiments/coverage_picture/compare_baselines.py
+```
+
+A direct conditional-quantile model would instead estimate the lower tenth
+percentile of `Y`, then choose the least `x` at which that estimate (with any
+desired global calibration correction) exceeds `0.35`. Here the true lower
+tenth percentile is `f(x)-0.8 sigma(x)`, giving the oracle decision `0.1352`.
+Unlike the fixed-bin comparisons, fitting such a model well from only 240
+training observations—especially near the abrupt scale changes—is a separate
+statistical task, not something established by this experiment.
