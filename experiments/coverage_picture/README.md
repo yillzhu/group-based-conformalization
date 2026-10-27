@@ -61,3 +61,39 @@ python experiments/coverage_picture/make_figures.py
 The script asserts all exact coverage values before drawing and uses one fixed
 sample of 480 observations across methods. The scatterplot is illustrative;
 the plotted coverage curves come from the analytic conditional law.
+
+## Running the actual RCC logic on these observations
+
+The companion experiment makes this a small optimization problem: choose the
+least `x` such that `P(Y < 0.35 | x) <= 0.1`. The algorithm does **not** see the
+true `f` or `sigma`: it fits a continuous piecewise-linear mean from the first
+240 plotted observations and uses the other 240 for calibration. Its fixed
+fitting knots are `0, 0.2, ..., 1`, not the noise boundaries. It then runs the
+Chapter 4 adaptive RCC queue, with absolute-residual scores and the original
+`delta=0.1` group test, through the exact one-dimensional specialization in
+`solve_learned_rcc`. For comparison, global conformalization uses the same
+fitted model and calibration observations. The oracle uses the known response
+law only for evaluation.
+
+| Method | Chosen `x` | Exact `P(Y < 0.35 | x)` |
+| --- | ---: | ---: |
+| Population oracle | 0.1352 | 10.0% |
+| Global conformal | 0.9713 | 20.4% |
+| Adaptive RCC | 0.1303 | 13.8% |
+
+RCC makes 33 geometric splits and selects the unresolved interval
+`[0.09775, 0.13033]`, which contains only 10 calibration observations. Its
+correction there is inherited from an ancestor, not freshly estimated in that
+cell. This run therefore illustrates both its potential reduction in decision
+cost relative to global calibration and its failure to meet the desired
+conditional risk at the chosen point. Global conformal coverage also does not
+give a chance-constraint guarantee after optimization. Neither outcome should
+be read as evidence that RCC discovered the four noise regimes.
+
+![RCC decisions and true risk](figures/rcc-on-picture.png)
+
+Regenerate with the project installed and Matplotlib available:
+
+```bash
+python experiments/coverage_picture/run_rcc.py
+```
