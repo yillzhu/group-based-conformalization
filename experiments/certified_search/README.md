@@ -72,3 +72,27 @@ Reproduce the paired confirmation with:
 ```
 
 The new saved JSON files also contain all proposals, audit counts and upper bounds, not just the selected points. The 95% guarantee refers to the probability, over fresh simulator draws, that any accepted point is unsafe; the observed 99/100 selection frequency is an empirical measure of search efficiency and is not itself part of the theorem.
+
+## Structure-free neural proposals
+
+The strong structured-tree result prompted a direct question: can a proposal model learn the staffing response surface **without being told** the exact capacity shift? The new `--proposal-model neural` option fits a two-hidden-layer, tanh conditional-quantile network to the raw two-dimensional inputs \((d,f)\) and response \(g\). It starts with 2,000 full-domain observations and warm-starts its fit after each audit using the audited response data. The network neither removes the flexible-staff coordinate nor uses \(R=y+f\). The same candidate mesh, ten rounds, 600 fresh audit scenarios per round, and Clopper–Pearson certificates are retained. PyTorch is needed only for this optional proposal model.
+
+We also tried an explicit `--audit-guidance` rule: after a failed audit, transfer half of the observed model-versus-empirical quantile discrepancy into a global margin for later proposals. This was counterproductive. At the 95th-percentile target, it certified 30/30 on seeds 10–39 but raised mean cost from 18.305 to 18.865. Warm-starting the network on past audit observations already provides useful adaptation; the extra margin is **off by default**.
+
+The initial 95th-percentile neural setting certified 10/10 exploratory seeds 0–9 and 30/30 seeds 10–39, but its mean cost was 18.305 on the latter range. We then tried only 94th and 93rd percentiles on seeds 0–39. Both certified every one of those 40 runs; the 93rd percentile was cheaper (mean cost 17.894 versus 18.120 on seeds 10–39). We froze the 93rd-percentile specification before evaluating its results on seeds 40–139. The 95th-percentile result on that range had already been inspected, so this is a confirmation of the *new* 93rd-percentile specification, not a claim that the entire project never looked at those seeds.
+
+| Proposal model, seeds 40–139 | Certified runs | Mean cost among certified | Mean independent risk among certified |
+| --- | ---: | ---: | ---: |
+| Raw two-input boosted tree, 95th percentile | 27/100 | 17.747 | 0.0745 |
+| Structure-aware boosted tree, 95th percentile | 99/100 | 17.839 | 0.0694 |
+| Raw two-input neural net, 95th percentile | 100/100 | 18.328 | 0.0595 |
+| Raw two-input neural net, 93rd percentile | 99/100 | 17.917 | 0.0720 |
+
+The simulated oracle mean cost is 17.059. On the 99 seeds where both the structured tree and 93rd-percentile neural method certified a plan, the neural cost was only 0.078 higher on average. The 93rd-percentile neural method and structured tree both failed to certify on seed 137; neither returned an uncertified plan. These results show that a sufficiently smooth, flexible proposal model can nearly reproduce the benefit of the known structural feature in this example. They do not show that neural models dominate structured modeling generally, nor that the 93rd-percentile setting transfers to other simulators.
+
+Reproduce the neural confirmation with:
+
+```bash
+.venv/bin/python experiments/certified_search/run.py --case queue --seed-start 40 --seeds 100 --proposal-model neural --output experiments/certified_search/results/queue-neural-plain-seeds40-139.json
+.venv/bin/python experiments/certified_search/run.py --case queue --seed-start 40 --seeds 100 --proposal-model neural --proposal-quantile .93 --output experiments/certified_search/results/queue-neural-q93-seeds40-139.json
+```

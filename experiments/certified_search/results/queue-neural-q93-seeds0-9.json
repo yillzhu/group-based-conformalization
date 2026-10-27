@@ -1,0 +1,1955 @@
+{
+  "method": "neural_quantile_proposals_with_independent_binomial_audits",
+  "config": {
+    "case": "queue",
+    "seeds": 10,
+    "seed_start": 0,
+    "training_size": 2000,
+    "batch_size": 600,
+    "rounds": 10,
+    "proposal_quantile": 0.93,
+    "proposal_model": "neural",
+    "audit_guidance": false,
+    "neural_initial_epochs": 300,
+    "neural_update_epochs": 40,
+    "queue_structured": false,
+    "evaluation_size": 30000,
+    "output": "experiments/certified_search/results/queue-neural-q93-seeds0-9.json"
+  },
+  "risk_alpha": 0.1,
+  "confidence_delta": 0.05,
+  "results": {
+    "queue": [
+      {
+        "selected": {
+          "round": 10,
+          "decision": [
+            5.4,
+            5.0
+          ],
+          "cost": 17.8,
+          "predicted_quantile": -0.02370452880859375,
+          "proposal_margin": 0.0,
+          "violations": 36,
+          "batch_size": 600,
+          "empirical_risk": 0.06,
+          "risk_upper_bound": 0.08948502825382393,
+          "accepted": true,
+          "evaluation_risk": 0.06583333333333333
+        },
+        "audits": [
+          {
+            "round": 1,
+            "decision": [
+              7.1,
+              2.7
+            ],
+            "cost": 17.98,
+            "predicted_quantile": -0.012229681015014648,
+            "proposal_margin": 0.0,
+            "violations": 48,
+            "batch_size": 600,
+            "empirical_risk": 0.08,
+            "risk_upper_bound": 0.11281933396503403,
+            "accepted": false,
+            "evaluation_risk": 0.0703
+          },
+          {
+            "round": 2,
+            "decision": [
+              4.0,
+              7.1000000000000005
+            ],
+            "cost": 17.939999999999998,
+            "predicted_quantile": -0.052788496017456055,
+            "proposal_margin": 0.0,
+            "violations": 54,
+            "batch_size": 600,
+            "empirical_risk": 0.09,
+            "risk_upper_bound": 0.12428133746687266,
+            "accepted": false,
+            "evaluation_risk": 0.0826
+          },
+          {
+            "round": 3,
+            "decision": [
+              4.0,
+              7.300000000000001
+            ],
+            "cost": 18.22,
+            "predicted_quantile": -0.04814648628234863,
+            "proposal_margin": 0.0,
+            "violations": 33,
+            "batch_size": 600,
+            "empirical_risk": 0.055,
+            "risk_upper_bound": 0.08354458261667205,
+            "accepted": true,
+            "evaluation_risk": 0.07176666666666667
+          },
+          {
+            "round": 4,
+            "decision": [
+              4.3,
+              6.9
+            ],
+            "cost": 18.259999999999998,
+            "predicted_quantile": -0.015873193740844727,
+            "proposal_margin": 0.0,
+            "violations": 31,
+            "batch_size": 600,
+            "empirical_risk": 0.051666666666666666,
+            "risk_upper_bound": 0.07955512657259999,
+            "accepted": true,
+            "evaluation_risk": 0.06366666666666666
+          },
+          {
+            "round": 5,
+            "decision": [
+              4.2,
+              6.9
+            ],
+            "cost": 18.060000000000002,
+            "predicted_quantile": -0.008665084838867188,
+            "proposal_margin": 0.0,
+            "violations": 49,
+            "batch_size": 600,
+            "empirical_risk": 0.08166666666666667,
+            "risk_upper_bound": 0.11473799982118792,
+            "accepted": false,
+            "evaluation_risk": 0.0724
+          },
+          {
+            "round": 6,
+            "decision": [
+              4.1,
+              7.1000000000000005
+            ],
+            "cost": 18.14,
+            "predicted_quantile": -0.016972780227661133,
+            "proposal_margin": 0.0,
+            "violations": 42,
+            "batch_size": 600,
+            "empirical_risk": 0.07,
+            "risk_upper_bound": 0.10122907130080253,
+            "accepted": false,
+            "evaluation_risk": 0.072
+          },
+          {
+            "round": 7,
+            "decision": [
+              5.6,
+              5.0
+            ],
+            "cost": 18.2,
+            "predicted_quantile": -0.012483835220336914,
+            "proposal_margin": 0.0,
+            "violations": 28,
+            "batch_size": 600,
+            "empirical_risk": 0.04666666666666667,
+            "risk_upper_bound": 0.07352187681951575,
+            "accepted": true,
+            "evaluation_risk": 0.05216666666666667
+          },
+          {
+            "round": 8,
+            "decision": [
+              5.5,
+              4.9
+            ],
+            "cost": 17.86,
+            "predicted_quantile": -0.0043849945068359375,
+            "proposal_margin": 0.0,
+            "violations": 38,
+            "batch_size": 600,
+            "empirical_risk": 0.06333333333333334,
+            "risk_upper_bound": 0.09341875333564421,
+            "accepted": true,
+            "evaluation_risk": 0.06373333333333334
+          },
+          {
+            "round": 9,
+            "decision": [
+              5.6,
+              4.7
+            ],
+            "cost": 17.78,
+            "predicted_quantile": -0.0076694488525390625,
+            "proposal_margin": 0.0,
+            "violations": 46,
+            "batch_size": 600,
+            "empirical_risk": 0.07666666666666666,
+            "risk_upper_bound": 0.10897125646805132,
+            "accepted": false,
+            "evaluation_risk": 0.0658
+          },
+          {
+            "round": 10,
+            "decision": [
+              5.4,
+              5.0
+            ],
+            "cost": 17.8,
+            "predicted_quantile": -0.02370452880859375,
+            "proposal_margin": 0.0,
+            "violations": 36,
+            "batch_size": 600,
+            "empirical_risk": 0.06,
+            "risk_upper_bound": 0.08948502825382393,
+            "accepted": true,
+            "evaluation_risk": 0.06583333333333333
+          }
+        ],
+        "initial_samples": 2000,
+        "audit_samples": 6000,
+        "alpha": 0.1,
+        "delta": 0.05,
+        "per_round_error_probability": 0.005,
+        "approximate_oracle": {
+          "decision": [
+            5.3,
+            4.597890727891344
+          ],
+          "cost": 17.037047019047883,
+          "same_sample_risk": 0.1
+        }
+      },
+      {
+        "selected": {
+          "round": 6,
+          "decision": [
+            6.9,
+            2.8000000000000003
+          ],
+          "cost": 17.72,
+          "predicted_quantile": -0.007195472717285156,
+          "proposal_margin": 0.0,
+          "violations": 31,
+          "batch_size": 600,
+          "empirical_risk": 0.051666666666666666,
+          "risk_upper_bound": 0.07955512657259999,
+          "accepted": true,
+          "evaluation_risk": 0.0839
+        },
+        "audits": [
+          {
+            "round": 1,
+            "decision": [
+              4.0,
+              6.0
+            ],
+            "cost": 16.4,
+            "predicted_quantile": -0.08936738967895508,
+            "proposal_margin": 0.0,
+            "violations": 102,
+            "batch_size": 600,
+            "empirical_risk": 0.17,
+            "risk_upper_bound": 0.21293125548384934,
+            "accepted": false,
+            "evaluation_risk": 0.18273333333333333
+          },
+          {
+            "round": 2,
+            "decision": [
+              4.0,
+              7.1000000000000005
+            ],
+            "cost": 17.939999999999998,
+            "predicted_quantile": -0.0007622241973876953,
+            "proposal_margin": 0.0,
+            "violations": 50,
+            "batch_size": 600,
+            "empirical_risk": 0.08333333333333333,
+            "risk_upper_bound": 0.11665321440876258,
+            "accepted": false,
+            "evaluation_risk": 0.0875
+          },
+          {
+            "round": 3,
+            "decision": [
+              6.5,
+              3.5
+            ],
+            "cost": 17.9,
+            "predicted_quantile": -0.0004012584686279297,
+            "proposal_margin": 0.0,
+            "violations": 36,
+            "batch_size": 600,
+            "empirical_risk": 0.06,
+            "risk_upper_bound": 0.08948502825382393,
+            "accepted": true,
+            "evaluation_risk": 0.07046666666666666
+          },
+          {
+            "round": 4,
+            "decision": [
+              6.7,
+              3.1
+            ],
+            "cost": 17.740000000000002,
+            "predicted_quantile": -0.0037097930908203125,
+            "proposal_margin": 0.0,
+            "violations": 44,
+            "batch_size": 600,
+            "empirical_risk": 0.07333333333333333,
+            "risk_upper_bound": 0.10510814547124726,
+            "accepted": false,
+            "evaluation_risk": 0.07976666666666667
+          },
+          {
+            "round": 5,
+            "decision": [
+              6.5,
+              3.4000000000000004
+            ],
+            "cost": 17.759999999999998,
+            "predicted_quantile": -0.026051998138427734,
+            "proposal_margin": 0.0,
+            "violations": 45,
+            "batch_size": 600,
+            "empirical_risk": 0.075,
+            "risk_upper_bound": 0.10704163591192946,
+            "accepted": false,
+            "evaluation_risk": 0.0765
+          },
+          {
+            "round": 6,
+            "decision": [
+              6.9,
+              2.8000000000000003
+            ],
+            "cost": 17.72,
+            "predicted_quantile": -0.007195472717285156,
+            "proposal_margin": 0.0,
+            "violations": 31,
+            "batch_size": 600,
+            "empirical_risk": 0.051666666666666666,
+            "risk_upper_bound": 0.07955512657259999,
+            "accepted": true,
+            "evaluation_risk": 0.0839
+          },
+          {
+            "round": 7,
+            "decision": [
+              6.300000000000001,
+              3.7
+            ],
+            "cost": 17.78,
+            "predicted_quantile": -0.030728816986083984,
+            "proposal_margin": 0.0,
+            "violations": 35,
+            "batch_size": 600,
+            "empirical_risk": 0.058333333333333334,
+            "risk_upper_bound": 0.08751040046045454,
+            "accepted": true,
+            "evaluation_risk": 0.0731
+          },
+          {
+            "round": 8,
+            "decision": [
+              6.800000000000001,
+              2.9000000000000004
+            ],
+            "cost": 17.660000000000004,
+            "predicted_quantile": -0.0218658447265625,
+            "proposal_margin": 0.0,
+            "violations": 47,
+            "batch_size": 600,
+            "empirical_risk": 0.07833333333333334,
+            "risk_upper_bound": 0.11089712010071866,
+            "accepted": false,
+            "evaluation_risk": 0.08496666666666666
+          },
+          {
+            "round": 9,
+            "decision": [
+              6.4,
+              3.5
+            ],
+            "cost": 17.7,
+            "predicted_quantile": -0.01533651351928711,
+            "proposal_margin": 0.0,
+            "violations": 42,
+            "batch_size": 600,
+            "empirical_risk": 0.07,
+            "risk_upper_bound": 0.10122907130080253,
+            "accepted": false,
+            "evaluation_risk": 0.07766666666666666
+          },
+          {
+            "round": 10,
+            "decision": [
+              6.5,
+              3.3000000000000003
+            ],
+            "cost": 17.62,
+            "predicted_quantile": -0.002097606658935547,
+            "proposal_margin": 0.0,
+            "violations": 43,
+            "batch_size": 600,
+            "empirical_risk": 0.07166666666666667,
+            "risk_upper_bound": 0.10317066592648788,
+            "accepted": false,
+            "evaluation_risk": 0.08243333333333333
+          }
+        ],
+        "initial_samples": 2000,
+        "audit_samples": 6000,
+        "alpha": 0.1,
+        "delta": 0.05,
+        "per_round_error_probability": 0.005,
+        "approximate_oracle": {
+          "decision": [
+            5.48,
+            4.33073986635731
+          ],
+          "cost": 17.023035812900233,
+          "same_sample_risk": 0.1
+        }
+      },
+      {
+        "selected": {
+          "round": 6,
+          "decision": [
+            5.5,
+            4.800000000000001
+          ],
+          "cost": 17.72,
+          "predicted_quantile": -0.0009889602661132812,
+          "proposal_margin": 0.0,
+          "violations": 32,
+          "batch_size": 600,
+          "empirical_risk": 0.05333333333333334,
+          "risk_upper_bound": 0.08155293466279531,
+          "accepted": true,
+          "evaluation_risk": 0.0681
+        },
+        "audits": [
+          {
+            "round": 1,
+            "decision": [
+              5.2,
+              5.5
+            ],
+            "cost": 18.1,
+            "predicted_quantile": -4.935264587402344e-05,
+            "proposal_margin": 0.0,
+            "violations": 36,
+            "batch_size": 600,
+            "empirical_risk": 0.06,
+            "risk_upper_bound": 0.08948502825382393,
+            "accepted": true,
+            "evaluation_risk": 0.05583333333333333
+          },
+          {
+            "round": 2,
+            "decision": [
+              5.8,
+              4.5
+            ],
+            "cost": 17.9,
+            "predicted_quantile": -0.020217418670654297,
+            "proposal_margin": 0.0,
+            "violations": 36,
+            "batch_size": 600,
+            "empirical_risk": 0.06,
+            "risk_upper_bound": 0.08948502825382393,
+            "accepted": true,
+            "evaluation_risk": 0.06196666666666667
+          },
+          {
+            "round": 3,
+            "decision": [
+              5.9,
+              4.2
+            ],
+            "cost": 17.68,
+            "predicted_quantile": -0.006338596343994141,
+            "proposal_margin": 0.0,
+            "violations": 44,
+            "batch_size": 600,
+            "empirical_risk": 0.07333333333333333,
+            "risk_upper_bound": 0.10510814547124726,
+            "accepted": false,
+            "evaluation_risk": 0.0703
+          },
+          {
+            "round": 4,
+            "decision": [
+              5.8,
+              4.4
+            ],
+            "cost": 17.759999999999998,
+            "predicted_quantile": -0.006119489669799805,
+            "proposal_margin": 0.0,
+            "violations": 41,
+            "batch_size": 600,
+            "empirical_risk": 0.06833333333333333,
+            "risk_upper_bound": 0.09928322830858395,
+            "accepted": true,
+            "evaluation_risk": 0.06716666666666667
+          },
+          {
+            "round": 5,
+            "decision": [
+              5.4,
+              4.9
+            ],
+            "cost": 17.66,
+            "predicted_quantile": -0.0016553401947021484,
+            "proposal_margin": 0.0,
+            "violations": 47,
+            "batch_size": 600,
+            "empirical_risk": 0.07833333333333334,
+            "risk_upper_bound": 0.11089712010071866,
+            "accepted": false,
+            "evaluation_risk": 0.07043333333333333
+          },
+          {
+            "round": 6,
+            "decision": [
+              5.5,
+              4.800000000000001
+            ],
+            "cost": 17.72,
+            "predicted_quantile": -0.0009889602661132812,
+            "proposal_margin": 0.0,
+            "violations": 32,
+            "batch_size": 600,
+            "empirical_risk": 0.05333333333333334,
+            "risk_upper_bound": 0.08155293466279531,
+            "accepted": true,
+            "evaluation_risk": 0.0681
+          },
+          {
+            "round": 7,
+            "decision": [
+              5.6,
+              4.6000000000000005
+            ],
+            "cost": 17.64,
+            "predicted_quantile": -0.006677150726318359,
+            "proposal_margin": 0.0,
+            "violations": 46,
+            "batch_size": 600,
+            "empirical_risk": 0.07666666666666666,
+            "risk_upper_bound": 0.10897125646805132,
+            "accepted": false,
+            "evaluation_risk": 0.07123333333333333
+          },
+          {
+            "round": 8,
+            "decision": [
+              5.3,
+              5.1000000000000005
+            ],
+            "cost": 17.740000000000002,
+            "predicted_quantile": -0.014822006225585938,
+            "proposal_margin": 0.0,
+            "violations": 35,
+            "batch_size": 600,
+            "empirical_risk": 0.058333333333333334,
+            "risk_upper_bound": 0.08751040046045454,
+            "accepted": true,
+            "evaluation_risk": 0.06793333333333333
+          },
+          {
+            "round": 9,
+            "decision": [
+              5.6,
+              4.7
+            ],
+            "cost": 17.78,
+            "predicted_quantile": -0.04624128341674805,
+            "proposal_margin": 0.0,
+            "violations": 37,
+            "batch_size": 600,
+            "empirical_risk": 0.06166666666666667,
+            "risk_upper_bound": 0.09145441498221117,
+            "accepted": true,
+            "evaluation_risk": 0.0661
+          },
+          {
+            "round": 10,
+            "decision": [
+              6.1,
+              4.0
+            ],
+            "cost": 17.799999999999997,
+            "predicted_quantile": -0.014691829681396484,
+            "proposal_margin": 0.0,
+            "violations": 39,
+            "batch_size": 600,
+            "empirical_risk": 0.065,
+            "risk_upper_bound": 0.09537822380570915,
+            "accepted": true,
+            "evaluation_risk": 0.0672
+          }
+        ],
+        "initial_samples": 2000,
+        "audit_samples": 6000,
+        "alpha": 0.1,
+        "delta": 0.05,
+        "per_round_error_probability": 0.005,
+        "approximate_oracle": {
+          "decision": [
+            5.52,
+            4.30682051936025
+          ],
+          "cost": 17.069548727104348,
+          "same_sample_risk": 0.1
+        }
+      },
+      {
+        "selected": {
+          "round": 7,
+          "decision": [
+            7.300000000000001,
+            2.4000000000000004
+          ],
+          "cost": 17.96,
+          "predicted_quantile": -0.012720584869384766,
+          "proposal_margin": 0.0,
+          "violations": 40,
+          "batch_size": 600,
+          "empirical_risk": 0.06666666666666667,
+          "risk_upper_bound": 0.09733299574460769,
+          "accepted": true,
+          "evaluation_risk": 0.0782
+        },
+        "audits": [
+          {
+            "round": 1,
+            "decision": [
+              4.0,
+              7.0
+            ],
+            "cost": 17.799999999999997,
+            "predicted_quantile": -0.036633968353271484,
+            "proposal_margin": 0.0,
+            "violations": 60,
+            "batch_size": 600,
+            "empirical_risk": 0.1,
+            "risk_upper_bound": 0.1356338382852757,
+            "accepted": false,
+            "evaluation_risk": 0.0918
+          },
+          {
+            "round": 2,
+            "decision": [
+              7.5,
+              2.0
+            ],
+            "cost": 17.8,
+            "predicted_quantile": -1.6927719116210938e-05,
+            "proposal_margin": 0.0,
+            "violations": 45,
+            "batch_size": 600,
+            "empirical_risk": 0.075,
+            "risk_upper_bound": 0.10704163591192946,
+            "accepted": false,
+            "evaluation_risk": 0.09076666666666666
+          },
+          {
+            "round": 3,
+            "decision": [
+              7.300000000000001,
+              2.3000000000000003
+            ],
+            "cost": 17.82,
+            "predicted_quantile": -0.00017261505126953125,
+            "proposal_margin": 0.0,
+            "violations": 52,
+            "batch_size": 600,
+            "empirical_risk": 0.08666666666666667,
+            "risk_upper_bound": 0.1204736536528634,
+            "accepted": false,
+            "evaluation_risk": 0.08543333333333333
+          },
+          {
+            "round": 4,
+            "decision": [
+              7.4,
+              2.2
+            ],
+            "cost": 17.880000000000003,
+            "predicted_quantile": -0.0069272518157958984,
+            "proposal_margin": 0.0,
+            "violations": 47,
+            "batch_size": 600,
+            "empirical_risk": 0.07833333333333334,
+            "risk_upper_bound": 0.11089712010071866,
+            "accepted": false,
+            "evaluation_risk": 0.08443333333333333
+          },
+          {
+            "round": 5,
+            "decision": [
+              7.5,
+              2.2
+            ],
+            "cost": 18.08,
+            "predicted_quantile": -0.001580953598022461,
+            "proposal_margin": 0.0,
+            "violations": 35,
+            "batch_size": 600,
+            "empirical_risk": 0.058333333333333334,
+            "risk_upper_bound": 0.08751040046045454,
+            "accepted": true,
+            "evaluation_risk": 0.07676666666666666
+          },
+          {
+            "round": 6,
+            "decision": [
+              7.5,
+              2.1
+            ],
+            "cost": 17.94,
+            "predicted_quantile": -0.00563812255859375,
+            "proposal_margin": 0.0,
+            "violations": 43,
+            "batch_size": 600,
+            "empirical_risk": 0.07166666666666667,
+            "risk_upper_bound": 0.10317066592648788,
+            "accepted": false,
+            "evaluation_risk": 0.0836
+          },
+          {
+            "round": 7,
+            "decision": [
+              7.300000000000001,
+              2.4000000000000004
+            ],
+            "cost": 17.96,
+            "predicted_quantile": -0.012720584869384766,
+            "proposal_margin": 0.0,
+            "violations": 40,
+            "batch_size": 600,
+            "empirical_risk": 0.06666666666666667,
+            "risk_upper_bound": 0.09733299574460769,
+            "accepted": true,
+            "evaluation_risk": 0.0782
+          },
+          {
+            "round": 8,
+            "decision": [
+              7.4,
+              2.3000000000000003
+            ],
+            "cost": 18.02,
+            "predicted_quantile": -0.014182329177856445,
+            "proposal_margin": 0.0,
+            "violations": 42,
+            "batch_size": 600,
+            "empirical_risk": 0.07,
+            "risk_upper_bound": 0.10122907130080253,
+            "accepted": false,
+            "evaluation_risk": 0.0776
+          },
+          {
+            "round": 9,
+            "decision": [
+              7.1,
+              2.7
+            ],
+            "cost": 17.98,
+            "predicted_quantile": -0.016995668411254883,
+            "proposal_margin": 0.0,
+            "violations": 40,
+            "batch_size": 600,
+            "empirical_risk": 0.06666666666666667,
+            "risk_upper_bound": 0.09733299574460769,
+            "accepted": true,
+            "evaluation_risk": 0.0737
+          },
+          {
+            "round": 10,
+            "decision": [
+              6.9,
+              3.0
+            ],
+            "cost": 18.0,
+            "predicted_quantile": -0.04050850868225098,
+            "proposal_margin": 0.0,
+            "violations": 36,
+            "batch_size": 600,
+            "empirical_risk": 0.06,
+            "risk_upper_bound": 0.08948502825382393,
+            "accepted": true,
+            "evaluation_risk": 0.0702
+          }
+        ],
+        "initial_samples": 2000,
+        "audit_samples": 6000,
+        "alpha": 0.1,
+        "delta": 0.05,
+        "per_round_error_probability": 0.005,
+        "approximate_oracle": {
+          "decision": [
+            5.46,
+            4.3684478606337045
+          ],
+          "cost": 17.035827004887185,
+          "same_sample_risk": 0.1
+        }
+      },
+      {
+        "selected": {
+          "round": 8,
+          "decision": [
+            6.1,
+            4.1000000000000005
+          ],
+          "cost": 17.939999999999998,
+          "predicted_quantile": -0.009167194366455078,
+          "proposal_margin": 0.0,
+          "violations": 35,
+          "batch_size": 600,
+          "empirical_risk": 0.058333333333333334,
+          "risk_upper_bound": 0.08751040046045454,
+          "accepted": true,
+          "evaluation_risk": 0.061
+        },
+        "audits": [
+          {
+            "round": 1,
+            "decision": [
+              4.0,
+              6.300000000000001
+            ],
+            "cost": 16.82,
+            "predicted_quantile": -0.027342557907104492,
+            "proposal_margin": 0.0,
+            "violations": 88,
+            "batch_size": 600,
+            "empirical_risk": 0.14666666666666667,
+            "risk_upper_bound": 0.18751126900001694,
+            "accepted": false,
+            "evaluation_risk": 0.1414
+          },
+          {
+            "round": 2,
+            "decision": [
+              4.0,
+              7.0
+            ],
+            "cost": 17.799999999999997,
+            "predicted_quantile": -0.027138233184814453,
+            "proposal_margin": 0.0,
+            "violations": 47,
+            "batch_size": 600,
+            "empirical_risk": 0.07833333333333334,
+            "risk_upper_bound": 0.11089712010071866,
+            "accepted": false,
+            "evaluation_risk": 0.08783333333333333
+          },
+          {
+            "round": 3,
+            "decision": [
+              7.7,
+              1.9000000000000001
+            ],
+            "cost": 18.060000000000002,
+            "predicted_quantile": -0.009574651718139648,
+            "proposal_margin": 0.0,
+            "violations": 54,
+            "batch_size": 600,
+            "empirical_risk": 0.09,
+            "risk_upper_bound": 0.12428133746687266,
+            "accepted": false,
+            "evaluation_risk": 0.0761
+          },
+          {
+            "round": 4,
+            "decision": [
+              4.0,
+              7.2
+            ],
+            "cost": 18.08,
+            "predicted_quantile": -0.06603670120239258,
+            "proposal_margin": 0.0,
+            "violations": 62,
+            "batch_size": 600,
+            "empirical_risk": 0.10333333333333333,
+            "risk_upper_bound": 0.1393962373804048,
+            "accepted": false,
+            "evaluation_risk": 0.0762
+          },
+          {
+            "round": 5,
+            "decision": [
+              4.0,
+              7.300000000000001
+            ],
+            "cost": 18.22,
+            "predicted_quantile": -0.07032585144042969,
+            "proposal_margin": 0.0,
+            "violations": 43,
+            "batch_size": 600,
+            "empirical_risk": 0.07166666666666667,
+            "risk_upper_bound": 0.10317066592648788,
+            "accepted": false,
+            "evaluation_risk": 0.0711
+          },
+          {
+            "round": 6,
+            "decision": [
+              6.300000000000001,
+              4.0
+            ],
+            "cost": 18.200000000000003,
+            "predicted_quantile": -0.0036628246307373047,
+            "proposal_margin": 0.0,
+            "violations": 32,
+            "batch_size": 600,
+            "empirical_risk": 0.05333333333333334,
+            "risk_upper_bound": 0.08155293466279531,
+            "accepted": true,
+            "evaluation_risk": 0.0538
+          },
+          {
+            "round": 7,
+            "decision": [
+              6.0,
+              4.3
+            ],
+            "cost": 18.02,
+            "predicted_quantile": -0.0014498233795166016,
+            "proposal_margin": 0.0,
+            "violations": 39,
+            "batch_size": 600,
+            "empirical_risk": 0.065,
+            "risk_upper_bound": 0.09537822380570915,
+            "accepted": true,
+            "evaluation_risk": 0.05803333333333333
+          },
+          {
+            "round": 8,
+            "decision": [
+              6.1,
+              4.1000000000000005
+            ],
+            "cost": 17.939999999999998,
+            "predicted_quantile": -0.009167194366455078,
+            "proposal_margin": 0.0,
+            "violations": 35,
+            "batch_size": 600,
+            "empirical_risk": 0.058333333333333334,
+            "risk_upper_bound": 0.08751040046045454,
+            "accepted": true,
+            "evaluation_risk": 0.061
+          },
+          {
+            "round": 9,
+            "decision": [
+              6.2,
+              3.9000000000000004
+            ],
+            "cost": 17.86,
+            "predicted_quantile": -0.00924062728881836,
+            "proposal_margin": 0.0,
+            "violations": 48,
+            "batch_size": 600,
+            "empirical_risk": 0.08,
+            "risk_upper_bound": 0.11281933396503403,
+            "accepted": false,
+            "evaluation_risk": 0.06483333333333334
+          },
+          {
+            "round": 10,
+            "decision": [
+              6.300000000000001,
+              3.8000000000000003
+            ],
+            "cost": 17.92,
+            "predicted_quantile": -0.0030357837677001953,
+            "proposal_margin": 0.0,
+            "violations": 45,
+            "batch_size": 600,
+            "empirical_risk": 0.075,
+            "risk_upper_bound": 0.10704163591192946,
+            "accepted": false,
+            "evaluation_risk": 0.06293333333333333
+          }
+        ],
+        "initial_samples": 2000,
+        "audit_samples": 6000,
+        "alpha": 0.1,
+        "delta": 0.05,
+        "per_round_error_probability": 0.005,
+        "approximate_oracle": {
+          "decision": [
+            5.46,
+            4.3807939801079945
+          ],
+          "cost": 17.05311157215119,
+          "same_sample_risk": 0.1
+        }
+      },
+      {
+        "selected": {
+          "round": 7,
+          "decision": [
+            7.1,
+            2.6
+          ],
+          "cost": 17.84,
+          "predicted_quantile": -0.0075664520263671875,
+          "proposal_margin": 0.0,
+          "violations": 39,
+          "batch_size": 600,
+          "empirical_risk": 0.065,
+          "risk_upper_bound": 0.09537822380570915,
+          "accepted": true,
+          "evaluation_risk": 0.07623333333333333
+        },
+        "audits": [
+          {
+            "round": 1,
+            "decision": [
+              4.0,
+              6.2
+            ],
+            "cost": 16.68,
+            "predicted_quantile": -0.005385875701904297,
+            "proposal_margin": 0.0,
+            "violations": 69,
+            "batch_size": 600,
+            "empirical_risk": 0.115,
+            "risk_upper_bound": 0.15248761152119214,
+            "accepted": false,
+            "evaluation_risk": 0.15163333333333334
+          },
+          {
+            "round": 2,
+            "decision": [
+              4.0,
+              6.7
+            ],
+            "cost": 17.38,
+            "predicted_quantile": -0.04540896415710449,
+            "proposal_margin": 0.0,
+            "violations": 67,
+            "batch_size": 600,
+            "empirical_risk": 0.11166666666666666,
+            "risk_upper_bound": 0.14875887946740818,
+            "accepted": false,
+            "evaluation_risk": 0.11003333333333333
+          },
+          {
+            "round": 3,
+            "decision": [
+              4.0,
+              7.0
+            ],
+            "cost": 17.799999999999997,
+            "predicted_quantile": -0.11318039894104004,
+            "proposal_margin": 0.0,
+            "violations": 55,
+            "batch_size": 600,
+            "empirical_risk": 0.09166666666666666,
+            "risk_upper_bound": 0.12618059342331342,
+            "accepted": false,
+            "evaluation_risk": 0.08916666666666667
+          },
+          {
+            "round": 4,
+            "decision": [
+              7.5,
+              2.1
+            ],
+            "cost": 17.94,
+            "predicted_quantile": -0.012793302536010742,
+            "proposal_margin": 0.0,
+            "violations": 43,
+            "batch_size": 600,
+            "empirical_risk": 0.07166666666666667,
+            "risk_upper_bound": 0.10317066592648788,
+            "accepted": false,
+            "evaluation_risk": 0.07866666666666666
+          },
+          {
+            "round": 5,
+            "decision": [
+              4.0,
+              7.1000000000000005
+            ],
+            "cost": 17.939999999999998,
+            "predicted_quantile": -0.033093929290771484,
+            "proposal_margin": 0.0,
+            "violations": 48,
+            "batch_size": 600,
+            "empirical_risk": 0.08,
+            "risk_upper_bound": 0.11281933396503403,
+            "accepted": false,
+            "evaluation_risk": 0.0833
+          },
+          {
+            "round": 6,
+            "decision": [
+              7.300000000000001,
+              2.4000000000000004
+            ],
+            "cost": 17.96,
+            "predicted_quantile": -0.006306648254394531,
+            "proposal_margin": 0.0,
+            "violations": 35,
+            "batch_size": 600,
+            "empirical_risk": 0.058333333333333334,
+            "risk_upper_bound": 0.08751040046045454,
+            "accepted": true,
+            "evaluation_risk": 0.07456666666666667
+          },
+          {
+            "round": 7,
+            "decision": [
+              7.1,
+              2.6
+            ],
+            "cost": 17.84,
+            "predicted_quantile": -0.0075664520263671875,
+            "proposal_margin": 0.0,
+            "violations": 39,
+            "batch_size": 600,
+            "empirical_risk": 0.065,
+            "risk_upper_bound": 0.09537822380570915,
+            "accepted": true,
+            "evaluation_risk": 0.07623333333333333
+          },
+          {
+            "round": 8,
+            "decision": [
+              7.2,
+              2.4000000000000004
+            ],
+            "cost": 17.76,
+            "predicted_quantile": -0.0059778690338134766,
+            "proposal_margin": 0.0,
+            "violations": 45,
+            "batch_size": 600,
+            "empirical_risk": 0.075,
+            "risk_upper_bound": 0.10704163591192946,
+            "accepted": false,
+            "evaluation_risk": 0.08183333333333333
+          },
+          {
+            "round": 9,
+            "decision": [
+              7.0,
+              2.7
+            ],
+            "cost": 17.78,
+            "predicted_quantile": -0.010578155517578125,
+            "proposal_margin": 0.0,
+            "violations": 53,
+            "batch_size": 600,
+            "empirical_risk": 0.08833333333333333,
+            "risk_upper_bound": 0.12237904961482202,
+            "accepted": false,
+            "evaluation_risk": 0.0775
+          },
+          {
+            "round": 10,
+            "decision": [
+              7.0,
+              2.8000000000000003
+            ],
+            "cost": 17.92,
+            "predicted_quantile": -0.009109020233154297,
+            "proposal_margin": 0.0,
+            "violations": 44,
+            "batch_size": 600,
+            "empirical_risk": 0.07333333333333333,
+            "risk_upper_bound": 0.10510814547124726,
+            "accepted": false,
+            "evaluation_risk": 0.07183333333333333
+          }
+        ],
+        "initial_samples": 2000,
+        "audit_samples": 6000,
+        "alpha": 0.1,
+        "delta": 0.05,
+        "per_round_error_probability": 0.005,
+        "approximate_oracle": {
+          "decision": [
+            5.4399999999999995,
+            4.419651131975308
+          ],
+          "cost": 17.06751158476543,
+          "same_sample_risk": 0.1
+        }
+      },
+      {
+        "selected": {
+          "round": 10,
+          "decision": [
+            6.4,
+            3.8000000000000003
+          ],
+          "cost": 18.12,
+          "predicted_quantile": -0.0015614032745361328,
+          "proposal_margin": 0.0,
+          "violations": 34,
+          "batch_size": 600,
+          "empirical_risk": 0.056666666666666664,
+          "risk_upper_bound": 0.08553032552111138,
+          "accepted": true,
+          "evaluation_risk": 0.05706666666666667
+        },
+        "audits": [
+          {
+            "round": 1,
+            "decision": [
+              4.0,
+              6.9
+            ],
+            "cost": 17.66,
+            "predicted_quantile": -0.009246587753295898,
+            "proposal_margin": 0.0,
+            "violations": 57,
+            "batch_size": 600,
+            "empirical_risk": 0.095,
+            "risk_upper_bound": 0.12997029792577522,
+            "accepted": false,
+            "evaluation_risk": 0.0927
+          },
+          {
+            "round": 2,
+            "decision": [
+              7.1,
+              2.5
+            ],
+            "cost": 17.7,
+            "predicted_quantile": -0.026900768280029297,
+            "proposal_margin": 0.0,
+            "violations": 49,
+            "batch_size": 600,
+            "empirical_risk": 0.08166666666666667,
+            "risk_upper_bound": 0.11473799982118792,
+            "accepted": false,
+            "evaluation_risk": 0.0832
+          },
+          {
+            "round": 3,
+            "decision": [
+              6.800000000000001,
+              3.2
+            ],
+            "cost": 18.080000000000002,
+            "predicted_quantile": -0.005528926849365234,
+            "proposal_margin": 0.0,
+            "violations": 42,
+            "batch_size": 600,
+            "empirical_risk": 0.07,
+            "risk_upper_bound": 0.10122907130080253,
+            "accepted": false,
+            "evaluation_risk": 0.06213333333333333
+          },
+          {
+            "round": 4,
+            "decision": [
+              6.9,
+              3.0
+            ],
+            "cost": 18.0,
+            "predicted_quantile": -0.010890960693359375,
+            "proposal_margin": 0.0,
+            "violations": 44,
+            "batch_size": 600,
+            "empirical_risk": 0.07333333333333333,
+            "risk_upper_bound": 0.10510814547124726,
+            "accepted": false,
+            "evaluation_risk": 0.06673333333333334
+          },
+          {
+            "round": 5,
+            "decision": [
+              6.9,
+              3.1
+            ],
+            "cost": 18.14,
+            "predicted_quantile": -0.024227619171142578,
+            "proposal_margin": 0.0,
+            "violations": 27,
+            "batch_size": 600,
+            "empirical_risk": 0.045,
+            "risk_upper_bound": 0.07149644131776879,
+            "accepted": true,
+            "evaluation_risk": 0.061
+          },
+          {
+            "round": 6,
+            "decision": [
+              7.1,
+              2.7
+            ],
+            "cost": 17.98,
+            "predicted_quantile": -0.0342867374420166,
+            "proposal_margin": 0.0,
+            "violations": 46,
+            "batch_size": 600,
+            "empirical_risk": 0.07666666666666666,
+            "risk_upper_bound": 0.10897125646805132,
+            "accepted": false,
+            "evaluation_risk": 0.0706
+          },
+          {
+            "round": 7,
+            "decision": [
+              6.800000000000001,
+              3.1
+            ],
+            "cost": 17.94,
+            "predicted_quantile": -0.012576103210449219,
+            "proposal_margin": 0.0,
+            "violations": 55,
+            "batch_size": 600,
+            "empirical_risk": 0.09166666666666666,
+            "risk_upper_bound": 0.12618059342331342,
+            "accepted": false,
+            "evaluation_risk": 0.06803333333333333
+          },
+          {
+            "round": 8,
+            "decision": [
+              7.300000000000001,
+              2.5
+            ],
+            "cost": 18.1,
+            "predicted_quantile": -0.0015511512756347656,
+            "proposal_margin": 0.0,
+            "violations": 53,
+            "batch_size": 600,
+            "empirical_risk": 0.08833333333333333,
+            "risk_upper_bound": 0.12237904961482202,
+            "accepted": false,
+            "evaluation_risk": 0.0687
+          },
+          {
+            "round": 9,
+            "decision": [
+              7.1,
+              2.8000000000000003
+            ],
+            "cost": 18.119999999999997,
+            "predicted_quantile": -0.009270906448364258,
+            "proposal_margin": 0.0,
+            "violations": 48,
+            "batch_size": 600,
+            "empirical_risk": 0.08,
+            "risk_upper_bound": 0.11281933396503403,
+            "accepted": false,
+            "evaluation_risk": 0.06456666666666666
+          },
+          {
+            "round": 10,
+            "decision": [
+              6.4,
+              3.8000000000000003
+            ],
+            "cost": 18.12,
+            "predicted_quantile": -0.0015614032745361328,
+            "proposal_margin": 0.0,
+            "violations": 34,
+            "batch_size": 600,
+            "empirical_risk": 0.056666666666666664,
+            "risk_upper_bound": 0.08553032552111138,
+            "accepted": true,
+            "evaluation_risk": 0.05706666666666667
+          }
+        ],
+        "initial_samples": 2000,
+        "audit_samples": 6000,
+        "alpha": 0.1,
+        "delta": 0.05,
+        "per_round_error_probability": 0.005,
+        "approximate_oracle": {
+          "decision": [
+            5.58,
+            4.23241075126488
+          ],
+          "cost": 17.085375051770832,
+          "same_sample_risk": 0.1
+        }
+      },
+      {
+        "selected": {
+          "round": 7,
+          "decision": [
+            6.1,
+            4.0
+          ],
+          "cost": 17.799999999999997,
+          "predicted_quantile": -0.0072021484375,
+          "proposal_margin": 0.0,
+          "violations": 40,
+          "batch_size": 600,
+          "empirical_risk": 0.06666666666666667,
+          "risk_upper_bound": 0.09733299574460769,
+          "accepted": true,
+          "evaluation_risk": 0.07026666666666667
+        },
+        "audits": [
+          {
+            "round": 1,
+            "decision": [
+              6.9,
+              2.7
+            ],
+            "cost": 17.580000000000002,
+            "predicted_quantile": -0.0017337799072265625,
+            "proposal_margin": 0.0,
+            "violations": 56,
+            "batch_size": 600,
+            "empirical_risk": 0.09333333333333334,
+            "risk_upper_bound": 0.12807689034145878,
+            "accepted": false,
+            "evaluation_risk": 0.08873333333333333
+          },
+          {
+            "round": 2,
+            "decision": [
+              6.5,
+              3.4000000000000004
+            ],
+            "cost": 17.759999999999998,
+            "predicted_quantile": -0.015110969543457031,
+            "proposal_margin": 0.0,
+            "violations": 48,
+            "batch_size": 600,
+            "empirical_risk": 0.08,
+            "risk_upper_bound": 0.11281933396503403,
+            "accepted": false,
+            "evaluation_risk": 0.0749
+          },
+          {
+            "round": 3,
+            "decision": [
+              6.5,
+              3.6
+            ],
+            "cost": 18.04,
+            "predicted_quantile": -0.005234241485595703,
+            "proposal_margin": 0.0,
+            "violations": 30,
+            "batch_size": 600,
+            "empirical_risk": 0.05,
+            "risk_upper_bound": 0.07755088327256622,
+            "accepted": true,
+            "evaluation_risk": 0.0638
+          },
+          {
+            "round": 4,
+            "decision": [
+              6.6,
+              3.2
+            ],
+            "cost": 17.68,
+            "predicted_quantile": -0.006646394729614258,
+            "proposal_margin": 0.0,
+            "violations": 44,
+            "batch_size": 600,
+            "empirical_risk": 0.07333333333333333,
+            "risk_upper_bound": 0.10510814547124726,
+            "accepted": false,
+            "evaluation_risk": 0.07956666666666666
+          },
+          {
+            "round": 5,
+            "decision": [
+              6.5,
+              3.5
+            ],
+            "cost": 17.9,
+            "predicted_quantile": -0.0064296722412109375,
+            "proposal_margin": 0.0,
+            "violations": 37,
+            "batch_size": 600,
+            "empirical_risk": 0.06166666666666667,
+            "risk_upper_bound": 0.09145441498221117,
+            "accepted": true,
+            "evaluation_risk": 0.06863333333333334
+          },
+          {
+            "round": 6,
+            "decision": [
+              6.300000000000001,
+              3.7
+            ],
+            "cost": 17.78,
+            "predicted_quantile": -0.0007851123809814453,
+            "proposal_margin": 0.0,
+            "violations": 42,
+            "batch_size": 600,
+            "empirical_risk": 0.07,
+            "risk_upper_bound": 0.10122907130080253,
+            "accepted": false,
+            "evaluation_risk": 0.0717
+          },
+          {
+            "round": 7,
+            "decision": [
+              6.1,
+              4.0
+            ],
+            "cost": 17.799999999999997,
+            "predicted_quantile": -0.0072021484375,
+            "proposal_margin": 0.0,
+            "violations": 40,
+            "batch_size": 600,
+            "empirical_risk": 0.06666666666666667,
+            "risk_upper_bound": 0.09733299574460769,
+            "accepted": true,
+            "evaluation_risk": 0.07026666666666667
+          },
+          {
+            "round": 8,
+            "decision": [
+              6.4,
+              3.5
+            ],
+            "cost": 17.7,
+            "predicted_quantile": -0.006304502487182617,
+            "proposal_margin": 0.0,
+            "violations": 48,
+            "batch_size": 600,
+            "empirical_risk": 0.08,
+            "risk_upper_bound": 0.11281933396503403,
+            "accepted": false,
+            "evaluation_risk": 0.07633333333333334
+          },
+          {
+            "round": 9,
+            "decision": [
+              6.6,
+              3.3000000000000003
+            ],
+            "cost": 17.82,
+            "predicted_quantile": -0.010279655456542969,
+            "proposal_margin": 0.0,
+            "violations": 46,
+            "batch_size": 600,
+            "empirical_risk": 0.07666666666666666,
+            "risk_upper_bound": 0.10897125646805132,
+            "accepted": false,
+            "evaluation_risk": 0.07313333333333333
+          },
+          {
+            "round": 10,
+            "decision": [
+              6.2,
+              3.8000000000000003
+            ],
+            "cost": 17.72,
+            "predicted_quantile": -0.006353855133056641,
+            "proposal_margin": 0.0,
+            "violations": 43,
+            "batch_size": 600,
+            "empirical_risk": 0.07166666666666667,
+            "risk_upper_bound": 0.10317066592648788,
+            "accepted": false,
+            "evaluation_risk": 0.07366666666666667
+          }
+        ],
+        "initial_samples": 2000,
+        "audit_samples": 6000,
+        "alpha": 0.1,
+        "delta": 0.05,
+        "per_round_error_probability": 0.005,
+        "approximate_oracle": {
+          "decision": [
+            5.6,
+            4.1647002677184926
+          ],
+          "cost": 17.030580374805886,
+          "same_sample_risk": 0.1
+        }
+      },
+      {
+        "selected": {
+          "round": 4,
+          "decision": [
+            7.1,
+            2.6
+          ],
+          "cost": 17.84,
+          "predicted_quantile": -0.005525350570678711,
+          "proposal_margin": 0.0,
+          "violations": 40,
+          "batch_size": 600,
+          "empirical_risk": 0.06666666666666667,
+          "risk_upper_bound": 0.09733299574460769,
+          "accepted": true,
+          "evaluation_risk": 0.07893333333333333
+        },
+        "audits": [
+          {
+            "round": 1,
+            "decision": [
+              4.0,
+              6.5
+            ],
+            "cost": 17.1,
+            "predicted_quantile": -0.01578545570373535,
+            "proposal_margin": 0.0,
+            "violations": 72,
+            "batch_size": 600,
+            "empirical_risk": 0.12,
+            "risk_upper_bound": 0.15806430265850635,
+            "accepted": false,
+            "evaluation_risk": 0.127
+          },
+          {
+            "round": 2,
+            "decision": [
+              4.0,
+              7.1000000000000005
+            ],
+            "cost": 17.939999999999998,
+            "predicted_quantile": -0.005537986755371094,
+            "proposal_margin": 0.0,
+            "violations": 35,
+            "batch_size": 600,
+            "empirical_risk": 0.058333333333333334,
+            "risk_upper_bound": 0.08751040046045454,
+            "accepted": true,
+            "evaluation_risk": 0.08366666666666667
+          },
+          {
+            "round": 3,
+            "decision": [
+              4.0,
+              7.0
+            ],
+            "cost": 17.799999999999997,
+            "predicted_quantile": -0.014138936996459961,
+            "proposal_margin": 0.0,
+            "violations": 46,
+            "batch_size": 600,
+            "empirical_risk": 0.07666666666666666,
+            "risk_upper_bound": 0.10897125646805132,
+            "accepted": false,
+            "evaluation_risk": 0.08973333333333333
+          },
+          {
+            "round": 4,
+            "decision": [
+              7.1,
+              2.6
+            ],
+            "cost": 17.84,
+            "predicted_quantile": -0.005525350570678711,
+            "proposal_margin": 0.0,
+            "violations": 40,
+            "batch_size": 600,
+            "empirical_risk": 0.06666666666666667,
+            "risk_upper_bound": 0.09733299574460769,
+            "accepted": true,
+            "evaluation_risk": 0.07893333333333333
+          },
+          {
+            "round": 5,
+            "decision": [
+              4.1,
+              6.9
+            ],
+            "cost": 17.86,
+            "predicted_quantile": -0.07928061485290527,
+            "proposal_margin": 0.0,
+            "violations": 51,
+            "batch_size": 600,
+            "empirical_risk": 0.085,
+            "risk_upper_bound": 0.11856506978819548,
+            "accepted": false,
+            "evaluation_risk": 0.0843
+          },
+          {
+            "round": 6,
+            "decision": [
+              7.4,
+              2.0
+            ],
+            "cost": 17.6,
+            "predicted_quantile": -0.0055353641510009766,
+            "proposal_margin": 0.0,
+            "violations": 45,
+            "batch_size": 600,
+            "empirical_risk": 0.075,
+            "risk_upper_bound": 0.10704163591192946,
+            "accepted": false,
+            "evaluation_risk": 0.09646666666666667
+          },
+          {
+            "round": 7,
+            "decision": [
+              7.300000000000001,
+              2.3000000000000003
+            ],
+            "cost": 17.82,
+            "predicted_quantile": -0.0007460117340087891,
+            "proposal_margin": 0.0,
+            "violations": 50,
+            "batch_size": 600,
+            "empirical_risk": 0.08333333333333333,
+            "risk_upper_bound": 0.11665321440876258,
+            "accepted": false,
+            "evaluation_risk": 0.08373333333333334
+          },
+          {
+            "round": 8,
+            "decision": [
+              4.1,
+              7.0
+            ],
+            "cost": 18.0,
+            "predicted_quantile": -0.028277158737182617,
+            "proposal_margin": 0.0,
+            "violations": 46,
+            "batch_size": 600,
+            "empirical_risk": 0.07666666666666666,
+            "risk_upper_bound": 0.10897125646805132,
+            "accepted": false,
+            "evaluation_risk": 0.0783
+          },
+          {
+            "round": 9,
+            "decision": [
+              7.1,
+              2.7
+            ],
+            "cost": 17.98,
+            "predicted_quantile": -0.0006346702575683594,
+            "proposal_margin": 0.0,
+            "violations": 50,
+            "batch_size": 600,
+            "empirical_risk": 0.08333333333333333,
+            "risk_upper_bound": 0.11665321440876258,
+            "accepted": false,
+            "evaluation_risk": 0.0727
+          },
+          {
+            "round": 10,
+            "decision": [
+              4.2,
+              6.9
+            ],
+            "cost": 18.060000000000002,
+            "predicted_quantile": -0.03929877281188965,
+            "proposal_margin": 0.0,
+            "violations": 47,
+            "batch_size": 600,
+            "empirical_risk": 0.07833333333333334,
+            "risk_upper_bound": 0.11089712010071866,
+            "accepted": false,
+            "evaluation_risk": 0.07366666666666667
+          }
+        ],
+        "initial_samples": 2000,
+        "audit_samples": 6000,
+        "alpha": 0.1,
+        "delta": 0.05,
+        "per_round_error_probability": 0.005,
+        "approximate_oracle": {
+          "decision": [
+            5.640000000000001,
+            4.119820839070106
+          ],
+          "cost": 17.047749174698147,
+          "same_sample_risk": 0.1
+        }
+      },
+      {
+        "selected": {
+          "round": 7,
+          "decision": [
+            5.8,
+            4.4
+          ],
+          "cost": 17.759999999999998,
+          "predicted_quantile": -0.0062749385833740234,
+          "proposal_margin": 0.0,
+          "violations": 39,
+          "batch_size": 600,
+          "empirical_risk": 0.065,
+          "risk_upper_bound": 0.09537822380570915,
+          "accepted": true,
+          "evaluation_risk": 0.06986666666666666
+        },
+        "audits": [
+          {
+            "round": 1,
+            "decision": [
+              6.4,
+              3.5
+            ],
+            "cost": 17.7,
+            "predicted_quantile": -0.023241281509399414,
+            "proposal_margin": 0.0,
+            "violations": 44,
+            "batch_size": 600,
+            "empirical_risk": 0.07333333333333333,
+            "risk_upper_bound": 0.10510814547124726,
+            "accepted": false,
+            "evaluation_risk": 0.07646666666666667
+          },
+          {
+            "round": 2,
+            "decision": [
+              6.1,
+              4.1000000000000005
+            ],
+            "cost": 17.939999999999998,
+            "predicted_quantile": -0.0070705413818359375,
+            "proposal_margin": 0.0,
+            "violations": 39,
+            "batch_size": 600,
+            "empirical_risk": 0.065,
+            "risk_upper_bound": 0.09537822380570915,
+            "accepted": true,
+            "evaluation_risk": 0.06393333333333333
+          },
+          {
+            "round": 3,
+            "decision": [
+              5.9,
+              4.3
+            ],
+            "cost": 17.82,
+            "predicted_quantile": -0.002907276153564453,
+            "proposal_margin": 0.0,
+            "violations": 41,
+            "batch_size": 600,
+            "empirical_risk": 0.06833333333333333,
+            "risk_upper_bound": 0.09928322830858395,
+            "accepted": true,
+            "evaluation_risk": 0.06773333333333334
+          },
+          {
+            "round": 4,
+            "decision": [
+              6.300000000000001,
+              3.7
+            ],
+            "cost": 17.78,
+            "predicted_quantile": -0.010574579238891602,
+            "proposal_margin": 0.0,
+            "violations": 36,
+            "batch_size": 600,
+            "empirical_risk": 0.06,
+            "risk_upper_bound": 0.08948502825382393,
+            "accepted": true,
+            "evaluation_risk": 0.07226666666666667
+          },
+          {
+            "round": 5,
+            "decision": [
+              6.2,
+              3.8000000000000003
+            ],
+            "cost": 17.72,
+            "predicted_quantile": -0.026369810104370117,
+            "proposal_margin": 0.0,
+            "violations": 45,
+            "batch_size": 600,
+            "empirical_risk": 0.075,
+            "risk_upper_bound": 0.10704163591192946,
+            "accepted": false,
+            "evaluation_risk": 0.07383333333333333
+          },
+          {
+            "round": 6,
+            "decision": [
+              6.5,
+              3.5
+            ],
+            "cost": 17.9,
+            "predicted_quantile": -0.001661539077758789,
+            "proposal_margin": 0.0,
+            "violations": 29,
+            "batch_size": 600,
+            "empirical_risk": 0.04833333333333333,
+            "risk_upper_bound": 0.07553990742735515,
+            "accepted": true,
+            "evaluation_risk": 0.06973333333333333
+          },
+          {
+            "round": 7,
+            "decision": [
+              5.8,
+              4.4
+            ],
+            "cost": 17.759999999999998,
+            "predicted_quantile": -0.0062749385833740234,
+            "proposal_margin": 0.0,
+            "violations": 39,
+            "batch_size": 600,
+            "empirical_risk": 0.065,
+            "risk_upper_bound": 0.09537822380570915,
+            "accepted": true,
+            "evaluation_risk": 0.06986666666666666
+          },
+          {
+            "round": 8,
+            "decision": [
+              6.0,
+              4.1000000000000005
+            ],
+            "cost": 17.740000000000002,
+            "predicted_quantile": -0.0220339298248291,
+            "proposal_margin": 0.0,
+            "violations": 45,
+            "batch_size": 600,
+            "empirical_risk": 0.075,
+            "risk_upper_bound": 0.10704163591192946,
+            "accepted": false,
+            "evaluation_risk": 0.0717
+          },
+          {
+            "round": 9,
+            "decision": [
+              6.5,
+              3.4000000000000004
+            ],
+            "cost": 17.759999999999998,
+            "predicted_quantile": -0.016638517379760742,
+            "proposal_margin": 0.0,
+            "violations": 44,
+            "batch_size": 600,
+            "empirical_risk": 0.07333333333333333,
+            "risk_upper_bound": 0.10510814547124726,
+            "accepted": false,
+            "evaluation_risk": 0.0752
+          },
+          {
+            "round": 10,
+            "decision": [
+              5.7,
+              4.6000000000000005
+            ],
+            "cost": 17.84,
+            "predicted_quantile": -0.0005948543548583984,
+            "proposal_margin": 0.0,
+            "violations": 45,
+            "batch_size": 600,
+            "empirical_risk": 0.075,
+            "risk_upper_bound": 0.10704163591192946,
+            "accepted": false,
+            "evaluation_risk": 0.0665
+          }
+        ],
+        "initial_samples": 2000,
+        "audit_samples": 6000,
+        "alpha": 0.1,
+        "delta": 0.05,
+        "per_round_error_probability": 0.005,
+        "approximate_oracle": {
+          "decision": [
+            5.66,
+            4.129672417266281
+          ],
+          "cost": 17.101541384172794,
+          "same_sample_risk": 0.1
+        }
+      }
+    ]
+  }
+}
