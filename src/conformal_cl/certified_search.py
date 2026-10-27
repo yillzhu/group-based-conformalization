@@ -23,6 +23,7 @@ class SearchConfig:
     batch_size: int = 500
     proposal_quantile: float = 0.95
     min_separation: float = 0.0
+    capacity_index: int | None = None
 
     def __post_init__(self):
         if not 0 < self.alpha < 1 or not 0 < self.delta < 1:
@@ -31,6 +32,11 @@ class SearchConfig:
             raise ValueError("rounds and batch_size must be positive")
         if not 0 < self.proposal_quantile < 1 or self.min_separation < 0:
             raise ValueError("invalid proposal settings")
+        if self.capacity_index is not None and (
+            isinstance(self.capacity_index, bool)
+            or not isinstance(self.capacity_index, (int, np.integer))
+        ):
+            raise ValueError("capacity_index must be an integer coordinate")
 
 
 def binomial_upper_bound(violations: int, size: int, error_probability: float) -> float:
@@ -79,18 +85,34 @@ def run_certified_search(
         raise ValueError("decisions must be finite")
     if not np.isfinite(initial_response).all():
         raise ValueError("responses must be finite")
+    if config.capacity_index is not None and not 0 <= config.capacity_index < candidates.shape[1]:
+        raise ValueError("capacity_index must name a decision coordinate")
+    if config.capacity_index is not None and candidates.shape[1] < 2:
+        raise ValueError("known capacity shift requires another decision coordinate")
 
     search_x, search_y = initial_x.copy(), initial_response.copy()
     audits = []
     selected = None
     tested = []
     for round_index in range(config.rounds):
+        if config.capacity_index is None:
+            model_x, model_y, candidate_x = search_x, search_y, candidates
+        else:
+            # When g(x, scenario) = R(x_without_capacity, scenario) - capacity,
+            # learn the random requirement R and retain the exact capacity
+            # coefficient. This changes only proposal quality, not the audit.
+            index = config.capacity_index
+            model_x = np.delete(search_x, index, axis=1)
+            model_y = search_y + search_x[:, index]
+            candidate_x = np.delete(candidates, index, axis=1)
         model = GradientBoostingRegressor(
             loss="quantile", alpha=config.proposal_quantile,
             n_estimators=120, learning_rate=0.06, max_depth=2,
             min_samples_leaf=20, random_state=round_index,
-        ).fit(search_x, search_y)
-        predicted_quantile = model.predict(candidates)
+        ).fit(model_x, model_y)
+        predicted_quantile = model.predict(candidate_x)
+        if config.capacity_index is not None:
+            predicted_quantile -= candidates[:, config.capacity_index]
         available = np.ones(len(candidates), dtype=bool)
         for previous in tested:
             distance = np.linalg.norm(candidates - previous, axis=1)

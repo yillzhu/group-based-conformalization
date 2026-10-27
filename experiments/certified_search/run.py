@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+from dataclasses import replace
 import json
 from pathlib import Path
 
@@ -70,7 +71,7 @@ def run_capacity(seed, config, training_size):
     return result
 
 
-def run_queue(seed, config, training_size, evaluation_size):
+def run_queue(seed, config, training_size, evaluation_size, *, structured=False):
     queue = ContinuousQueueConfig()
     lower, upper = np.array((4., 0.)), np.array((12., 9.))
     train_rng, audit_rng, evaluation_rng, oracle_rng = map(
@@ -91,7 +92,8 @@ def run_queue(seed, config, training_size, evaluation_size):
 
     result = run_certified_search(
         candidates=grid, costs=costs, initial_x=train_x, initial_response=response,
-        simulator=simulate, rng=audit_rng, config=config,
+        simulator=simulate, rng=audit_rng,
+        config=replace(config, capacity_index=1) if structured else config,
     )
     if result["audits"]:
         risks = continuous_queue_violation_probabilities(
@@ -121,10 +123,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--case", choices=("picture", "capacity", "queue", "all"), default="all")
     parser.add_argument("--seeds", type=int, default=3)
+    parser.add_argument("--seed-start", type=int, default=0)
     parser.add_argument("--training-size", type=int, default=2000)
     parser.add_argument("--batch-size", type=int, default=600)
     parser.add_argument("--rounds", type=int, default=10)
     parser.add_argument("--proposal-quantile", type=float, default=.95)
+    parser.add_argument("--queue-structured", action="store_true",
+                        help="learn the random requirement by dedicated FTE, using the exact -flexible FTE response shift")
     parser.add_argument("--evaluation-size", type=int, default=30000)
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
@@ -136,8 +141,9 @@ def main():
     for case in cases:
         function = {"picture": run_picture, "capacity": run_capacity, "queue": run_queue}[case]
         records = []
-        for seed in range(args.seeds):
-            record = (function(seed, config, args.training_size, args.evaluation_size)
+        for seed in range(args.seed_start, args.seed_start + args.seeds):
+            record = (function(seed, config, args.training_size, args.evaluation_size,
+                               structured=args.queue_structured)
                       if case == "queue" else function(seed, config, args.training_size))
             records.append(record)
         runs[case] = records

@@ -16,6 +16,8 @@ class CertifiedSearchTests(unittest.TestCase):
         self.assertEqual(binomial_upper_bound(100, 100, 0.05), 1)
         with self.assertRaises(ValueError):
             binomial_upper_bound(101, 100, 0.05)
+        with self.assertRaises(ValueError):
+            SearchConfig(capacity_index=1.5)
 
 
     def test_search_certifies_only_fresh_audited_decisions(self):
@@ -52,6 +54,24 @@ class CertifiedSearchTests(unittest.TestCase):
         )
         self.assertIsNone(result["selected"])
         self.assertFalse(any(audit["accepted"] for audit in result["audits"]))
+
+    def test_known_capacity_shift_learns_requirement(self):
+        dedicated = np.repeat(np.array([0., 1.]), 50)
+        flexible = np.tile(np.linspace(0., 9., 50), 2)
+        train_x = np.column_stack((dedicated, flexible))
+        candidates = np.column_stack((np.zeros(10), np.arange(10.)))
+
+        def simulator(decision, size, rng):
+            return np.full(size, 5. - decision[1])
+
+        result = run_certified_search(
+            candidates=candidates, costs=candidates[:, 1],
+            initial_x=train_x, initial_response=5. - flexible,
+            simulator=simulator, rng=np.random.default_rng(4),
+            config=SearchConfig(rounds=1, batch_size=100, capacity_index=1),
+        )
+        self.assertEqual(result["selected"]["decision"], [0., 5.])
+        self.assertAlmostEqual(result["audits"][0]["predicted_quantile"], 0.)
 
 
 if __name__ == "__main__":
