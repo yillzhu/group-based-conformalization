@@ -203,3 +203,45 @@ then the figure with Matplotlib available:
 python experiments/coverage_picture/direct_quantile.py
 python experiments/coverage_picture/plot_direct_quantile.py
 ```
+
+## Learning residual regions with a tree
+
+`residual_tree_quantile.py` tests a learned-partition version of the binned
+model. It fits the same piecewise-linear conditional mean as the RCC baseline
+from 240 training observations. A regression tree then splits on squared
+training residuals, seeking regions of different residual magnitude. Within
+each leaf, the empirical *signed* residual tenth percentile becomes an offset
+to the smooth mean. Three-fold training-only pinball validation chooses the
+maximum number of leaves from `1, 2, 3, 4, 6, 8` and the minimum leaf size
+from `10, 20`. Finally, a separate set of 240 observations supplies one
+global, one-sided conformal correction. No true boundaries are given to the
+tree or its validation procedure.
+
+On the first sample, validation selects six leaves. The tree cuts at
+`0.2544, 0.5009, 0.5934, 0.7556, 0.8924`: it nearly recovers all three
+true scale-change locations (`0.25, 0.5, 0.75`), while making two extra
+splits. Its optimized decision is `x=0.1375` with 8.2% true risk. RCC chooses
+`x=0.1303` with 13.8% true risk on the same sample.
+
+| Method, 100 seeds | Solutions | Mean chosen `x` | Mean true risk | Chosen points at or below 10% risk |
+| --- | ---: | ---: | ---: | ---: |
+| Residual tree, uncalibrated | 99/100 | 0.1470 | 6.0% | 75/99 |
+| Residual tree + global correction | 100/100 | 0.1576 | 2.6% | 92/100 |
+| RCC | 100/100 | 0.1446 | 4.1% | 90/100 |
+
+The calibrated tree is safer in this experiment, but pays about `0.013` more
+in mean decision cost than RCC. Its cuts fall within `0.025` of the true noise
+boundaries in 46/100, 83/100, and 89/100 runs respectively, ordered from
+left to right; all three are found in 32/100 runs. The smaller jump at `0.25`
+is hardest to identify. These cut-recovery statistics use the true boundaries
+only **after** fitting, for diagnosis. The result supports the idea that a
+prediction-driven partition can compete with RCC in this simple setting, but
+neither its regional quantile estimates nor its selected decisions have a
+pointwise conformal guarantee.
+
+![Learned residual-tree regions and first-sample decisions](figures/residual-tree.png)
+
+```bash
+python experiments/coverage_picture/residual_tree_quantile.py
+python experiments/coverage_picture/plot_residual_tree.py
+```
