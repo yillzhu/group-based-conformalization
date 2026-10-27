@@ -1,6 +1,7 @@
 """Checks for the independent pointwise audit, not an RCC guarantee."""
 
 import numpy as np
+import importlib.util
 import unittest
 
 from conformal_cl.certified_search import (
@@ -72,6 +73,27 @@ class CertifiedSearchTests(unittest.TestCase):
         )
         self.assertEqual(result["selected"]["decision"], [0., 5.])
         self.assertAlmostEqual(result["audits"][0]["predicted_quantile"], 0.)
+
+    @unittest.skipUnless(importlib.util.find_spec("torch"), "PyTorch not installed")
+    def test_neural_proposals_still_require_independent_audit(self):
+        rng = np.random.default_rng(8)
+        x = rng.uniform(0, 1, (200, 2))
+        y = 1. - x[:, 0] - x[:, 1]
+        grid = np.column_stack((np.linspace(0, 1, 20), np.linspace(0, 1, 20)))
+        result = run_certified_search(
+            candidates=grid, costs=grid.sum(axis=1), initial_x=x,
+            initial_response=y,
+            simulator=lambda decision, size, audit_rng: np.full(
+                size, 1. - decision.sum()),
+            rng=np.random.default_rng(9),
+            config=SearchConfig(
+                proposal_model="neural", rounds=2, batch_size=100,
+                neural_initial_epochs=50, neural_update_epochs=10,
+            ),
+        )
+        self.assertEqual(len(result["audits"]), 2)
+        self.assertTrue(all(np.isfinite(a["predicted_quantile"]) for a in result["audits"]))
+        self.assertTrue(all(a["risk_upper_bound"] <= .1 for a in result["audits"] if a["accepted"]))
 
 
 if __name__ == "__main__":

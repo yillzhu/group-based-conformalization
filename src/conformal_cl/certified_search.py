@@ -24,6 +24,10 @@ class SearchConfig:
     proposal_quantile: float = 0.95
     min_separation: float = 0.0
     capacity_index: int | None = None
+    proposal_model: str = "tree"
+    audit_guidance: bool = False
+    neural_initial_epochs: int = 300
+    neural_update_epochs: int = 40
 
     def __post_init__(self):
         if not 0 < self.alpha < 1 or not 0 < self.delta < 1:
@@ -37,6 +41,12 @@ class SearchConfig:
             or not isinstance(self.capacity_index, (int, np.integer))
         ):
             raise ValueError("capacity_index must be an integer coordinate")
+        if self.proposal_model not in ("tree", "neural"):
+            raise ValueError("unknown proposal model")
+        if self.neural_initial_epochs < 1 or self.neural_update_epochs < 1:
+            raise ValueError("neural epochs must be positive")
+        if self.proposal_model == "neural" and self.capacity_index is not None:
+            raise ValueError("neural comparison must not use the known capacity shift")
 
 
 def binomial_upper_bound(violations: int, size: int, error_probability: float) -> float:
@@ -67,8 +77,6 @@ def run_certified_search(
     the current audit data nor its RNG may enter the current proposal.
     """
 
-    from sklearn.ensemble import GradientBoostingRegressor
-
     candidates = np.asarray(candidates, dtype=float)
     costs = np.asarray(costs, dtype=float).reshape(-1)
     initial_x = np.asarray(initial_x, dtype=float)
@@ -94,6 +102,8 @@ def run_certified_search(
     audits = []
     selected = None
     tested = []
+    guidance_margin = 0.0
+    neural_model = None
     for round_index in range(config.rounds):
         if config.capacity_index is None:
             model_x, model_y, candidate_x = search_x, search_y, candidates
@@ -105,11 +115,26 @@ def run_certified_search(
             model_x = np.delete(search_x, index, axis=1)
             model_y = search_y + search_x[:, index]
             candidate_x = np.delete(candidates, index, axis=1)
-        model = GradientBoostingRegressor(
-            loss="quantile", alpha=config.proposal_quantile,
-            n_estimators=120, learning_rate=0.06, max_depth=2,
-            min_samples_leaf=20, random_state=round_index,
-        ).fit(model_x, model_y)
+        if config.proposal_model == "neural":
+            from conformal_cl.neural_quantile_search import NeuralQuantileSearchModel
+
+            if neural_model is None:
+                neural_model = NeuralQuantileSearchModel(
+                    model_x, model_y, config.proposal_quantile, seed=0,
+                )
+            model = neural_model.fit(
+                model_x, model_y,
+                epochs=(config.neural_initial_epochs if round_index == 0
+                        else config.neural_update_epochs),
+            )
+        else:
+            from sklearn.ensemble import GradientBoostingRegressor
+
+            model = GradientBoostingRegressor(
+                loss="quantile", alpha=config.proposal_quantile,
+                n_estimators=120, learning_rate=0.06, max_depth=2,
+                min_samples_leaf=20, random_state=round_index,
+            ).fit(model_x, model_y)
         predicted_quantile = model.predict(candidate_x)
         if config.capacity_index is not None:
             predicted_quantile -= candidates[:, config.capacity_index]
@@ -119,7 +144,7 @@ def run_certified_search(
             available &= distance > config.min_separation + 1e-12
         if not np.any(available):
             break
-        predicted_feasible = available & (predicted_quantile <= 0)
+        predicted_feasible = available & (predicted_quantile <= -guidance_margin)
         if np.any(predicted_feasible):
             index = min(np.flatnonzero(predicted_feasible), key=lambda i: (costs[i], i))
         else:
@@ -139,6 +164,7 @@ def run_certified_search(
         audit = {
             "round": round_index + 1, "decision": proposal.tolist(),
             "cost": float(costs[index]), "predicted_quantile": float(predicted_quantile[index]),
+            "proposal_margin": float(guidance_margin),
             "violations": violations, "batch_size": config.batch_size,
             "empirical_risk": violations / config.batch_size,
             "risk_upper_bound": upper, "accepted": bool(accepted),
@@ -146,6 +172,13 @@ def run_certified_search(
         audits.append(audit)
         if accepted and (selected is None or audit["cost"] < selected["cost"]):
             selected = audit
+        if config.audit_guidance and not accepted:
+            # A failed audit can reveal optimism at the point just tested.
+            # Transfer half that observed response-quantile discrepancy as a
+            # global *proposal* margin. It has no validity role whatsoever.
+            empirical_quantile = float(np.quantile(response, config.proposal_quantile))
+            discrepancy = max(0.0, empirical_quantile - predicted_quantile[index])
+            guidance_margin = max(guidance_margin, 0.5 * discrepancy)
         search_x = np.vstack((search_x, np.repeat(proposal[None, :], config.batch_size, axis=0)))
         search_y = np.concatenate((search_y, response))
     return {

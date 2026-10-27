@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Non-RCC, boosted-quantile proposal search with fresh pointwise audits."""
+"""Non-RCC quantile proposal search with fresh pointwise audits."""
 
 from __future__ import annotations
 
@@ -128,14 +128,23 @@ def main():
     parser.add_argument("--batch-size", type=int, default=600)
     parser.add_argument("--rounds", type=int, default=10)
     parser.add_argument("--proposal-quantile", type=float, default=.95)
+    parser.add_argument("--proposal-model", choices=("tree", "neural"), default="tree")
+    parser.add_argument("--audit-guidance", action="store_true")
+    parser.add_argument("--neural-initial-epochs", type=int, default=300)
+    parser.add_argument("--neural-update-epochs", type=int, default=40)
     parser.add_argument("--queue-structured", action="store_true",
                         help="learn the random requirement by dedicated FTE, using the exact -flexible FTE response shift")
     parser.add_argument("--evaluation-size", type=int, default=30000)
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
+    if args.queue_structured and args.proposal_model == "neural":
+        parser.error("the neural comparison does not use the known capacity shift")
     config = SearchConfig(rounds=args.rounds, batch_size=args.batch_size,
                           proposal_quantile=args.proposal_quantile,
-                          min_separation=.01)
+                          min_separation=.01, proposal_model=args.proposal_model,
+                          audit_guidance=args.audit_guidance,
+                          neural_initial_epochs=args.neural_initial_epochs,
+                          neural_update_epochs=args.neural_update_epochs)
     cases = ("picture", "capacity", "queue") if args.case == "all" else (args.case,)
     runs = {}
     for case in cases:
@@ -147,7 +156,7 @@ def main():
                       if case == "queue" else function(seed, config, args.training_size))
             records.append(record)
         runs[case] = records
-    payload = {"method": "boosted_quantile_proposals_with_independent_binomial_audits",
+    payload = {"method": f"{args.proposal_model}_quantile_proposals_with_independent_binomial_audits",
                "config": vars(args) | {"output": str(args.output) if args.output else None},
                "risk_alpha": config.alpha, "confidence_delta": config.delta,
                "results": runs}
