@@ -148,3 +148,58 @@ tenth percentile is `f(x)-0.8 sigma(x)`, giving the oracle decision `0.1352`.
 Unlike the fixed-bin comparisons, fitting such a model well from only 240
 training observations—especially near the abrupt scale changes—is a separate
 statistical task, not something established by this experiment.
+
+## Directly learned conditional quantiles
+
+`direct_quantile.py` carries out that test with the same 240 training and 240
+calibration observations per seed. It fits two lower-tenth-quantile model
+classes from training data alone:
+
+1. Gradient-boosted quantile regression, with depth 1--3 and minimum leaf
+   size 10 or 20 chosen by three-fold training-only pinball-loss validation.
+2. A piecewise-linear fitted mean plus an empirical lower residual quantile in
+   equal-width bins. Three-fold validation chooses among 2, 4, 5, 8, 10, and
+   16 bins. A sensitivity model restricts the choice to 2, 5, or 10 bins, so
+   no candidate has all three true quarter boundaries as bin edges.
+
+Each fitted lower quantile `qhat(x)` then receives a **single**, independent,
+one-sided split-conformal correction: the adjusted 90%-level order statistic
+of `qhat(X_i)-Y_i` on the calibration sample (using the same extra `1/n`
+level adjustment as the RCC code). The optimizer chooses the least
+`x` for which `qhat(x)-correction >= 0.35`. No true response function or noise
+boundary enters training, validation, calibration, or optimization. The
+known simulation law is used only to report the chosen point's true risk.
+
+| Method, 100 seeds | Solutions | Mean chosen `x` when returned | Mean true risk when returned | Chosen points at or below 10% risk |
+| --- | ---: | ---: | ---: | ---: |
+| Boosted lower quantile + global correction | 91/100 | 0.1342 | 12.8% | 46/91 |
+| Binned lower quantile + global correction | 100/100 | 0.1437 | 4.8% | 85/100 |
+| Binned quantile, no quarter-aligned candidates | 100/100 | 0.1452 | 4.3% | 86/100 |
+| RCC | 100/100 | 0.1446 | 4.1% | 90/100 |
+
+The binned direct-quantile approach is essentially tied with RCC in mean
+decision cost and risk on this intentionally simple problem; removing exactly
+quarter-aligned bin models barely changes that conclusion. The boosted-tree
+model has better average decision cost only because it often chooses unsafe
+points. Its global correction does not repair a local quantile error right
+where optimization selects. The first sample makes this visible: the boosted
+model selects `x=0.129` with 14.9% true risk, while the calibrated binned
+model selects `x=0.1397` with 6.6% true risk. RCC selects `x=0.1303` with
+13.8% true risk on that same draw.
+
+These are empirical comparisons, not claims of pointwise coverage. In
+particular, one-sided split conformal guarantees a marginal statement before
+optimization; it does not guarantee a 10% chance constraint at an adaptively
+chosen `x`. The two direct-model classes also illustrate why a claim that
+"a good ML model eliminates RCC" needs a quantitative account of model
+quality **near the optimizer's choice**, not just an average validation loss.
+
+![Learned conditional quantiles and first-sample decisions](figures/direct-quantile.png)
+
+With scikit-learn in the project environment, regenerate the JSON results and
+then the figure with Matplotlib available:
+
+```bash
+python experiments/coverage_picture/direct_quantile.py
+python experiments/coverage_picture/plot_direct_quantile.py
+```
