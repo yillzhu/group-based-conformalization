@@ -96,3 +96,49 @@ Reproduce the neural confirmation with:
 .venv/bin/python experiments/certified_search/run.py --case queue --seed-start 40 --seeds 100 --proposal-model neural --output experiments/certified_search/results/queue-neural-plain-seeds40-139.json
 .venv/bin/python experiments/certified_search/run.py --case queue --seed-start 40 --seeds 100 --proposal-model neural --proposal-quantile .93 --output experiments/certified_search/results/queue-neural-q93-seeds40-139.json
 ```
+
+## Tests beyond staffing
+
+`run_other_examples.py` applies the **same unstructured neural proposal model and independent pointwise audit**, at the prespecified 95th-percentile proposal target, to two other simulator-backed families. A raw boosted tree is run on the same seeds as a comparator. Each search starts with 2,000 full-domain observations and has ten audits of 600 fresh outcomes; the risk target is 10% and the confidence error budget is 5% per quadratic instance or complete tuition policy. No RCC method is called.
+
+These are carefully scoped variants, not claims about the original chapter's data:
+
+- **Quadratics.** The original Section 4.5 constraint is deterministic, observed with noise, so its true-feasibility check is not a chance constraint. Here we retain the original random coefficient *distributions* for objective and constraint, but define a stochastic response \(g(x,\xi)=\bar g(x)+\sigma Z\), where \(Z\) is standard normal and \(\sigma=0.2\operatorname{sd}_{X\sim U([-1,1]^d)}\bar g(X)\). The operational target is \(P(g(x,\xi)>0)\leq 0.1\), whose exact risk is \(\Phi(\bar g(x)/\sigma)\). Search and oracle both use a documented mesh of 801 points in 1-D, \(81^2\) in 2-D, or \(31^3\) in 3-D; no continuous global-optimality claim is made. Random instances with no chance-feasible mesh point are reported separately.
+- **Tuition.** The historical JANOS observations cannot supply new cohorts at an offer selected by the optimizer. Instead we use the repository's published synthetic tuition oracle: for each of 12 fixed applicant segments, a fresh cohort enrollment count is binomial at the selected merit offer. The operational event is enrollment rate below \(\theta=0.4\). This is the synthetic oracle benchmark's predictive target, not the historical experiment's \(\theta=0.17\). Merit costs are in thousands of dollars. The 5% confidence budget is divided equally across the 12 segments, so the entire returned tuition policy—not merely each segment in isolation—has a simultaneous 95% pointwise risk certificate if all segments certify.
+
+Fresh seed ranges, using the same initial training draws and audit RNG streams for the two proposal models, gave:
+
+| Stochastic quadratic, seeds 10–39 | Chance-feasible instances | Certified, neural | Certified, tree | Mean objective gap on active certified instances, neural / tree |
+| --- | ---: | ---: | ---: | ---: |
+| One-dimensional | 22/30 | 21/22 | 20/22 | 0.063 / 0.127 |
+| Two-dimensional | 24/30 | 24/24 | 24/24 | 0.189 / 0.974 |
+| Three-dimensional | 29/30 | 29/29 | 27/29 | 0.245 / 3.991 |
+
+The last column restricts to instances where the chance constraint changes the mesh optimum (11 feasible instances in 1-D, 16 in 2-D, and 18 in 3-D). No certified point in these runs exceeded 10% **exact** risk. The gap values are in each random quadratic objective's units, not a common monetary scale. The 1-D and 3-D comparisons condition on different certified subsets; the 2-D comparison uses all 16 active instances.
+
+For synthetic tuition on seeds 5–14:
+
+| Proposal model | Certified segment decisions | Complete 12-segment policies | Mean merit gap among certified segments |
+| --- | ---: | ---: | ---: |
+| Neural 95th percentile | 120/120 | 10/10 | \$444 |
+| Boosted-tree 95th percentile | 115/120 | 7/10 | \$790 |
+
+On the 115 segments certified by both, the tree's offer was \$351 higher on average. The neural policies' cohort-weighted mean merit was \$8,569, versus \$8,243 for the exact predictive-risk mesh oracle. All 120 neural selections had exact risks below 10% in this study. These results support the usefulness of smooth structure-free proposals in these *simulatable* variants; they do not establish an advantage on the original observational tuition dataset or the deterministic quadratic benchmark.
+
+Reproduce with:
+
+```bash
+for case in quadratic1 quadratic2 quadratic3; do
+  for model in neural tree; do
+    .venv/bin/python experiments/certified_search/run_other_examples.py \
+      --case "$case" --proposal-model "$model" \
+      --seed-start 10 --seeds 30
+  done
+done
+for model in neural tree; do
+  .venv/bin/python experiments/certified_search/run_other_examples.py \
+    --case tuition --proposal-model "$model" --seed-start 5 --seeds 10
+done
+```
+
+The saved JSON in `results/` contains every audit count, upper confidence bound, selected point, and exact-risk evaluation. The independent simulation assumption remains indispensable: without the ability to generate new outcomes at a chosen decision, the pointwise certificate does not follow.
